@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">SchoolInforApplication</string>
+
+    <!--login-->
+    <string name="skip">跳过</string>
+    <string name="hint_login_name">请输入你的手机号</string>
+    <string name="hint_login_password">请输入密码</string>
+    <string name="btn_login">登录</string>
+    <string name="btn_register">注册</string>
+
+    <!--register code-->
+    <string name="hint_register_name">请输入手机号</string>
+    <string name="hint_register_password">请输入6位及以上的字符</string>
+    <string name="register_next">下一步</string>
+    
+    <!--register-->
+    <string name="hint_register_realname">请输入你的真实姓名</string>
+    <string name="hint_department">请选择你所在系</string>
+    <string name="hint_class">请选择你所在班级</string>
+    <string name="hint_student_id">请输入你的学号</string>
+    <string name="hint_nation">请选择你所属民族</string>
+    <string name="hint_birthday">请选择你的出生日期</string>
+    <string name="hint_address">请输入你的家庭住址</string>
+    <string name="hint_hobby">请输入你的兴趣爱好</string>
+</resources>
