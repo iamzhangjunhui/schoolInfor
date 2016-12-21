@@ -1,10 +1,12 @@
 package com.cdxy.schoolinforapplication.ui.load;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -15,6 +17,8 @@ import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ui.ChooseInfor.ChooseInforActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
+
+import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -92,6 +96,15 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
              intent.putExtra("flagSelectInforFrom",Constant.FLAG_REQURST_FROM_NATION);
              startActivityForResult(intent, Constant.REQUEST_CODE_CHOOSENATION);
              break;
+         case R.id.txt_birthday:
+             Calendar calendar=Calendar.getInstance();
+             new DatePickerDialog(RegisterActivity.this, new DatePickerDialog.OnDateSetListener() {
+                 @Override
+                 public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                     txtBirthday.setText(i+"年"+(i1+1)+"月"+ i2+"日");
+                 }
+             },calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH)).show();
+             break;
          default:
              break;
      }
@@ -112,10 +125,11 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                     txtClass.setText(clazz);
             }
         }
-        if (requestCode==Constant.REQUEST_CODE_CHOOSENATION&&resultCode==Constant.RESULT_CODE_CHOOSENATION);
-             String nation=data.getStringExtra("nation");
-             if (!TextUtils.isEmpty(nation)){
-                     txtNation.setText(nation);
-             }
+        if (requestCode==Constant.REQUEST_CODE_CHOOSENATION&&resultCode==Constant.RESULT_CODE_CHOOSENATION) {
+            String nation = data.getStringExtra("nation");
+            if (!TextUtils.isEmpty(nation)) {
+                txtNation.setText(nation);
+            }
+        }
     }
 }

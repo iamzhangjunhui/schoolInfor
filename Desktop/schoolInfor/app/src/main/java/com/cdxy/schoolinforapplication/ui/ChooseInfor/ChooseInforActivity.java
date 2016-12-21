@@ -21,7 +21,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
+//系、班级、民族的选择
 public class ChooseInforActivity extends BaseActivity implements View.OnClickListener {
 
     @BindView(R.id.img_back)
@@ -51,6 +51,7 @@ public class ChooseInforActivity extends BaseActivity implements View.OnClickLis
         Intent intent=getIntent();
         flagSelectInforFrom=intent.getStringExtra("flagSelectInforFrom");
         selectDepartment=intent.getStringExtra("department");
+        //选择系
         if (flagSelectInforFrom.equals(Constant.FLAG_REQURST_FROM_DEPARTMENT)) {
             txtTitle.setText("选择系");
             arrayAdapter = new Text1Adapter(ChooseInforActivity.this, getResources().getStringArray(R.array.department));
@@ -67,6 +68,7 @@ public class ChooseInforActivity extends BaseActivity implements View.OnClickLis
                     }
                 }
             });
+            //选择班级
         }else if (flagSelectInforFrom.equals(Constant.FLAG_REQURST_FROM_CLASS)){
             txtTitle.setText("选择班级");
             listClass=new ArrayList<>();
@@ -126,6 +128,7 @@ public class ChooseInforActivity extends BaseActivity implements View.OnClickLis
                     }
                 }
             });
+            //选择民族
         }else {
             txtTitle.setText("选择民族");
             arrayAdapter=new Text1Adapter(ChooseInforActivity.this,getResources().getStringArray(R.array.nation));
