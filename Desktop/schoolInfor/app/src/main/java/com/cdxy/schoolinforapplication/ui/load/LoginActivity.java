@@ -1,6 +1,8 @@
 package com.cdxy.schoolinforapplication.ui.load;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -45,8 +47,21 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.btn_register:
-                intent = new Intent(LoginActivity.this, RegisterCodeActivity.class);
-                startActivity(intent);
+                new AlertDialog.Builder(LoginActivity.this).setMessage("只有学生才需要注册，老师的账号学校已经配好，详情可以咨询教务处")
+                .setNegativeButton("我是老师", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).setPositiveButton("我是学生", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(LoginActivity.this, RegisterCodeActivity.class);
+                        startActivity(intent);
+                        dialogInterface.dismiss();
+                    }
+                }).create().show();
+
                 break;
             default:
                 break;

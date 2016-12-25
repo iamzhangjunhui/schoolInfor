@@ -23,4 +23,9 @@
     <string name="hint_address">请输入你的家庭住址</string>
     <string name="hint_hobby">请输入你的兴趣爱好</string>
     <string name="submit_register">确认</string>
+
+    <!--my-->
+    <string name="my_information">我的个人信息</string>
+    <string name="my_modify_psw">修改密码</string>
+    <string name="exit">退出登录</string>
 </resources>
