@@ -13,7 +13,6 @@ import java.util.Stack;
 
 public class SchoolInforManager extends Application {
     private static Context context;
-    private static Stack<Activity> activityStack;
     private static SchoolInforManager application;
 
 public static SchoolInforManager getInstance(){

@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
 
 import butterknife.BindView;
@@ -32,6 +33,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+        ScreenManager.getScreenManager().pushActivity(this);
 
     }
 

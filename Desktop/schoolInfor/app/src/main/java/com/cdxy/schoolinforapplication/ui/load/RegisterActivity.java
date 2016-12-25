@@ -14,6 +14,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.ui.ChooseInfor.ChooseInforActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
@@ -53,79 +54,82 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     EditText edtAddress;
     @BindView(R.id.edt_hobby)
     EditText edtHobby;
+    @BindView(R.id.submit_register)
+    Button submitRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
+        ScreenManager.getScreenManager().pushActivity(this);
         initView();
     }
 
     @Override
     public void initView() {
-    txtTitle.setText("注册");
+        txtTitle.setText("注册");
 
     }
 
     @Override
     public void onClick(View view) {
-     switch (view.getId()){
-         case R.id.img_back:
-             finish();
-             break;
-         case R.id.txt_department:
-             Intent intent=new Intent(RegisterActivity.this, ChooseInforActivity.class);
-             intent.putExtra("flagSelectInforFrom",Constant.FLAG_REQURST_FROM_DEPARTMENT);
-             startActivityForResult(intent, Constant.REQUEST_CODE_CHOOSEDEPARTMENT);
-             break;
-         case R.id.txt_class:
-             intent=new Intent(RegisterActivity.this, ChooseInforActivity.class);
-             intent.putExtra("flagSelectInforFrom",Constant.FLAG_REQURST_FROM_CLASS);
-             String department=txtDepartment.getText().toString();
-             if (TextUtils.isEmpty(department)){
-                 toast("请先选择你所在系");
-                 return;
-             }else {
-                 intent.putExtra("department",department);
-                 startActivityForResult(intent, Constant.REQUEST_CODE_CHOOSECLASS);
-             }
-             break;
-         case R.id.txt_nation:
-             intent=new Intent(RegisterActivity.this, ChooseInforActivity.class);
-             intent.putExtra("flagSelectInforFrom",Constant.FLAG_REQURST_FROM_NATION);
-             startActivityForResult(intent, Constant.REQUEST_CODE_CHOOSENATION);
-             break;
-         case R.id.txt_birthday:
-             Calendar calendar=Calendar.getInstance();
-             new DatePickerDialog(RegisterActivity.this, new DatePickerDialog.OnDateSetListener() {
-                 @Override
-                 public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                     txtBirthday.setText(i+"年"+(i1+1)+"月"+ i2+"日");
-                 }
-             },calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH)).show();
-             break;
-         default:
-             break;
-     }
+        switch (view.getId()) {
+            case R.id.img_back:
+                ScreenManager.getScreenManager().popActivty(this);
+                break;
+            case R.id.txt_department:
+                Intent intent = new Intent(RegisterActivity.this, ChooseInforActivity.class);
+                intent.putExtra("flagSelectInforFrom", Constant.FLAG_REQURST_FROM_DEPARTMENT);
+                startActivityForResult(intent, Constant.REQUEST_CODE_CHOOSEDEPARTMENT);
+                break;
+            case R.id.txt_class:
+                intent = new Intent(RegisterActivity.this, ChooseInforActivity.class);
+                intent.putExtra("flagSelectInforFrom", Constant.FLAG_REQURST_FROM_CLASS);
+                String department = txtDepartment.getText().toString();
+                if (TextUtils.isEmpty(department)) {
+                    toast("请先选择你所在系");
+                    return;
+                } else {
+                    intent.putExtra("department", department);
+                    startActivityForResult(intent, Constant.REQUEST_CODE_CHOOSECLASS);
+                }
+                break;
+            case R.id.txt_nation:
+                intent = new Intent(RegisterActivity.this, ChooseInforActivity.class);
+                intent.putExtra("flagSelectInforFrom", Constant.FLAG_REQURST_FROM_NATION);
+                startActivityForResult(intent, Constant.REQUEST_CODE_CHOOSENATION);
+                break;
+            case R.id.txt_birthday:
+                Calendar calendar = Calendar.getInstance();
+                new DatePickerDialog(RegisterActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                        txtBirthday.setText(i + "年" + (i1 + 1) + "月" + i2 + "日");
+                    }
+                }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==Constant.REQUEST_CODE_CHOOSEDEPARTMENT&&resultCode==Constant.RESULT_CODE_CHOOSEDEPARTMENT) {
+        if (requestCode == Constant.REQUEST_CODE_CHOOSEDEPARTMENT && resultCode == Constant.RESULT_CODE_CHOOSEDEPARTMENT) {
             String department = data.getStringExtra("department");
             if (!TextUtils.isEmpty(department)) {
                 txtDepartment.setText(department);
             }
         }
-        if (requestCode==Constant.REQUEST_CODE_CHOOSECLASS&&resultCode==Constant.RESULT_CODE_CHOOSECLASS){
-            String clazz=data.getStringExtra("clazz");
-            if (!TextUtils.isEmpty(clazz)){
-                    txtClass.setText(clazz);
+        if (requestCode == Constant.REQUEST_CODE_CHOOSECLASS && resultCode == Constant.RESULT_CODE_CHOOSECLASS) {
+            String clazz = data.getStringExtra("clazz");
+            if (!TextUtils.isEmpty(clazz)) {
+                txtClass.setText(clazz);
             }
         }
-        if (requestCode==Constant.REQUEST_CODE_CHOOSENATION&&resultCode==Constant.RESULT_CODE_CHOOSENATION) {
+        if (requestCode == Constant.REQUEST_CODE_CHOOSENATION && resultCode == Constant.RESULT_CODE_CHOOSENATION) {
             String nation = data.getStringExtra("nation");
             if (!TextUtils.isEmpty(nation)) {
                 txtNation.setText(nation);

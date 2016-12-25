@@ -24,7 +24,7 @@
                     android:layout_height="match_parent"
                     android:textSize="@dimen/content_text_size"
                     android:textColor="@color/text_color"
-                    android:text="姓  名："
+                    android:text="姓       名："
                     android:gravity="center_vertical"/>
                 <EditText
                     android:id="@+id/edt_realname"
@@ -54,7 +54,7 @@
                     android:layout_height="match_parent"
                     android:textSize="@dimen/content_text_size"
                     android:textColor="@color/text_color"
-                    android:text="所在系："
+                    android:text=" 所 在 系："
                     android:gravity="center_vertical"/>
 
                 <TextView
@@ -88,7 +88,7 @@
                     android:layout_height="match_parent"
                     android:textSize="@dimen/content_text_size"
                     android:textColor="@color/text_color"
-                    android:text="班    级："
+                    android:text="班       级："
                     android:gravity="center_vertical"/>
                 <TextView
                     android:id="@+id/txt_class"
@@ -120,7 +120,7 @@
                     android:layout_height="match_parent"
                     android:textSize="@dimen/content_text_size"
                     android:textColor="@color/text_color"
-                    android:text="学  号："
+                    android:text="学       号："
                     android:gravity="center_vertical"/>
                 <EditText
                     android:id="@+id/edt_student_id"
@@ -150,7 +150,7 @@
                     android:layout_height="match_parent"
                     android:textSize="@dimen/content_text_size"
                     android:textColor="@color/text_color"
-                    android:text="性  别："
+                    android:text="性       别："
                     android:gravity="center_vertical"/>
                 <RadioGroup
                     android:id="@+id/rg_sex"
@@ -197,6 +197,7 @@
                     android:textColor="@color/text_color"
                     android:text="出生年月："
                     android:gravity="center_vertical"/>
+
                 <TextView
                     android:onClick="onClick"
                     android:clickable="true"
@@ -220,7 +221,7 @@
                     android:layout_height="match_parent"
                     android:textSize="@dimen/content_text_size"
                     android:textColor="@color/text_color"
-                    android:text="民  族："
+                    android:text="民       族："
                     android:gravity="center_vertical"/>
                 <TextView
                     android:onClick="onClick"
@@ -282,6 +283,8 @@
                     android:gravity="center_vertical"/>
             </LinearLayout>
             <Button
+                android:onClick="onClick"
+                android:id="@+id/submit_register"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@color/top_color"

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.adapter.Text1Adapter;
 import com.cdxy.schoolinforapplication.adapter.Text1ListAdapter;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
@@ -43,6 +44,7 @@ public class ChooseInforActivity extends BaseActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_infor);
         ButterKnife.bind(this);
+        ScreenManager.getScreenManager().pushActivity(this);
         initView();
     }
 
@@ -152,7 +154,7 @@ public class ChooseInforActivity extends BaseActivity implements View.OnClickLis
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.img_back:
-                finish();
+               ScreenManager.getScreenManager().popActivty(this);
         }
     }
 }

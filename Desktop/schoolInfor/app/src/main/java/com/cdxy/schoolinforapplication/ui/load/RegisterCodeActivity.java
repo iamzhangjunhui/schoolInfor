@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
 import com.cdxy.schoolinforapplication.util.NumberCheckUtil;
@@ -40,6 +41,7 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_code);
         ButterKnife.bind(this);
+        ScreenManager.getScreenManager().pushActivity(this);
         initView();
     }
 
@@ -87,7 +89,7 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
                 startActivity(intent);
                 break;
             case R.id.img_back:
-                finish();
+                ScreenManager.getScreenManager().popActivty(this);
                 break;
             default:
                 break;
