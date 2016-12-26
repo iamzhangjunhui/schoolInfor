@@ -25,7 +25,10 @@
         <activity android:name=".ui.base.BaseActivity" />
         <activity android:name=".ui.load.RegisterActivity" />
         <activity android:name=".ui.load.RegisterCodeActivity" />
-        <activity android:name=".ui.ChooseInfor.ChooseInforActivity"></activity>
+        <activity android:name=".ui.ChooseInfor.ChooseInforActivity" />
+        <activity android:name=".ui.my.MyInformationActivity" />
+        <activity android:name=".ui.my.ModifyMyInforActivity" />
+        <activity android:name=".ui.my.ModifyMyPswActivity"></activity>
     </application>
 
 </manifest>

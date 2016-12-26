@@ -45,11 +45,11 @@ public class ChooseInforActivity extends BaseActivity implements View.OnClickLis
         setContentView(R.layout.activity_choose_infor);
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
-        initView();
+        init();
     }
 
     @Override
-    public void initView() {
+    public void init() {
         Intent intent=getIntent();
         flagSelectInforFrom=intent.getStringExtra("flagSelectInforFrom");
         selectDepartment=intent.getStringExtra("department");

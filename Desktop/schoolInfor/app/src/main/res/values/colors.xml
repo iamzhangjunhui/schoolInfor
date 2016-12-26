@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<color name="top_color">#05b16f</color>
+<color name="top_color">#8dd4e6</color>
     <color name="text_color">#302f2f</color>
     <color name="backgroud_text_must_fill">#ed0707</color>
     <color name="txt_departent_class_color">#f9e908</color>
     <color name="white">#ffffff</color>
     <color name="diliver">#c6c2c2</color>
+    <color name="my_background_color">@color/top_color</color>
 </resources>

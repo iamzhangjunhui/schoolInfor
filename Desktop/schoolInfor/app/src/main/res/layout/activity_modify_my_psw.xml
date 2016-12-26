@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_modify_my_psw"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/my_background_color"
+    tools:context="com.cdxy.schoolinforapplication.ui.my.ModifyMyPswActivity">
+<include layout="@layout/view_title_my"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/add_white_border"
+        android:layout_marginTop="40dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="@string/my_psw"
+            android:layout_marginLeft="10dp"
+            android:textSize="@dimen/text_size"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:layout_height="match_parent" />
+
+        <EditText
+            android:id="@+id/edt_my_psw"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:layout_marginLeft="5dp"
+            android:textSize="@dimen/text_size"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:hint="@string/hint_my_psw"
+            android:textColorHint="@color/white"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/add_white_border"
+        android:layout_marginTop="20dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:text=" 新   密   码："
+            android:layout_marginLeft="10dp"
+            android:textSize="@dimen/text_size"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:layout_height="match_parent" />
+
+        <EditText
+            android:id="@+id/edt_new_psw"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:layout_marginLeft="5dp"
+            android:textSize="@dimen/text_size"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:hint="@string/hint_new_psw"
+            android:textColorHint="@color/white"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/add_white_border"
+        android:layout_marginTop="20dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="@string/sure_new_psw"
+            android:layout_marginLeft="10dp"
+            android:textSize="@dimen/text_size"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:layout_height="match_parent" />
+        <EditText
+            android:id="@+id/edt_sure_new_psw"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:layout_marginLeft="5dp"
+            android:textSize="@dimen/text_size"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:hint="@string/hint_sure_new_psw"
+            android:textColorHint="@color/white"
+            />
+    </LinearLayout>
+</LinearLayout>

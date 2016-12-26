@@ -14,11 +14,12 @@ import android.widget.TextView;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
+import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class LoginActivity extends Activity implements View.OnClickListener {
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     @BindView(R.id.txt_skip)
     TextView txtSkip;
@@ -36,6 +37,11 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
+
+    }
+
+    @Override
+    public void init() {
 
     }
 

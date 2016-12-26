@@ -42,13 +42,14 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
         setContentView(R.layout.activity_register_code);
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
-        initView();
+        init();
     }
 
     @Override
-    public void initView() {
+    public void init() {
         txtTitle.setText("注册");
     }
+
 
     @Override
     public void onClick(View view) {

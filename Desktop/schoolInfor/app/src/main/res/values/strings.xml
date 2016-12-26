@@ -28,4 +28,16 @@
     <string name="my_information">我的个人信息</string>
     <string name="my_modify_psw">修改密码</string>
     <string name="exit">退出登录</string>
+    <string name="dialog_my_motto">我的座右铭</string>
+    <string name="dialog_modify_my_motto">修改我的座右铭</string>
+    <string name="save">保存</string>
+    <string name="cancle">取消</string>
+    <string name="modify">编辑</string>
+    <string name="my_psw">我的旧密码：</string>
+    <string name="sure_new_psw">确认新密码：</string>
+    <string name="hint_my_psw">请输入旧密码</string>
+    <string name="hint_new_psw">请输入6位及以上的新密码</string>
+    <string name="hint_sure_new_psw">请再次输入新密码</string>
+    <string name="sure">确定</string>
+
 </resources>

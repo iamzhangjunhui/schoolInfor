@@ -16,7 +16,7 @@ public abstract class BaseActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
     }
-   public abstract void  initView();
+   public abstract void  init();
   public void toast(String s){
       Toast.makeText(SchoolInforManager.getContext(),s,Toast.LENGTH_SHORT).show();
   }
