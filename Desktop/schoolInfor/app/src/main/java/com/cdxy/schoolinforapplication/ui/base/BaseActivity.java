@@ -2,6 +2,8 @@ package com.cdxy.schoolinforapplication.ui.base;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.widget.Toast;
 
 import com.cdxy.schoolinforapplication.R;
@@ -9,7 +11,7 @@ import com.cdxy.schoolinforapplication.SchoolInforManager;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActivity extends Activity {
+public abstract class BaseActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
