@@ -2,12 +2,11 @@ package com.cdxy.schoolinforapplication.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.content.Intent;
-import android.os.Bundle;
-import android.transition.Transition;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +35,6 @@ import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
-
     @BindView(R.id.img_my_icon)
     ImageView imgMyIcon;
     @BindView(R.id.txt_my_name)
@@ -59,8 +57,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     TextView txtTitle;
     @BindView(R.id.btn_right)
     Button btnRight;
-    @BindView(R.id.draglayout)
-    DragLayout draglayout;
     @BindView(R.id.frame_container)
     FrameLayout frameContainer;
     @BindView(R.id.img_bottom_chat)
@@ -81,14 +77,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     TextView txtBottomMessage;
     @BindView(R.id.layout_bottom_message)
     LinearLayout layoutBottomMessage;
+    @BindView(R.id.draglayout)
+    DragLayout draglayout;
     private long exitTime = 0;
     private boolean isOpon;//侧滑栏是否打开
     private FragmentManager fragmentManager;
-    private LinearLayout[] layouts;
     private TextView[] textViews;
     private ImageView[] imageViews;
     private Fragment[] fragments;
-    private int oldPos=1;
+    private int oldPos = 1;
 
 
     @Override
@@ -105,14 +102,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void init() {
         Glide.with(MainActivity.this).load(R.drawable.students).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
         Glide.with(MainActivity.this).load(R.drawable.students).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
-      if (fragmentManager==null) {
+        if (fragmentManager == null) {
 
-          fragmentManager = getSupportFragmentManager();
-      }
-        layouts = new LinearLayout[]{layoutBottomChat, layoutBottomTopic, layoutBottomMessage};
+            fragmentManager = getSupportFragmentManager();
+        }
+        fragments = new Fragment[]{fragmentManager.findFragmentById(R.id.chat_fragment),fragmentManager.findFragmentById(R.id.topic_fragment),fragmentManager.findFragmentById(R.id.message_fragment)};
         textViews = new TextView[]{txtBottomChat, txtBottomTopic, txtBottomMessage};
         imageViews = new ImageView[]{imgBottomChat, imgBottomTopic, imgBottomMessage};
-        fragments = new Fragment[]{new ChatFragment(), new TopicFragment(), new MessageFragment()};
 
     }
 
@@ -124,43 +120,50 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             ScreenManager.getScreenManager().appExit(MainActivity.this);
         }
     }
-private void setFragments(int selectPos){
-    FragmentTransaction transaction=fragmentManager.beginTransaction();
-    if (selectPos<oldPos){
-        //该方法实现的是fragment跳转时的动画效果，需要使用support.v4.app.fragment的包,使用app.fragment包的话直接报红。
-        transaction.setCustomAnimations(R.anim.fragment_in_2,R.anim.fragment_out_2);
-    }else if (selectPos>oldPos){
-        transaction.setCustomAnimations(R.anim.fragment_in_1,R.anim.fragment_out_1);
+
+    private void setFragments(int selectPos) {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        if (selectPos < oldPos) {
+            //该方法实现的是fragment跳转时的动画效果，需要使用support.v4.app.fragment的包,使用app.fragment包的话直接报红。
+            transaction.setCustomAnimations(R.anim.fragment_in_2, R.anim.fragment_out_2);
+        } else if (selectPos > oldPos) {
+            transaction.setCustomAnimations(R.anim.fragment_in_1, R.anim.fragment_out_1);
+        }
+        transaction.commit();
+        oldPos = selectPos;
+        for (int i = 0; i < textViews.length; i++) {
+            if (i == selectPos) {
+                transaction.show(fragments[i]);
+                textViews[i].setTextColor(getResources().getColor(R.color.text_bottom_tap_color));
+                setImage(i, true);
+            } else {
+                transaction.hide(fragments[i]);
+                textViews[i].setTextColor(getResources().getColor(R.color.white));
+                setImage(i, false);
+            }
+        }
     }
-    oldPos=selectPos;
-    transaction.replace(R.id.frame_container,fragments[selectPos]);
-    transaction.commit();
-   for (int i=0;i<textViews.length;i++) {
-       if (i==selectPos) {
-           textViews[i].setTextColor(getResources().getColor(R.color.text_bottom_tap_color));
-           setImage(i,true);
-       }else {
-           textViews[i].setTextColor(getResources().getColor(R.color.white));
-           setImage(i,false);
-       }
-   }
-}
-    private void setImage(int selectPos,boolean siselect){
-        switch (selectPos){
-            case 0:imageViews[0].setImageDrawable(
-                    siselect?getResources().getDrawable(R.drawable.bottom_tap_chat_true):
-                            getResources().getDrawable(R.drawable.bottom_tap_chat_false));
+
+    private void setImage(int selectPos, boolean siselect) {
+        switch (selectPos) {
+            case 0:
+                imageViews[0].setImageDrawable(
+                        siselect ? getResources().getDrawable(R.drawable.bottom_tap_chat_true) :
+                                getResources().getDrawable(R.drawable.bottom_tap_chat_false));
                 break;
-            case 1:imageViews[1].setImageDrawable(
-                    siselect?getResources().getDrawable(R.drawable.bottom_tap_topic_true):
-                            getResources().getDrawable(R.drawable.bottom_tap_topic_false));
+            case 1:
+                imageViews[1].setImageDrawable(
+                        siselect ? getResources().getDrawable(R.drawable.bottom_tap_topic_true) :
+                                getResources().getDrawable(R.drawable.bottom_tap_topic_false));
                 break;
-            case 2:imageViews[2].setImageDrawable(
-                    siselect?getResources().getDrawable(R.drawable.bottom_tap_message_true):
-                            getResources().getDrawable(R.drawable.bottom_tap_message_false));
+            case 2:
+                imageViews[2].setImageDrawable(
+                        siselect ? getResources().getDrawable(R.drawable.bottom_tap_message_true) :
+                                getResources().getDrawable(R.drawable.bottom_tap_message_false));
                 break;
         }
     }
+
     //双击退出程序
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

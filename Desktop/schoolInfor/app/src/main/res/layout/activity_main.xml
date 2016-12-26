@@ -162,7 +162,24 @@
             android:id="@+id/frame_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1">
+            <fragment
+                android:id="@+id/chat_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.cdxy.schoolinforapplication.ui.main_fragment.ChatFragment"/>
+            <fragment
+                android:id="@+id/topic_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.cdxy.schoolinforapplication.ui.main_fragment.TopicFragment"/>
+            <fragment
+                android:id="@+id/message_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.cdxy.schoolinforapplication.ui.main_fragment.MessageFragment"/>
+            </FrameLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
