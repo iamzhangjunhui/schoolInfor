@@ -106,6 +106,7 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
             protected void onPostExecute(List<MessageEntity> messageEntities) {
                 super.onPostExecute(messageEntities);
                 if (list != null) {
+                    list.clear();
                     list.addAll(messageEntities);
                     adapter.notifyDataSetChanged();
                     layoutProgress.setVisibility(View.GONE);
@@ -131,6 +132,7 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
             protected void onPostExecute(List<MessageEntity> messageEntities) {
                 super.onPostExecute(messageEntities);
                 if (list != null) {
+                    list.clear();
                     list.addAll(messageEntities);
                     adapter.notifyDataSetChanged();
                     layoutProgress.setVisibility(View.GONE);
@@ -156,6 +158,7 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
             protected void onPostExecute(List<MessageEntity> messageEntities) {
                 super.onPostExecute(messageEntities);
                 if (list != null) {
+                    list.clear();
                     list.addAll(messageEntities);
                     adapter.notifyDataSetChanged();
                     layoutProgress.setVisibility(View.GONE);

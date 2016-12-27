@@ -53,5 +53,7 @@
     <string name="my_message">我发送的消息</string>
     <string name="explain_no_my_message">我还没有发送消息</string>
     <string name="accept_group">接收群体：</string>
+    <string name="accept_time">接收时间：</string>
+    <string name="see_students_number">查看学生数：</string>
 
 </resources>

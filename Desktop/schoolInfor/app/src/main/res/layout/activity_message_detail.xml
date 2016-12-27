@@ -9,6 +9,14 @@
 
     <include layout="@layout/view_title" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
     <TextView
         android:id="@+id/txt_message_detail_title"
         android:layout_width="match_parent"
@@ -20,13 +28,7 @@
         android:textColor="@color/text_message_title"
         android:textSize="@dimen/messege_title_text_size" />
 
-    <include layout="@layout/separate_line_1dp_margin10dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="10dp">
+    <include layout="@layout/separate_line_1dp" />
 
         <TextView
             android:id="@+id/txt_message_detail_content"
@@ -79,6 +81,5 @@
             android:textColor="@color/text_light_colored"
             android:textSize="@dimen/small_text_size" />
     </LinearLayout>
-
-    // 消息详情：发送人（4)、发送时间（5）、发送对象（3)、发送消息标题(1 text_size,居中)、消息详情(2)。
+    </ScrollView>
 </LinearLayout>
