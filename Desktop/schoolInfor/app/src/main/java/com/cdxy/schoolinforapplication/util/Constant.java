@@ -14,4 +14,7 @@ public class Constant {
     public static final String FLAG_REQURST_FROM_DEPARTMENT="department";
     public static final String FLAG_REQURST_FROM_CLASS="class";
     public static final String FLAG_REQURST_FROM_NATION="nation";
+    public static final String IMPORTANT_MESSAGE="important_message";
+    public static final String NOT_IMPORTANT_MESSAGE="not_important_message";
+    public static final String MY_SEND_MESSAGE="my_send_message";
 }

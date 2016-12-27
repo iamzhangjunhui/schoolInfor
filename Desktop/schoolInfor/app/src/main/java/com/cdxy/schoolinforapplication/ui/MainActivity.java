@@ -22,9 +22,6 @@ import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
-import com.cdxy.schoolinforapplication.ui.main_fragment.ChatFragment;
-import com.cdxy.schoolinforapplication.ui.main_fragment.MessageFragment;
-import com.cdxy.schoolinforapplication.ui.main_fragment.TopicFragment;
 import com.cdxy.schoolinforapplication.ui.my.ModifyMyPswActivity;
 import com.cdxy.schoolinforapplication.ui.my.MyInformationActivity;
 import com.cdxy.schoolinforapplication.ui.widget.DragLayout;
@@ -106,7 +103,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             fragmentManager = getSupportFragmentManager();
         }
-        fragments = new Fragment[]{fragmentManager.findFragmentById(R.id.chat_fragment),fragmentManager.findFragmentById(R.id.topic_fragment),fragmentManager.findFragmentById(R.id.message_fragment)};
+        fragments = new Fragment[]{fragmentManager.findFragmentById(R.id.chat_fragment),
+                fragmentManager.findFragmentById(R.id.topic_fragment),
+                fragmentManager.findFragmentById(R.id.message_fragment)};
         textViews = new TextView[]{txtBottomChat, txtBottomTopic, txtBottomMessage};
         imageViews = new ImageView[]{imgBottomChat, imgBottomTopic, imgBottomMessage};
 
@@ -124,7 +123,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void setFragments(int selectPos) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (selectPos < oldPos) {
-            //该方法实现的是fragment跳转时的动画效果，需要使用support.v4.app.fragment的包,使用app.fragment包的话直接报红。
+            //该方法实现的是fragment跳转时的动画效果
             transaction.setCustomAnimations(R.anim.fragment_in_2, R.anim.fragment_out_2);
         } else if (selectPos > oldPos) {
             transaction.setCustomAnimations(R.anim.fragment_in_1, R.anim.fragment_out_1);

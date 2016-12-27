@@ -28,7 +28,8 @@
         <activity android:name=".ui.ChooseInfor.ChooseInforActivity" />
         <activity android:name=".ui.my.MyInformationActivity" />
         <activity android:name=".ui.my.ModifyMyInforActivity" />
-        <activity android:name=".ui.my.ModifyMyPswActivity"></activity>
+        <activity android:name=".ui.my.ModifyMyPswActivity" />
+        <activity android:name=".ui.Message.MessageListActivity"></activity>
     </application>
 
 </manifest>

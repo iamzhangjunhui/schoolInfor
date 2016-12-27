@@ -8,11 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatFragment extends Fragment {
+public class ChatFragment extends BaseFragment {
 
 
     public ChatFragment() {
@@ -25,6 +26,10 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_chat, container, false);
+    }
+
+    @Override
+    public void init() {
     }
 
 }
