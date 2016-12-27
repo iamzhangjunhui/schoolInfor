@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,6 +18,7 @@ import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 import com.cdxy.schoolinforapplication.util.Constant;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
     LinearLayout activityMessageList;
     private List<MessageEntity> list;
     private MessageListAdapter adapter;
-    private String messageType;
+    private String messageType;//重要消息、普通消息、我发送的消息
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,23 +53,33 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
         switch (messageType) {
             case Constant.IMPORTANT_MESSAGE:
                 txtTitle.setText("重要消息列表");
-                adapter = new MessageListAdapter(MessageListActivity.this, list,Constant.IMPORTANT_MESSAGE);
+                adapter = new MessageListAdapter(MessageListActivity.this, list, messageType);
                 scrollListViewMesageList.setAdapter(adapter);
                 getImportantMessage();
                 break;
             case Constant.NOT_IMPORTANT_MESSAGE:
                 txtTitle.setText("普通消息列表");
-                adapter = new MessageListAdapter(MessageListActivity.this, list,Constant.NOT_IMPORTANT_MESSAGE);
+                adapter = new MessageListAdapter(MessageListActivity.this, list, messageType);
                 scrollListViewMesageList.setAdapter(adapter);
                 getNotImportantMessage();
                 break;
             case Constant.MY_SEND_MESSAGE:
                 txtTitle.setText("我发送的消息列表");
-                adapter = new MessageListAdapter(MessageListActivity.this, list,Constant.MY_SEND_MESSAGE);
+                adapter = new MessageListAdapter(MessageListActivity.this, list, messageType);
                 scrollListViewMesageList.setAdapter(adapter);
                 getMySendMessage();
                 break;
         }
+        scrollListViewMesageList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(MessageListActivity.this, MessageDetailActivity.class);
+                MessageEntity entity = list.get(i);
+                intent.putExtra("message", entity);
+                intent.putExtra("message_type", messageType);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -93,7 +105,7 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
             @Override
             protected void onPostExecute(List<MessageEntity> messageEntities) {
                 super.onPostExecute(messageEntities);
-                if (list!=null) {
+                if (list != null) {
                     list.addAll(messageEntities);
                     adapter.notifyDataSetChanged();
                     layoutProgress.setVisibility(View.GONE);
@@ -118,7 +130,7 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
             @Override
             protected void onPostExecute(List<MessageEntity> messageEntities) {
                 super.onPostExecute(messageEntities);
-                if (list!=null) {
+                if (list != null) {
                     list.addAll(messageEntities);
                     adapter.notifyDataSetChanged();
                     layoutProgress.setVisibility(View.GONE);
@@ -143,7 +155,7 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
             @Override
             protected void onPostExecute(List<MessageEntity> messageEntities) {
                 super.onPostExecute(messageEntities);
-                if (list!=null) {
+                if (list != null) {
                     list.addAll(messageEntities);
                     adapter.notifyDataSetChanged();
                     layoutProgress.setVisibility(View.GONE);

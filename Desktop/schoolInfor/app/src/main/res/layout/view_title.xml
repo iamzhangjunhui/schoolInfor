@@ -20,12 +20,13 @@
         android:textSize="@dimen/text_size"
         android:gravity="center_vertical"/>
     <Button
+       android:paddingRight="10dp"
         android:id="@+id/btn_right"
         android:onClick="onClick"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:visibility="gone"
         android:textColor="@color/text_color"
         android:textSize="@dimen/text_size"
+        android:background="@color/top_color"
         android:layout_alignParentRight="true"/>
 </RelativeLayout>

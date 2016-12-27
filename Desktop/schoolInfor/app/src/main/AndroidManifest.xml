@@ -29,7 +29,9 @@
         <activity android:name=".ui.my.MyInformationActivity" />
         <activity android:name=".ui.my.ModifyMyInforActivity" />
         <activity android:name=".ui.my.ModifyMyPswActivity" />
-        <activity android:name=".ui.Message.MessageListActivity"></activity>
+        <activity android:name=".ui.Message.MessageListActivity" />
+        <activity android:name=".ui.Message.MessageDetailActivity" />
+        <activity android:name=".ui.Message.SeeMessageStudentsActivity"></activity>
     </application>
 
 </manifest>

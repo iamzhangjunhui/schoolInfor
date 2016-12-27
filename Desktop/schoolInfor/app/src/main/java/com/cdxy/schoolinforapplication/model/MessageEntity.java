@@ -1,10 +1,12 @@
 package com.cdxy.schoolinforapplication.model;
 
+import java.io.Serializable;
+
 /**
  * Created by huihui on 2016/12/27.
  */
 
-public class MessageEntity {
+public class MessageEntity implements Serializable {
     private int type;//消息类型，0为非重要消息，1为重要消息
     private String sender; //发送人
     private String sendTime; //发送时间
