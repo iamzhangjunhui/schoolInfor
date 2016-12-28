@@ -3,8 +3,12 @@ package com.cdxy.schoolinforapplication.ui.topic;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,6 +23,7 @@ import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.adapter.ShowPhotoAdapter;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
+import com.cdxy.schoolinforapplication.util.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +57,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
         init();
-        getPhotoPath();
+//        getPhotoPath();
     }
 
     @Override
@@ -77,50 +82,80 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                 ScreenManager.getScreenManager().popActivty(this);
                 break;
             case R.id.layout_add_photo:
-                View dialogView= LayoutInflater.from(AddNewTopicActivity.this).inflate(R.layout.dialog_choose_way,null);
-                TextView txtWay1= (TextView) dialogView.findViewById(R.id.txt_way1);
-                TextView txtWay2= (TextView) dialogView.findViewById(R.id.txt_way2);
+                View dialogView = LayoutInflater.from(AddNewTopicActivity.this).inflate(R.layout.dialog_choose_way, null);
+                TextView txtWay1 = (TextView) dialogView.findViewById(R.id.txt_way1);
+                TextView txtWay2 = (TextView) dialogView.findViewById(R.id.txt_way2);
                 txtWay1.setText("拍照");
                 txtWay2.setText("从相册中获取");
-                final AlertDialog dialog=new AlertDialog.Builder(AddNewTopicActivity.this).setView(dialogView).create();
+                final AlertDialog dialog = new AlertDialog.Builder(AddNewTopicActivity.this).setView(dialogView).create();
                 dialog.show();
                 txtWay1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent=new Intent();
+                        //打开系统拍照程序，选择拍照图片
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, Constant.REQUEST_CODE_CAMERA);
                         dialog.dismiss();
                     }
                 });
                 txtWay2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        ////打开系统图库程序，选择图片
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
                         dialog.dismiss();
                     }
                 });
                 break;
         }
     }
+//测试数据
+//    private void getPhotoPath() {
+//        new AsyncTask<Void, Void, List<Object>>() {
+//            @Override
+//            protected List<Object> doInBackground(Void... voids) {
+//                List<Object> objects = new ArrayList<Object>();
+//                objects.add(R.drawable.bottom_tap_chat_false);
+//                objects.add(R.drawable.bottom_tap_chat_false);
+//                objects.add(R.drawable.bottom_tap_chat_false);
+//                return objects;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(List<Object> objects) {
+//                super.onPostExecute(objects);
+//                if (objects != null) {
+//                    list.clear();
+//                    list.addAll(objects);
+//                    adapter.notifyDataSetChanged();
+//                }
+//            }
+//        }.execute();
+//    }
 
-    private void getPhotoPath() {
-        new AsyncTask<Void, Void, List<Object>>() {
-            @Override
-            protected List<Object> doInBackground(Void... voids) {
-                List<Object> objects = new ArrayList<Object>();
-                objects.add(R.drawable.bottom_tap_chat_false);
-                objects.add(R.drawable.bottom_tap_chat_false);
-                objects.add(R.drawable.bottom_tap_chat_false);
-                return objects;
-            }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //获取拍照后返回的图片
+        if (requestCode == Constant.REQUEST_CODE_CAMERA) {
+            Bundle bundle = data.getExtras();
+            //获取相机返回的数据，并转换为图片格式
+            Bitmap bitmap = (Bitmap) bundle.get("data");
+            list.add(bitmap);
+            adapter.notifyItemInserted(list.size() - 1);
 
-            @Override
-            protected void onPostExecute(List<Object> objects) {
-                super.onPostExecute(objects);
-                if (objects != null) {
-                    list.clear();
-                    list.addAll(objects);
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        }.execute();
+        }
+        if (requestCode == Constant.REQUEST_CODE_PICTURE) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumns={MediaStore.Images.Media.DATA};
+            Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null,null, null);
+            c.moveToFirst();
+            int columnIndex = c.getColumnIndex(filePathColumns[0]);
+            String picturePath= c.getString(columnIndex);
+            list.add(picturePath);
+            adapter.notifyItemInserted(list.size()-1);
+            c.close();
+        }
     }
 }

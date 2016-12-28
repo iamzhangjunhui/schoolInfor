@@ -1,6 +1,7 @@
 package com.cdxy.schoolinforapplication.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import butterknife.BindView;
@@ -37,8 +39,14 @@ public class ShowPhotoAdapter extends RecyclerView.Adapter<ShowPhotoAdapter.View
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        if(list.get(position) instanceof Integer)
         Glide.with(context).load(list.get(position)).placeholder(R.drawable.loading).into(holder.imageView);
+        if (list.get(position) instanceof Bitmap)
+            holder.imageView.setImageBitmap((Bitmap)list.get(position));
+        if (list.get(position) instanceof String)
+            Glide.with(context).load(list.get(position)).placeholder(R.drawable.loading).into(holder.imageView);
     }
+
 
     @Override
     public int getItemCount() {

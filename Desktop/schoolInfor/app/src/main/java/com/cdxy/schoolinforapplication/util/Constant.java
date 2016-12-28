@@ -17,4 +17,6 @@ public class Constant {
     public static final String IMPORTANT_MESSAGE="important_message";
     public static final String NOT_IMPORTANT_MESSAGE="not_important_message";
     public static final String MY_SEND_MESSAGE="my_send_message";
+    public static final int  REQUEST_CODE_CAMERA=7;
+    public static final int REQUEST_CODE_PICTURE=8;
 }
