@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
+import com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity;
 import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
 import com.cdxy.schoolinforapplication.ui.my.ModifyMyPswActivity;
 import com.cdxy.schoolinforapplication.ui.my.MyInformationActivity;
@@ -227,11 +228,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.layout_bottom_chat:
                 setFragments(0);
+                txtTitle.setText("会话中心");
+                btnRight.setText("我的好友");
+                btnRight.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, MyFriendActivity.class);
+                        startActivity(intent);
+                    }
+                });
                 break;
             case R.id.layout_bottom_topic:
+                txtTitle.setText("话题");
+                btnRight.setText("");
                 setFragments(1);
                 break;
             case R.id.layout_bottom_message:
+                txtTitle.setText("消息中心");
+                btnRight.setText("");
                 setFragments(2);
                 break;
 

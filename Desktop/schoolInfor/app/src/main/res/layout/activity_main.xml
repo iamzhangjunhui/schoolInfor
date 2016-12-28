@@ -167,7 +167,7 @@
                 android:id="@+id/chat_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:name="com.cdxy.schoolinforapplication.ui.main_fragment.ChatFragment"/>
+                android:name="com.cdxy.schoolinforapplication.ui.chat.ChatFragment"/>
             <fragment
                 android:id="@+id/topic_fragment"
                 android:layout_width="match_parent"
