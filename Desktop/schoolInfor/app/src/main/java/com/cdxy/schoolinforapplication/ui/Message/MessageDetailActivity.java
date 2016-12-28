@@ -72,6 +72,7 @@ public class MessageDetailActivity extends BaseActivity implements View.OnClickL
                         @Override
                         public void onClick(View view) {
                             Intent intent=new Intent(MessageDetailActivity.this,SeeMessageStudentsActivity.class);
+                            intent.putExtra("messageEntity",messageEntity);
                             startActivity(intent);
                         }
                     });

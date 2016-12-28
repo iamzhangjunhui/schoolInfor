@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
+<uses-permission android:name="android.permission.CALL_PHONE"/>
     <application
         android:name=".SchoolInforManager"
         android:allowBackup="true"
@@ -31,7 +31,8 @@
         <activity android:name=".ui.my.ModifyMyPswActivity" />
         <activity android:name=".ui.Message.MessageListActivity" />
         <activity android:name=".ui.Message.MessageDetailActivity" />
-        <activity android:name=".ui.Message.SeeMessageStudentsActivity"></activity>
+        <activity android:name=".ui.Message.SeeMessageStudentsActivity" />
+        <activity android:name=".ui.Message.NotSeeMessageStudentsActivity"></activity>
     </application>
 
 </manifest>

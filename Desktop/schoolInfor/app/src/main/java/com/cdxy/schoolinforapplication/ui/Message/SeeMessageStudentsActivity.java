@@ -1,5 +1,6 @@
 package com.cdxy.schoolinforapplication.ui.Message;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -49,11 +50,13 @@ public class SeeMessageStudentsActivity extends BaseActivity implements View.OnC
         init();
         getSeeMessageStudents();
 
+
     }
 
     @Override
     public void init() {
         txtTitle.setText("查看情况");
+        btnRight.setText("未查看提醒");
         list = new ArrayList<>();
         adapter = new SeeMessageStudentAdapter(SeeMessageStudentsActivity.this, list);
         scrollSeeMessageStudent.setAdapter(adapter);
@@ -65,8 +68,13 @@ public class SeeMessageStudentsActivity extends BaseActivity implements View.OnC
             case R.id.img_back:
                 ScreenManager.getScreenManager().popActivty(this);
                 break;
+            case R.id.btn_right:
+                Intent intent=new Intent(SeeMessageStudentsActivity.this,NotSeeMessageStudentsActivity.class);
+                intent.putExtra("messageEntity",getIntent().getSerializableExtra("messageEntity"));
+                startActivity(intent);
         }
     }
+
 
     //测试数据
     private void getSeeMessageStudents() {
@@ -75,7 +83,7 @@ public class SeeMessageStudentsActivity extends BaseActivity implements View.OnC
             protected List<SeeMeaaseStudentEntity> doInBackground(Void... voids) {
                 List<SeeMeaaseStudentEntity> seeMeaaseStudentEntities = new ArrayList<>();
                 SeeMeaaseStudentEntity entity1 = new SeeMeaaseStudentEntity("zhang", "1340610232", "计算机系", "嵌入式1班", "2016-12-27");
-                SeeMeaaseStudentEntity entity2 = new SeeMeaaseStudentEntity("li", "1340610222", "云计算机系", "1班", "2016-12-21");
+                SeeMeaaseStudentEntity entity2 = new SeeMeaaseStudentEntity("li", "1340610222", "计算机系", "软件技术1班", "2016-12-21");
                 seeMeaaseStudentEntities.add(entity1);
                 seeMeaaseStudentEntities.add(entity2);
                 return seeMeaaseStudentEntities;

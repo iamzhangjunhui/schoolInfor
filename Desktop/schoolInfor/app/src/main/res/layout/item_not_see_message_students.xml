@@ -17,7 +17,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/txt_see_message_student_id"
+                android:id="@+id/txt_not_see_message_student_id"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
@@ -26,11 +26,11 @@
                 android:textSize="@dimen/text_size" />
 
             <TextView
-                android:paddingLeft="5dp"
-                android:id="@+id/txt_see_message_student_name"
+                android:id="@+id/txt_not_see_message_student_name"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
+                android:paddingLeft="5dp"
                 android:text="姓名"
                 android:textColor="@color/text_color"
                 android:textSize="@dimen/text_size" />
@@ -43,8 +43,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/txt_see_message_student_department"
-
+                android:id="@+id/txt_not_see_message_student_department"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
@@ -54,11 +53,11 @@
                 android:textSize="@dimen/text_size" />
 
             <TextView
-                android:paddingLeft="5dp"
-                android:id="@+id/txt_see_message_student_clazz"
+                android:id="@+id/txt_not_see_message_student_clazz"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
+                android:paddingLeft="5dp"
                 android:text="班级"
                 android:textColor="@color/text_color"
                 android:textSize="@dimen/text_size" />
@@ -69,27 +68,31 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="right"
         android:layout_marginBottom="5dp"
         android:orientation="horizontal"
-        android:paddingRight="10dp">
+        android:paddingLeft="10dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@string/accept_time"
-            android:textColor="@color/text_light_colored"
-            android:textSize="@dimen/content_text_size" />
+            android:text="@string/phoneNumber" />
 
-        <TextView
-            android:id="@+id/txt_see_message_accept_time"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="yyyy-MM-dd"
-            android:textColor="@color/text_light_colored"
-            android:textSize="@dimen/content_text_size" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txt_no_see_message_student_phoneNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:text="110"
+                android:textColor="@color/text_message_title"
+                android:textSize="@dimen/text_size" />
+
+            <include layout="@layout/separate_line_blue_color_1dp" />
+        </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>

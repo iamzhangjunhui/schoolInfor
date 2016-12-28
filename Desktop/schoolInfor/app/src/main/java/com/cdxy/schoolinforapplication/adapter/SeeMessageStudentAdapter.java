@@ -89,4 +89,9 @@ public class SeeMessageStudentAdapter extends BaseAdapter {
             ButterKnife.bind(this, view);
         }
     }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return false;
+    }
 }
