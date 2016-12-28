@@ -172,7 +172,7 @@
                 android:id="@+id/topic_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:name="com.cdxy.schoolinforapplication.ui.main_fragment.TopicFragment"/>
+                android:name="com.cdxy.schoolinforapplication.ui.topic.TopicFragment"/>
             <fragment
                 android:id="@+id/message_fragment"
                 android:layout_width="match_parent"

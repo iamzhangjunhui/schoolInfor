@@ -34,7 +34,8 @@
         <activity android:name=".ui.Message.MessageDetailActivity" />
         <activity android:name=".ui.Message.SeeMessageStudentsActivity" />
         <activity android:name=".ui.Message.NotSeeMessageStudentsActivity" />
-        <activity android:name=".ui.chat.MyFriendActivity"></activity>
+        <activity android:name=".ui.chat.MyFriendActivity" />
+        <activity android:name=".ui.topic.AddNewTopicActivity"></activity>
     </application>
 
 </manifest>

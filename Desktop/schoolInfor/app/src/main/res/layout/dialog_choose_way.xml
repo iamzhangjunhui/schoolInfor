@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:background="@color/white">
 <TextView
-    android:id="@+id/txt_call"
+    android:id="@+id/txt_way1"
     android:layout_width="match_parent"
     android:layout_height="60dp"
    android:textColor="@color/top_color"
@@ -14,7 +14,7 @@
     android:gravity="center"/>
 <include layout="@layout/separate_line_top_color_1dp"/>
     <TextView
-        android:id="@+id/txt_send_SMS"
+        android:id="@+id/txt_way2"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:textColor="@color/top_color"

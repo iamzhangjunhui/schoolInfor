@@ -25,6 +25,7 @@ import com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity;
 import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
 import com.cdxy.schoolinforapplication.ui.my.ModifyMyPswActivity;
 import com.cdxy.schoolinforapplication.ui.my.MyInformationActivity;
+import com.cdxy.schoolinforapplication.ui.topic.AddNewTopicActivity;
 import com.cdxy.schoolinforapplication.ui.widget.DragLayout;
 
 import butterknife.BindView;
@@ -93,13 +94,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
         init();
+        txtTitle.setText("话题");
+        btnRight.setText("创建话题");
+        btnRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, AddNewTopicActivity.class);
+                startActivity(intent);
+            }
+        });
         setFragments(1);
     }
 
     @Override
     public void init() {
-        Glide.with(MainActivity.this).load(R.drawable.students).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
-        Glide.with(MainActivity.this).load(R.drawable.students).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
+        Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
+        Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
         if (fragmentManager == null) {
 
             fragmentManager = getSupportFragmentManager();
@@ -240,7 +250,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.layout_bottom_topic:
                 txtTitle.setText("话题");
-                btnRight.setText("");
+                btnRight.setText("创建话题");
+                btnRight.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, AddNewTopicActivity.class);
+                        startActivity(intent);
+                    }
+                });
                 setFragments(1);
                 break;
             case R.id.layout_bottom_message:

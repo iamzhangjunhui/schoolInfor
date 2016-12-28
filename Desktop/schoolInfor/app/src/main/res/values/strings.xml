@@ -59,4 +59,8 @@
     <string name="call">打电话</string>
     <string name="send_SMS">发短信</string>
 
+    <!--topic-->
+    <string name="hint_txt_new_topic">说点什么吧。。。。</string>
+    <string name="photos">照片/拍照</string>
+
 </resources>

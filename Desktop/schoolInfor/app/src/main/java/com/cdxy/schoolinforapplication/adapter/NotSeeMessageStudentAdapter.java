@@ -17,9 +17,7 @@ import android.widget.TextView;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.model.MessageEntity;
 import com.cdxy.schoolinforapplication.model.NotSeeMessageStudentEntity;
-import com.cdxy.schoolinforapplication.model.SeeMeaaseStudentEntity;
 
-import java.net.URL;
 import java.util.List;
 
 import butterknife.BindView;
@@ -84,9 +82,9 @@ public class NotSeeMessageStudentAdapter extends BaseAdapter {
         viewHolder.txtNoSeeMessageStudentPhoneNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_choose_inform_not_see_message_way, null);
-                TextView txtCall = (TextView) dialogView.findViewById(R.id.txt_call);
-                TextView txtSendSMS = (TextView) dialogView.findViewById(R.id.txt_send_SMS);
+                View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_choose_way, null);
+                TextView txtCall = (TextView) dialogView.findViewById(R.id.txt_way1);
+                TextView txtSendSMS = (TextView) dialogView.findViewById(R.id.txt_way2);
                 final AlertDialog dialog = new AlertDialog.Builder(context).setView(dialogView).create();
                 dialog.show();
                 txtCall.setOnClickListener(new View.OnClickListener() {

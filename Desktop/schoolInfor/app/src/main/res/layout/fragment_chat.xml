@@ -5,10 +5,4 @@
     android:background="@color/white"
     tools:context="com.cdxy.schoolinforapplication.ui.chat.ChatFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="49dp"
-        android:text="chat" />
-
 </FrameLayout>
