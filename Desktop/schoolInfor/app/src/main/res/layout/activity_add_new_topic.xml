@@ -8,63 +8,29 @@
     tools:context="com.cdxy.schoolinforapplication.ui.topic.AddNewTopicActivity">
 
     <include layout="@layout/view_title" />
-
-    <EditText
-        android:id="@+id/txt_new_topic"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_margin="10dp"
-        android:background="@drawable/add_border_light_color"
-        android:gravity="top"
-        android:hint="@string/hint_txt_new_topic"
-        android:padding="10dp"
-        android:textColor="@color/text_color"
-        android:textSize="@dimen/content_text_size" />
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="10dp"
-        android:scrollbars="none">
-
+        android:layout_height="match_parent">
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <EditText
+                android:id="@+id/txt_new_topic"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/add_border_light_color"
+                android:gravity="top"
+                android:hint="@string/hint_txt_new_topic"
+                android:padding="10dp"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/content_text_size" />
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycleView_add_photo"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal" />
-
-            <LinearLayout
-                android:onClick="onClick"
-                android:clickable="true"
-                android:id="@+id/layout_add_photo"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginLeft="2dp"
-                android:background="@color/main_bottom_tab_color"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/add_photo" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/photos"
-                    android:textSize="@dimen/small_text_size"
-                    android:textColor="@color/text_light_colored"/>
-            </LinearLayout>
-
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:scrollbars="vertical"/>
         </LinearLayout>
-    </HorizontalScrollView>
-
+    </ScrollView>
 </LinearLayout>

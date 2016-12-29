@@ -8,7 +8,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,6 +27,8 @@ import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.adapter.ShowPhotoAdapter;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +48,6 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     EditText txtNewTopic;
     @BindView(R.id.recycleView_add_photo)
     RecyclerView recycleViewAddPhoto;
-    @BindView(R.id.layout_add_photo)
-    LinearLayout layoutAddPhoto;
     @BindView(R.id.activity_add_new_topic)
     LinearLayout activityAddNewTopic;
     private List<Object> list;
@@ -57,7 +60,6 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
         init();
-//        getPhotoPath();
     }
 
     @Override
@@ -65,10 +67,10 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         txtTitle.setText("新建话题");
         btnRight.setText("发表");
         list = new ArrayList<>();
+        list.add(R.drawable.remind_add_photo);
         //设置布局管理器，控制布局效果
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(AddNewTopicActivity.this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        recycleViewAddPhoto.setLayoutManager(linearLayoutManager);
+        GridLayoutManager gridLayoutManager=new GridLayoutManager(AddNewTopicActivity.this,5);
+        recycleViewAddPhoto.setLayoutManager(gridLayoutManager);
         //如果可以确定每个item的高度是固定的，设置这个选项可以提高性能
         recycleViewAddPhoto.setHasFixedSize(true);
         adapter = new ShowPhotoAdapter(AddNewTopicActivity.this, list);
@@ -81,59 +83,8 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
             case R.id.img_back:
                 ScreenManager.getScreenManager().popActivty(this);
                 break;
-            case R.id.layout_add_photo:
-                View dialogView = LayoutInflater.from(AddNewTopicActivity.this).inflate(R.layout.dialog_choose_way, null);
-                TextView txtWay1 = (TextView) dialogView.findViewById(R.id.txt_way1);
-                TextView txtWay2 = (TextView) dialogView.findViewById(R.id.txt_way2);
-                txtWay1.setText("拍照");
-                txtWay2.setText("从相册中获取");
-                final AlertDialog dialog = new AlertDialog.Builder(AddNewTopicActivity.this).setView(dialogView).create();
-                dialog.show();
-                txtWay1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        //打开系统拍照程序，选择拍照图片
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(intent, Constant.REQUEST_CODE_CAMERA);
-                        dialog.dismiss();
-                    }
-                });
-                txtWay2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ////打开系统图库程序，选择图片
-                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
-                        dialog.dismiss();
-                    }
-                });
-                break;
         }
     }
-//测试数据
-//    private void getPhotoPath() {
-//        new AsyncTask<Void, Void, List<Object>>() {
-//            @Override
-//            protected List<Object> doInBackground(Void... voids) {
-//                List<Object> objects = new ArrayList<Object>();
-//                objects.add(R.drawable.bottom_tap_chat_false);
-//                objects.add(R.drawable.bottom_tap_chat_false);
-//                objects.add(R.drawable.bottom_tap_chat_false);
-//                return objects;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(List<Object> objects) {
-//                super.onPostExecute(objects);
-//                if (objects != null) {
-//                    list.clear();
-//                    list.addAll(objects);
-//                    adapter.notifyDataSetChanged();
-//                }
-//            }
-//        }.execute();
-//    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -142,19 +93,20 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
             Bundle bundle = data.getExtras();
             //获取相机返回的数据，并转换为图片格式
             Bitmap bitmap = (Bitmap) bundle.get("data");
-            list.add(bitmap);
-            adapter.notifyItemInserted(list.size() - 1);
+            list.add(0,bitmap);
+            adapter.notifyItemInserted(0);
 
         }
+        //从相册获取图片
         if (requestCode == Constant.REQUEST_CODE_PICTURE) {
             Uri selectedImage = data.getData();
-            String[] filePathColumns={MediaStore.Images.Media.DATA};
-            Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null,null, null);
+            String[] filePathColumns = {MediaStore.Images.Media.DATA};
+            Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null, null, null);
             c.moveToFirst();
             int columnIndex = c.getColumnIndex(filePathColumns[0]);
-            String picturePath= c.getString(columnIndex);
-            list.add(picturePath);
-            adapter.notifyItemInserted(list.size()-1);
+            String picturePath = c.getString(columnIndex);
+            list.add(0,picturePath);
+            adapter.notifyItemInserted(0);
             c.close();
         }
     }
