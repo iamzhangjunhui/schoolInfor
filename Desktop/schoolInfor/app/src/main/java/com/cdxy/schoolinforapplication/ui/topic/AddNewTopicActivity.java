@@ -1,19 +1,14 @@
 package com.cdxy.schoolinforapplication.ui.topic;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Looper;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -22,13 +17,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.location.Poi;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.adapter.ShowPhotoAdapter;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
-
-import org.greenrobot.eventbus.EventBus;
+import com.cdxy.schoolinforapplication.util.OnRecyclerItemOnLongClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,14 +43,16 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     TextView txtTitle;
     @BindView(R.id.btn_right)
     Button btnRight;
-    @BindView(R.id.txt_new_topic)
-    EditText txtNewTopic;
     @BindView(R.id.recycleView_add_photo)
     RecyclerView recycleViewAddPhoto;
     @BindView(R.id.activity_add_new_topic)
     LinearLayout activityAddNewTopic;
+    @BindView(R.id.edt_new_topic)
+    EditText edtNewTopic;
     private List<Object> list;
     private ShowPhotoAdapter adapter;
+    public LocationClient locationClient;
+    public BDLocationListener myListener = new MyLocationListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,29 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
         init();
+        //注意：LocationClient类必须在主线程中声明
+        //Context需要时全进程有效的Context,推荐用getApplicationConext获取全进程有效的Context。
+        // //声明LocationClient类
+        locationClient = new LocationClient(getApplicationContext());
+        //注册监听函数
+        locationClient.registerLocationListener(myListener);
+        initLocation();
+        locationClient.start();
+        recycleViewAddPhoto.addOnItemTouchListener(new OnRecyclerItemOnLongClickListener(recycleViewAddPhoto) {
+            @Override
+            public void onItemLongClick(final RecyclerView.ViewHolder viewHolder) {
+                View view = LayoutInflater.from(AddNewTopicActivity.this).inflate(R.layout.item_show_photo, null);
+//                ImageView imgDeletePhoto= (ImageView) view.findViewById(img_delete_photo);
+//                imgDeletePhoto.setVisibility(View.VISIBLE);
+//                imgDeletePhoto.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        list.remove((int)viewHolder.getItemId());
+//                        adapter.notifyItemRemoved((int)viewHolder.getItemId());
+//                    }
+//                });
+            }
+        });
     }
 
     @Override
@@ -69,7 +93,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         list = new ArrayList<>();
         list.add(R.drawable.remind_add_photo);
         //设置布局管理器，控制布局效果
-        GridLayoutManager gridLayoutManager=new GridLayoutManager(AddNewTopicActivity.this,5);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(AddNewTopicActivity.this, 5);
         recycleViewAddPhoto.setLayoutManager(gridLayoutManager);
         //如果可以确定每个item的高度是固定的，设置这个选项可以提高性能
         recycleViewAddPhoto.setHasFixedSize(true);
@@ -85,29 +109,113 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                 break;
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //获取拍照后返回的图片
-        if (requestCode == Constant.REQUEST_CODE_CAMERA) {
-            Bundle bundle = data.getExtras();
-            //获取相机返回的数据，并转换为图片格式
-            Bitmap bitmap = (Bitmap) bundle.get("data");
-            list.add(0,bitmap);
-            adapter.notifyItemInserted(0);
+        if (resultCode == RESULT_OK) {
+            //获取拍照后返回的图片
+            if (requestCode == Constant.REQUEST_CODE_CAMERA) {
+                Bundle bundle = data.getExtras();
+                //获取相机返回的数据，并转换为图片格式
+                Bitmap bitmap = (Bitmap) bundle.get("data");
+                list.add(0, bitmap);
+                adapter.notifyItemInserted(0);
 
+            }
+            //从相册获取图片
+            if (requestCode == Constant.REQUEST_CODE_PICTURE) {
+                Uri selectedImage = data.getData();
+                String[] filePathColumns = {MediaStore.Images.Media.DATA};
+                Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null, null, null);
+                c.moveToFirst();
+                int columnIndex = c.getColumnIndex(filePathColumns[0]);
+                String picturePath = c.getString(columnIndex);
+                list.add(0, picturePath);
+                adapter.notifyItemInserted(0);
+                c.close();
+            }
         }
-        //从相册获取图片
-        if (requestCode == Constant.REQUEST_CODE_PICTURE) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumns = {MediaStore.Images.Media.DATA};
-            Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null, null, null);
-            c.moveToFirst();
-            int columnIndex = c.getColumnIndex(filePathColumns[0]);
-            String picturePath = c.getString(columnIndex);
-            list.add(0,picturePath);
-            adapter.notifyItemInserted(0);
-            c.close();
+    }
+
+    //LocationClientOption类，该类用来设置定位SDK的定位方式
+    private void initLocation() {
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        int span = 60000;
+        option.setScanSpan(span);
+        option.setIsNeedAddress(true);
+        option.setOpenGps(true);
+        option.setIgnoreKillProcess(false);
+        option.SetIgnoreCacheException(false);
+    }
+
+    //BDLocationListener为结果监听接口
+    public class MyLocationListener implements BDLocationListener {
+
+        @Override
+        public void onReceiveLocation(BDLocation location) {
+            //Receive Location
+            StringBuffer sb = new StringBuffer(256);
+            sb.append("time : ");
+            sb.append(location.getTime());
+            sb.append("\nerror code : ");
+            sb.append(location.getLocType());
+            sb.append("\nlatitude : ");
+            sb.append(location.getLatitude());
+            sb.append("\nlontitude : ");
+            sb.append(location.getLongitude());
+            sb.append("\nradius : ");
+            sb.append(location.getRadius());
+            if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS定位结果
+                sb.append("\nspeed : ");
+                sb.append(location.getSpeed());// 单位：公里每小时
+                sb.append("\nsatellite : ");
+                sb.append(location.getSatelliteNumber());
+                sb.append("\nheight : ");
+                sb.append(location.getAltitude());// 单位：米
+                sb.append("\ndirection : ");
+                sb.append(location.getDirection());// 单位度
+                sb.append("\naddr : ");
+                sb.append(location.getAddrStr());
+                sb.append("\ndescribe : ");
+                sb.append("gps定位成功");
+
+            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
+                sb.append("\naddr : ");
+                sb.append(location.getAddrStr());
+                //运营商信息
+                sb.append("\noperationers : ");
+                sb.append(location.getOperators());
+                sb.append("\ndescribe : ");
+                sb.append("网络定位成功");
+            } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
+                sb.append("\ndescribe : ");
+                sb.append("离线定位成功，离线定位结果也是有效的");
+            } else if (location.getLocType() == BDLocation.TypeServerError) {
+                sb.append("\ndescribe : ");
+                sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
+            } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
+                sb.append("\ndescribe : ");
+                sb.append("网络不同导致定位失败，请检查网络是否通畅");
+            } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
+                sb.append("\ndescribe : ");
+                sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+            }
+            sb.append("\nlocationdescribe : ");
+            sb.append(location.getLocationDescribe());// 位置语义化信息
+            List<Poi> list = location.getPoiList();// POI数据
+            if (list != null) {
+                sb.append("\npoilist size = : ");
+                sb.append(list.size());
+                for (Poi p : list) {
+                    sb.append("\npoi= : ");
+                    sb.append(p.getId() + " " + p.getName() + " " + p.getRank());
+                }
+            }
+            Log.i("BaiduLocationApiDem", sb.toString());
+            edtNewTopic.setText(sb.toString());
+
         }
     }
 }
