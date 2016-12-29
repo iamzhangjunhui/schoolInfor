@@ -31,6 +31,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:scrollbars="vertical"/>
+            <LinearLayout
+                android:id="@+id/layout_show_address"
+                android:layout_marginTop="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:onClick="onClick"
+                    android:clickable="true"
+                    android:background="@drawable/add_border_light_color"
+                    android:id="@+id/txt_remind_show_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/show_now_address"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/content_text_size"/>
+                <TextView
+                    android:paddingLeft="10dp"
+                    android:singleLine="true"
+                    android:id="@+id/txt_now_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/content_text_size"
+                    android:textColor="@color/text_color"/>
+            </LinearLayout>
         </LinearLayout>
+
     </ScrollView>
 </LinearLayout>

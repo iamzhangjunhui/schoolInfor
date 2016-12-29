@@ -61,6 +61,5 @@
 
     <!--topic-->
     <string name="hint_txt_new_topic">说点什么吧。。。。</string>
-    <string name="photos">照片/拍照</string>
-
+    <string name="show_now_address">显示当前地址</string>
 </resources>
