@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.model.CommentPerson;
 import com.cdxy.schoolinforapplication.model.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
@@ -36,6 +37,7 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
     private List<TopicEntity> list;
     private Context context;
     private TopicPhotosAdapter topicPhotosAdapter;
+    private TopicCommentPersonsAdapter topicCommentPersonsAdapter;
 
     public TopicAdapter(List<TopicEntity> list, Context context) {
         this.list = list;
@@ -121,6 +123,11 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
                 }
                 viewHolder.txtThumbPersonsName.setText(thumbPersonsNameString);
             }
+        }
+        List<CommentPerson> commentPersons=entity.getCommentPersons();
+        if (commentPersons!=null){
+            topicCommentPersonsAdapter=new TopicCommentPersonsAdapter(context,commentPersons);
+            viewHolder.scrollComments.setAdapter(topicCommentPersonsAdapter);
         }
         return view;
     }

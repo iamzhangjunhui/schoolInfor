@@ -156,6 +156,7 @@
         </LinearLayout>
 
         <com.cdxy.schoolinforapplication.ui.widget.ScrollListView
+            android:divider="@null"
             android:id="@+id/scroll_comments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

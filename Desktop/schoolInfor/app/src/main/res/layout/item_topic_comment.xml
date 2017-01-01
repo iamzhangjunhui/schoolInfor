@@ -5,12 +5,9 @@
     android:layout_marginBottom="2dp"
     android:layout_marginTop="2dp"
     android:orientation="horizontal">
-
-    <TextView
-        android:id="@+id/comment_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="5dp"
-        android:text="评价详情"
-        android:textSize="@dimen/content_text_size" />
+<com.cdxy.schoolinforapplication.ui.widget.ScrollListView
+    android:id="@+id/scroll_comment_persons"
+    android:divider="@null"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"/>
 </LinearLayout>
