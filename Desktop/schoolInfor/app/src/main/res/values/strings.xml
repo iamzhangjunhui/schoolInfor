@@ -62,4 +62,6 @@
     <!--topic-->
     <string name="hint_txt_new_topic">说点什么吧。。。。</string>
     <string name="show_now_address">显示当前地址</string>
+    <string name="number_of_thumb">点赞数:</string>
+    <string name="reply">回复</string>
 </resources>

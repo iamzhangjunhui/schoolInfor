@@ -155,6 +155,8 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         int span = 60000;
+        option.setCoorType("bd09ll");
+        option.setIsNeedLocationDescribe(true);
         option.setScanSpan(span);
         option.setIsNeedAddress(true);
         option.setOpenGps(true);

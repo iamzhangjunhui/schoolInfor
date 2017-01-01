@@ -135,9 +135,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (selectPos < oldPos) {
             //该方法实现的是fragment跳转时的动画效果
-            transaction.setCustomAnimations(R.anim.fragment_in_2, R.anim.fragment_out_2);
-        } else if (selectPos > oldPos) {
             transaction.setCustomAnimations(R.anim.fragment_in_1, R.anim.fragment_out_1);
+        } else if (selectPos > oldPos) {
+            transaction.setCustomAnimations(R.anim.fragment_in_2, R.anim.fragment_out_2);
         }
         transaction.commit();
         oldPos = selectPos;

@@ -2,7 +2,6 @@ package com.cdxy.schoolinforapplication.adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.provider.MediaStore;
@@ -10,18 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.ui.topic.AddNewTopicActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
 
-import org.greenrobot.eventbus.EventBus;
-
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import butterknife.BindView;
@@ -49,12 +43,11 @@ public class ShowPhotoAdapter extends RecyclerView.Adapter<ShowPhotoAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         if (list.get(position) instanceof Integer) {
-            holder.imageView.setImageDrawable(activity.getResources().getDrawable( R.drawable.remind_add_photo));
-            if ((int)list.get(position) == R.drawable.remind_add_photo) {
-
+            holder.imageView.setImageDrawable(activity.getResources().getDrawable(R.drawable.remind_add_photo));
+            if ((int) list.get(position) == R.drawable.remind_add_photo) {
                 holder.imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -87,15 +80,15 @@ public class ShowPhotoAdapter extends RecyclerView.Adapter<ShowPhotoAdapter.View
                 });
             }
 
+        } else {
+            //通过照相获取的图片
+            if (list.get(position) instanceof Bitmap)
+                holder.imageView.setImageBitmap((Bitmap) list.get(position));
+
+            //从相册获取的图片
+            if (list.get(position) instanceof String)
+                Glide.with(activity).load(list.get(position)).placeholder(R.drawable.loading).into(holder.imageView);
         }
-        //通过照相获取的图片
-        if (list.get(position) instanceof Bitmap)
-            holder.imageView.setImageBitmap((Bitmap) list.get(position));
-        //从相册获取的图片
-        if (list.get(position) instanceof String)
-            Glide.with(activity).load(list.get(position)).placeholder(R.drawable.loading).into(holder.imageView);
-
-
     }
 
 
@@ -107,9 +100,12 @@ public class ShowPhotoAdapter extends RecyclerView.Adapter<ShowPhotoAdapter.View
     //自定义的ViewHolder，持有每个Item的的所有界面元素
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView imageView;
+        private ImageView imgDeletePhoto;
+
         public ViewHolder(View view) {
             super(view);
             imageView = (ImageView) view.findViewById(R.id.img_photo);
+            imgDeletePhoto = (ImageView) view.findViewById(R.id.img_delete_photo);
 
         }
     }
