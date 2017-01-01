@@ -53,25 +53,27 @@
             android:textSize="@dimen/content_text_size" />
 
         <FrameLayout
+            android:id="@+id/frame_photos"
+            android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="100dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
             android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"
-            android:visibility="gone">
+            android:layout_marginTop="2dp">
 
             <GridView
                 android:id="@+id/gridView_photos"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:numColumns="5" />
+                android:layout_height="100dp"
+                android:numColumns="3" />
 
             <TextView
                 android:id="@+id/txt_more_photo_number"
-                android:layout_width="62dp"
+                android:layout_width="122dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="right"
                 android:gravity="center"
-                android:text="+1"
                 android:textColor="@color/white"
                 android:textSize="@dimen/number_see_more_photo"
                 android:visibility="gone" />
@@ -88,6 +90,8 @@
             android:paddingTop="10dp">
 
             <ImageView
+                android:clickable="true"
+                android:onClick="onClick"
                 android:id="@+id/img_comment"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
@@ -95,6 +99,8 @@
                 android:src="@drawable/add_comment" />
 
             <ImageView
+                android:clickable="true"
+                android:onClick="onClick"
                 android:id="@+id/img_thumb"
                 android:layout_width="25dp"
                 android:layout_height="25dp"

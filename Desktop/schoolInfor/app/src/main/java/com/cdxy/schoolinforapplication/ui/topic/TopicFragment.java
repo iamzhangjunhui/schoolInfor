@@ -66,8 +66,14 @@ public class TopicFragment extends BaseFragment {
             @Override
             protected List<TopicEntity> doInBackground(Void... voids) {
                 List<TopicEntity> topicEntities = new ArrayList<TopicEntity>();
-                TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "张三", "2016-12-12", "今天天气好，适合出去玩", null, 2, null, null);
-
+                List<Object> photos1=new ArrayList<Object>();
+                photos1.add(R.drawable.school);
+                photos1.add(R.drawable.myinfor_backgroud_photo);
+                photos1.add(R.drawable.students);
+                photos1.add(R.drawable.bottom_tap_message_true);
+                photos1.add(R.drawable.school);
+                photos1.add(R.drawable.bottom_tap_topic_true);
+                TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "张三", "2016-12-12", "今天天气好，适合出去玩", photos1, 2, null, null);
                 TopicEntity topicEntity2 = new TopicEntity("2",R.drawable.students, "andy", "李四", "2016-12-31", "走去打球", null, 0, null, null);
                 topicEntities.add(topicEntity1);
                 topicEntities.add(topicEntity2);

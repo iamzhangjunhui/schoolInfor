@@ -13,12 +13,12 @@ public class TopicEntity {
     private String name;//姓名
     private String create_time;//发起时间
     private String content;//内容
-    private List<String> photos;//照片
+    private List<Object> photos;//照片
     private int thumbNum;//点赞数
     private List<String> thumbPersonsName;//点赞人姓名
     private List<CommentPerson> commentPersons;//评论
 
-    public TopicEntity(String id, Object icon, String nickName, String name, String create_time, String content, List<String> photos, int thumbNum, List<String> thumbPersonsName, List<CommentPerson> commentPersons) {
+    public TopicEntity(String id, Object icon, String nickName, String name, String create_time, String content, List<Object> photos, int thumbNum, List<String> thumbPersonsName, List<CommentPerson> commentPersons) {
         this.id = id;
         this.icon = icon;
         this.nickName = nickName;
@@ -79,11 +79,11 @@ public class TopicEntity {
         this.content = content;
     }
 
-    public List<String> getPhotos() {
+    public List<Object> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<String> photos) {
+    public void setPhotos(List<Object> photos) {
         this.photos = photos;
     }
 

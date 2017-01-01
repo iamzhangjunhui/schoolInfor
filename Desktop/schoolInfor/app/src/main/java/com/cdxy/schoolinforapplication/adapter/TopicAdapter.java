@@ -1,22 +1,27 @@
 package com.cdxy.schoolinforapplication.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.model.TopicEntity;
+import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 
+import java.io.Serializable;
 import java.util.List;
 
 import butterknife.BindView;
@@ -27,9 +32,10 @@ import jp.wasabeef.glide.transformations.CropCircleTransformation;
  * Created by huihui on 2016/12/30.
  */
 
-public class TopicAdapter extends BaseAdapter {
+public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
     private List<TopicEntity> list;
     private Context context;
+    private TopicPhotosAdapter topicPhotosAdapter;
 
     public TopicAdapter(List<TopicEntity> list, Context context) {
         this.list = list;
@@ -38,7 +44,7 @@ public class TopicAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return list == null ? 0 :list.size();
+        return list == null ? 0 : list.size();
     }
 
     @Override
@@ -82,6 +88,27 @@ public class TopicAdapter extends BaseAdapter {
         if (!TextUtils.isEmpty(topicContent)) {
             viewHolder.txtTopicContent.setText(topicContent);
         }
+        final List<Object> photos = entity.getPhotos();
+        if (photos != null) {
+            int width=context.getResources().getDisplayMetrics().widthPixels/3;
+            viewHolder.gridViewPhotos.setColumnWidth(width);
+            viewHolder.framePhotos.setVisibility(View.VISIBLE);
+            topicPhotosAdapter = new TopicPhotosAdapter(context, photos);
+            viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
+            if (photos.size() > 3) {
+                viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
+                viewHolder.txtMorePhotoNumber.setText("+"+(photos.size()-3));
+            }
+            viewHolder.gridViewPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Intent intent=new Intent(context, ShowBigPhotosActivity.class);
+                    intent.putExtra("position",i);
+                    intent.putExtra("photos", (Serializable) photos);
+                    context.startActivity(intent);
+                }
+            });
+        }
         int thumbNumber = entity.getThumbNum();
         if (thumbNumber > 0) {
             viewHolder.layoutThumb.setVisibility(View.VISIBLE);
@@ -98,6 +125,22 @@ public class TopicAdapter extends BaseAdapter {
         return view;
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.img_comment:
+                break;
+            case R.id.img_thumb:
+                break;
+        }
+    }
+
+
+    @Override
+    public boolean isEnabled(int position) {
+        return false;
+
+    }
 
     static class ViewHolder {
         @BindView(R.id.img_topic_icon)
@@ -112,6 +155,8 @@ public class TopicAdapter extends BaseAdapter {
         GridView gridViewPhotos;
         @BindView(R.id.txt_more_photo_number)
         TextView txtMorePhotoNumber;
+        @BindView(R.id.frame_photos)
+        FrameLayout framePhotos;
         @BindView(R.id.img_comment)
         ImageView imgComment;
         @BindView(R.id.img_thumb)
@@ -128,11 +173,5 @@ public class TopicAdapter extends BaseAdapter {
         ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-        return false;
-
     }
 }
