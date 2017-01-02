@@ -14,6 +14,7 @@
     <string name="register_next">下一步</string>
 
     <!--register-->
+    <string name="hint_register_nickname">请输入你的昵称</string>
     <string name="hint_register_realname">请输入你的真实姓名</string>
     <string name="hint_department">请选择你所在系</string>
     <string name="hint_class">请选择你所在班级</string>

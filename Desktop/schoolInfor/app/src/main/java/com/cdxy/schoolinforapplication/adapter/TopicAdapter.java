@@ -3,6 +3,7 @@ package com.cdxy.schoolinforapplication.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -22,6 +24,7 @@ import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -59,23 +62,20 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder viewHolder;
+    public View getView(final int i, View view, ViewGroup viewGroup) {
+        final ViewHolder viewHolder;
         if (view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.item_topic, null);
             viewHolder = new ViewHolder(view);
-            viewHolder.layout_divider= (LinearLayout) view.findViewById(R.id.layout_divider);
+            viewHolder.layout_divider = (LinearLayout) view.findViewById(R.id.layout_divider);
             view.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) view.getTag();
         }
-        TopicEntity entity = (TopicEntity) getItem(i);
-        String name = entity.getName();
+        final TopicEntity entity = (TopicEntity) getItem(i);
         String nickName = entity.getNickName();
         if (!TextUtils.isEmpty(nickName)) {
-            viewHolder.txtTopicNameOrNickname.setText(nickName);
-        } else if (!TextUtils.isEmpty(name)) {
-            viewHolder.txtTopicNameOrNickname.setText(name);
+            viewHolder.txtTopicNickname.setText(nickName);
         }
         String createTime = entity.getCreate_time();
         if (!TextUtils.isEmpty(createTime)) {
@@ -112,12 +112,12 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
             });
         }
         //点赞人姓名集合
-        List<String> thumbPersonsName = entity.getThumbPersonsName();
+        final List<String> thumbPersonsName = entity.getThumbPersonsNickname();
         if (thumbPersonsName != null) {
             int thumbNumber = thumbPersonsName.size();
             if (thumbNumber > 0) {
                 viewHolder.layout_divider.setVisibility(View.VISIBLE);
-                viewHolder.txtThumbPersonsName.setVisibility(View.VISIBLE);
+                viewHolder.txtThumbPersonsNickname.setVisibility(View.VISIBLE);
                 String thumbPersonsNameString = "";
                 for (int j = 0; j < thumbPersonsName.size(); j++) {
                     if (j == 0) {
@@ -127,9 +127,38 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
                     }
                 }
                 thumbPersonsNameString = thumbPersonsNameString + " " + thumbNumber + "人为你点赞";
-                viewHolder.txtThumbPersonsName.setText(thumbPersonsNameString);
+                viewHolder.txtThumbPersonsNickname.setText(thumbPersonsNameString);
             }
         }
+        viewHolder.imgThumb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //获取点赞人的昵称(应该从SharePreference里面获取用户的昵称)
+                String newThumbNickname = entity.getNickName();//这里的不是获取的不是用户昵称，只是测试用
+                if (viewHolder.txtThumbPersonsNickname.getVisibility() == View.GONE) {
+                    viewHolder.txtThumbPersonsNickname.setVisibility(View.VISIBLE);
+                    viewHolder.layout_divider.setVisibility(View.VISIBLE);
+                }
+                int j = 0;
+                for (; j < thumbPersonsName.size(); j++) {
+                    if (newThumbNickname.equals(thumbPersonsName.get(j))) {
+                        break;
+                    }
+                }
+                //如果这个人还没有点过赞，则添加进点赞人列表中
+                if (j == thumbPersonsName.size()) {
+                    entity.getThumbPersonsNickname().add(newThumbNickname);
+                } else {
+                    //如果这个人已点过赞，则将这个人从点赞人列表中移除
+                    entity.getThumbPersonsNickname().remove(j--);
+                    if (thumbPersonsName.size()==0){
+                        viewHolder.layout_divider.setVisibility(View.GONE);
+                        viewHolder.txtThumbPersonsNickname.setVisibility(View.GONE);
+                    }
+                }
+                TopicAdapter.this.notifyDataSetChanged();
+            }
+        });
         List<CommentPerson> commentPersons = entity.getCommentPersons();
         if (commentPersons != null) {
             topicCommentPersonsAdapter = new TopicCommentPersonsAdapter(context, commentPersons);
@@ -158,8 +187,8 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
     static class ViewHolder {
         @BindView(R.id.img_topic_icon)
         ImageView imgTopicIcon;
-        @BindView(R.id.txt_topic_name_or_nickname)
-        TextView txtTopicNameOrNickname;
+        @BindView(R.id.txt_topic_nickname)
+        TextView txtTopicNickname;
         @BindView(R.id.txt_topic_create_time)
         TextView txtTopicCreateTime;
         @BindView(R.id.txt_topic_content)
@@ -174,8 +203,8 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
         ImageView imgComment;
         @BindView(R.id.img_thumb)
         ImageView imgThumb;
-        @BindView(R.id.txt_thumb_persons_name)
-        TextView txtThumbPersonsName;
+        @BindView(R.id.txt_thumb_persons_nickname)
+        TextView txtThumbPersonsNickname;
         @BindView(R.id.scroll_comments)
         ScrollListView scrollComments;
         private LinearLayout layout_divider;
@@ -184,4 +213,5 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
             ButterKnife.bind(this, view);
         }
     }
+
 }

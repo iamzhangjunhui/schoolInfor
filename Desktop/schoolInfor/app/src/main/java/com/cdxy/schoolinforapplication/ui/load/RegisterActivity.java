@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -56,6 +57,10 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     EditText edtHobby;
     @BindView(R.id.submit_register)
     Button submitRegister;
+    @BindView(R.id.edt_nickname)
+    EditText edtNickname;
+    @BindView(R.id.activity_register)
+    LinearLayout activityRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

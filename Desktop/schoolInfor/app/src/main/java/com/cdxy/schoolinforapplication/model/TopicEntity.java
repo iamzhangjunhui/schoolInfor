@@ -10,22 +10,20 @@ public class TopicEntity {
     private String id;//发起话题人的id
     private Object icon;//头像
     private String nickName;//昵称
-    private String name;//姓名
     private String create_time;//发起时间
     private String content;//内容
     private List<Object> photos;//照片
-    private List<String> thumbPersonsName;//点赞人姓名
+    private List<String> thumbPersonsNickname;//点赞人姓名
     private List<CommentPerson> commentPersons;//评论
 
-    public TopicEntity(String id, Object icon, String nickName, String name, String create_time, String content, List<Object> photos,List<String> thumbPersonsName, List<CommentPerson> commentPersons) {
+    public TopicEntity(String id, Object icon, String nickName, String create_time, String content, List<Object> photos, List<String> thumbPersonsNickname, List<CommentPerson> commentPersons) {
         this.id = id;
         this.icon = icon;
         this.nickName = nickName;
-        this.name = name;
         this.create_time = create_time;
         this.content = content;
         this.photos = photos;
-        this.thumbPersonsName = thumbPersonsName;
+        this.thumbPersonsNickname = thumbPersonsNickname;
         this.commentPersons = commentPersons;
     }
 
@@ -53,14 +51,6 @@ public class TopicEntity {
         this.nickName = nickName;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getCreate_time() {
         return create_time;
     }
@@ -85,12 +75,12 @@ public class TopicEntity {
         this.photos = photos;
     }
 
-    public List<String> getThumbPersonsName() {
-        return thumbPersonsName;
+    public List<String> getThumbPersonsNickname() {
+        return thumbPersonsNickname;
     }
 
-    public void setThumbPersonsName(List<String> thumbPersonsName) {
-        this.thumbPersonsName = thumbPersonsName;
+    public void setThumbPersonsNickname(List<String> thumbPersonsNickname) {
+        this.thumbPersonsNickname = thumbPersonsNickname;
     }
 
     public List<CommentPerson> getCommentPersons() {
@@ -107,11 +97,10 @@ public class TopicEntity {
                 "id='" + id + '\'' +
                 ", icon='" + icon + '\'' +
                 ", nickName='" + nickName + '\'' +
-                ", name='" + name + '\'' +
                 ", create_time='" + create_time + '\'' +
                 ", content='" + content + '\'' +
                 ", photos=" + photos +
-                ", thumbPersonsName=" + thumbPersonsName +
+                ", thumbPersonsNickname=" + thumbPersonsNickname +
                 ", commentPersons=" + commentPersons +
                 '}';
     }

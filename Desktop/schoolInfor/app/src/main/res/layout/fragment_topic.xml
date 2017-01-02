@@ -20,13 +20,14 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <com.cdxy.schoolinforapplication.ui.widget.ScrollListView
-            android:id="@+id/scroll_list_topic"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@null" />
+            <com.cdxy.schoolinforapplication.ui.widget.ScrollListView
+                android:id="@+id/scroll_list_topic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@null" />
+
     </ScrollView>
 
 </LinearLayout>

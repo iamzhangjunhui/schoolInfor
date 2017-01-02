@@ -59,32 +59,14 @@ public class TopicCommentContentAdapter extends BaseAdapter {
         String content=commentContent.getContent();
         if (!TextUtils.isEmpty(content)){
             //显示在屏幕上的发送者名称
-            String sender=null;
             String senderNickName=commentContent.getSenderNickname();
-            if (TextUtils.isEmpty(senderNickName)){
-                String senderName=commentContent.getSenderName();
-                if (!TextUtils.isEmpty(senderName)){
-                    sender=senderName;
-                }
-            }else {
-                sender=senderNickName;
-            }
-            String receiver=null;
             String receiverNickName=commentContent.getReceiverNickname();
-            if (TextUtils.isEmpty(receiverNickName)){
-                String receiverName=commentContent.getReceiverName();
-                if (!TextUtils.isEmpty(receiverName)){
-                    receiver=receiverName;
-                }
-            }else {
-                receiver=receiverNickName;
-            }
             //包含发送人和接收者和评价内容的信息
             String commentContentString;
-            if (TextUtils.isEmpty(receiver)) {
-                commentContentString="<font color='blue'>"+sender+":"+"</font>"+content;
+            if (TextUtils.isEmpty(receiverNickName)) {
+                commentContentString="<font color='blue'>"+senderNickName+":"+"</font>"+content;
             }else {
-                commentContentString="<font color='blue'>"+sender+"</font>"+" 回复 "+"<font color='blue'>"+receiver+":"+"</font>"+content;
+                commentContentString="<font color='blue'>"+senderNickName+"</font>"+" 回复 "+"<font color='blue'>"+receiverNickName+":"+"</font>"+content;
             }
             viewHolder.commentContent.setText(Html.fromHtml(commentContentString));
         }
