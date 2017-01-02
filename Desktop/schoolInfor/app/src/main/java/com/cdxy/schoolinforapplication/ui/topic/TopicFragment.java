@@ -76,6 +76,11 @@ public class TopicFragment extends BaseFragment {
                 photos1.add(R.drawable.bottom_tap_message_true);
                 photos1.add(R.drawable.school);
                 photos1.add(R.drawable.bottom_tap_topic_true);
+                //点赞人姓名
+                List<String> thumbPersonsName=new ArrayList<String>();
+                thumbPersonsName.add("可可");
+                thumbPersonsName.add("张涛");
+                thumbPersonsName.add("李四");
                 //评论
                 List<CommentPerson> commentPersons=new ArrayList<CommentPerson>();
                 //第一个评论人
@@ -100,10 +105,12 @@ public class TopicFragment extends BaseFragment {
                 commentPersons.add(commentPerson1);
                 commentPersons.add(commentPerson2);
                 commentPersons.add(commentPerson3);
-                TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "张三", "2016-12-12", "今天天气好，适合出去玩", photos1, 2, null, commentPersons);
-                TopicEntity topicEntity2 = new TopicEntity("2",R.drawable.students, "andy", "李四", "2016-12-31", "走去打球", null, 0, null, null);
+                TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "张三", "2016-12-12", "今天天气好，适合出去玩", photos1, thumbPersonsName, commentPersons);
+                TopicEntity topicEntity2 = new TopicEntity("2",R.drawable.students, "andy", "李四", "2016-12-31", "走去打球", null, null, null);
+                TopicEntity topicEntity3= new TopicEntity("2",R.drawable.students, "andy", "李四", "2016-12-31", "走去打球", null, null, null);
                 topicEntities.add(topicEntity1);
                 topicEntities.add(topicEntity2);
+                topicEntities.add(topicEntity3);
                 return topicEntities;
             }
 

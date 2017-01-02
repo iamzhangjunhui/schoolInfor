@@ -14,11 +14,10 @@ public class TopicEntity {
     private String create_time;//发起时间
     private String content;//内容
     private List<Object> photos;//照片
-    private int thumbNum;//点赞数
     private List<String> thumbPersonsName;//点赞人姓名
     private List<CommentPerson> commentPersons;//评论
 
-    public TopicEntity(String id, Object icon, String nickName, String name, String create_time, String content, List<Object> photos, int thumbNum, List<String> thumbPersonsName, List<CommentPerson> commentPersons) {
+    public TopicEntity(String id, Object icon, String nickName, String name, String create_time, String content, List<Object> photos,List<String> thumbPersonsName, List<CommentPerson> commentPersons) {
         this.id = id;
         this.icon = icon;
         this.nickName = nickName;
@@ -26,7 +25,6 @@ public class TopicEntity {
         this.create_time = create_time;
         this.content = content;
         this.photos = photos;
-        this.thumbNum = thumbNum;
         this.thumbPersonsName = thumbPersonsName;
         this.commentPersons = commentPersons;
     }
@@ -87,14 +85,6 @@ public class TopicEntity {
         this.photos = photos;
     }
 
-    public int getThumbNum() {
-        return thumbNum;
-    }
-
-    public void setThumbNum(int thumbNum) {
-        this.thumbNum = thumbNum;
-    }
-
     public List<String> getThumbPersonsName() {
         return thumbPersonsName;
     }
@@ -121,7 +111,6 @@ public class TopicEntity {
                 ", create_time='" + create_time + '\'' +
                 ", content='" + content + '\'' +
                 ", photos=" + photos +
-                ", thumbNum='" + thumbNum + '\'' +
                 ", thumbPersonsName=" + thumbPersonsName +
                 ", commentPersons=" + commentPersons +
                 '}';

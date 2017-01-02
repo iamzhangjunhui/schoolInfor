@@ -49,10 +49,9 @@ public class ShowBigPhotosActivity extends BaseActivity  {
         position=intent.getIntExtra("position",0);
         views=new ArrayList<>();
         for (int i=0;i<photos.size();i++){
-            LinearLayout linearLayout=new LinearLayout(ShowBigPhotosActivity.this);
-//            ImageView imageView=new ImageView(ShowBigPhotosActivity.this);
-//            Glide.with(ShowBigPhotosActivity.this).load(photos.get(i)).placeholder(R.drawable.loading).into(imageView);
-//            views.add(imageView);
+            ImageView imageView=new ImageView(ShowBigPhotosActivity.this);
+            Glide.with(ShowBigPhotosActivity.this).load(photos.get(i)).placeholder(R.drawable.loading).into(imageView);
+            views.add(imageView);
         }
         adapter=new PagerAdapter() {
             @Override

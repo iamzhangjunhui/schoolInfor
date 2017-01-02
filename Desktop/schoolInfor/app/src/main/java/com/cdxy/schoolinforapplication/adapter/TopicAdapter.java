@@ -2,7 +2,6 @@ package com.cdxy.schoolinforapplication.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +64,7 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
         if (view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.item_topic, null);
             viewHolder = new ViewHolder(view);
+            viewHolder.layout_divider= (LinearLayout) view.findViewById(R.id.layout_divider);
             view.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) view.getTag();
@@ -92,41 +92,47 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
         }
         final List<Object> photos = entity.getPhotos();
         if (photos != null) {
-            int width=context.getResources().getDisplayMetrics().widthPixels/3;
+            int width = context.getResources().getDisplayMetrics().widthPixels / 3;
             viewHolder.gridViewPhotos.setColumnWidth(width);
             viewHolder.framePhotos.setVisibility(View.VISIBLE);
             topicPhotosAdapter = new TopicPhotosAdapter(context, photos);
             viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
             if (photos.size() > 3) {
                 viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
-                viewHolder.txtMorePhotoNumber.setText("+"+(photos.size()-3));
+                viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 3));
             }
             viewHolder.gridViewPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Intent intent=new Intent(context, ShowBigPhotosActivity.class);
-                    intent.putExtra("position",i);
+                    Intent intent = new Intent(context, ShowBigPhotosActivity.class);
+                    intent.putExtra("position", i);
                     intent.putExtra("photos", (Serializable) photos);
                     context.startActivity(intent);
                 }
             });
         }
-        int thumbNumber = entity.getThumbNum();
-        if (thumbNumber > 0) {
-            viewHolder.layoutThumb.setVisibility(View.VISIBLE);
-            viewHolder.txtThumbNumber.setText(thumbNumber + "");
-            List<String> thumbPersonsName = entity.getThumbPersonsName();
-            if (thumbPersonsName != null) {
+        //点赞人姓名集合
+        List<String> thumbPersonsName = entity.getThumbPersonsName();
+        if (thumbPersonsName != null) {
+            int thumbNumber = thumbPersonsName.size();
+            if (thumbNumber > 0) {
+                viewHolder.layout_divider.setVisibility(View.VISIBLE);
+                viewHolder.txtThumbPersonsName.setVisibility(View.VISIBLE);
                 String thumbPersonsNameString = "";
-                for (String thumbPersonName : thumbPersonsName) {
-                    thumbPersonsNameString = thumbPersonsNameString + "  " + thumbPersonName;
+                for (int j = 0; j < thumbPersonsName.size(); j++) {
+                    if (j == 0) {
+                        thumbPersonsNameString = thumbPersonsName.get(j);
+                    } else {
+                        thumbPersonsNameString = thumbPersonsNameString + "," + thumbPersonsName.get(j);
+                    }
                 }
+                thumbPersonsNameString = thumbPersonsNameString + " " + thumbNumber + "人为你点赞";
                 viewHolder.txtThumbPersonsName.setText(thumbPersonsNameString);
             }
         }
-        List<CommentPerson> commentPersons=entity.getCommentPersons();
-        if (commentPersons!=null){
-            topicCommentPersonsAdapter=new TopicCommentPersonsAdapter(context,commentPersons);
+        List<CommentPerson> commentPersons = entity.getCommentPersons();
+        if (commentPersons != null) {
+            topicCommentPersonsAdapter = new TopicCommentPersonsAdapter(context, commentPersons);
             viewHolder.scrollComments.setAdapter(topicCommentPersonsAdapter);
         }
         return view;
@@ -168,14 +174,11 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
         ImageView imgComment;
         @BindView(R.id.img_thumb)
         ImageView imgThumb;
-        @BindView(R.id.txt_thumb_number)
-        TextView txtThumbNumber;
         @BindView(R.id.txt_thumb_persons_name)
         TextView txtThumbPersonsName;
-        @BindView(R.id.layout_thumb)
-        LinearLayout layoutThumb;
         @BindView(R.id.scroll_comments)
         ScrollListView scrollComments;
+        private LinearLayout layout_divider;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);

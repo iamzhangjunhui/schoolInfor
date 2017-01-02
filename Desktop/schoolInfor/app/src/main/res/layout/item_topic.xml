@@ -2,170 +2,144 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@color/white">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:orientation="horizontal">
+    android:background="@color/white"
+    android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/img_topic_icon"
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:src="@drawable/loading" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="5dp">
-
-                <TextView
-                    android:id="@+id/txt_topic_name_or_nickname"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="姓名"
-                    android:textColor="@color/text_color"
-                    android:textSize="@dimen/messege_title_text_size" />
-
-                <TextView
-                    android:id="@+id/txt_topic_create_time"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="yyyy_MM_dd"
-                    android:textColor="@color/text_light_colored"
-                    android:textSize="@dimen/small_text_size" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/txt_topic_content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="2dp"
-            android:text="话题内容"
-            android:textColor="@color/text_color"
-            android:textSize="@dimen/content_text_size" />
-
-        <FrameLayout
-            android:id="@+id/frame_photos"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp">
-
-            <GridView
-                android:id="@+id/gridView_photos"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:numColumns="3" />
-
-            <TextView
-                android:id="@+id/txt_more_photo_number"
-                android:layout_width="122dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="@dimen/number_see_more_photo"
-                android:visibility="gone" />
-        </FrameLayout>
+        <ImageView
+            android:id="@+id/img_topic_icon"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/loading" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="10dp">
-
-            <ImageView
-                android:clickable="true"
-                android:onClick="onClick"
-                android:id="@+id/img_comment"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_gravity="right"
-                android:src="@drawable/add_comment" />
-
-            <ImageView
-                android:clickable="true"
-                android:onClick="onClick"
-                android:id="@+id/img_thumb"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_gravity="right"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="10dp"
-                android:src="@drawable/good" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_thumb"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="2dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="2dp"
-            android:visibility="visible">
-            <include layout="@layout/separate_line_1dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/number_of_thumb"
-                    android:textColor="@color/text_color"
-                    android:textSize="@dimen/small_text_size" />
-
-                <TextView
-                    android:id="@+id/txt_thumb_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textColor="@color/text_color"
-                    android:textSize="@dimen/small_text_size" />
-            </LinearLayout>
+            android:paddingLeft="5dp">
 
             <TextView
-                android:id="@+id/txt_thumb_persons_name"
+                android:id="@+id/txt_topic_name_or_nickname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="点赞人昵称（姓名）"
-                android:textColor="@color/text_name"
+                android:text="姓名"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/messege_title_text_size" />
+
+            <TextView
+                android:id="@+id/txt_topic_create_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="yyyy_MM_dd"
+                android:textColor="@color/text_light_colored"
                 android:textSize="@dimen/small_text_size" />
-
         </LinearLayout>
+    </LinearLayout>
 
-        <com.cdxy.schoolinforapplication.ui.widget.ScrollListView
-            android:divider="@null"
-            android:id="@+id/scroll_comments"
+    <TextView
+        android:id="@+id/txt_topic_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="2dp"
+        android:text="话题内容"
+        android:textColor="@color/text_color"
+        android:textSize="@dimen/content_text_size" />
+
+    <FrameLayout
+        android:id="@+id/frame_photos"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:visibility="gone">
+
+        <GridView
+            android:id="@+id/gridView_photos"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="2dp" />
+            android:layout_height="100dp"
+            android:numColumns="3" />
+
+        <TextView
+            android:id="@+id/txt_more_photo_number"
+            android:layout_width="122dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/number_see_more_photo"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp">
+
+        <ImageView
+            android:id="@+id/img_comment"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="right"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:src="@drawable/add_comment" />
+
+        <ImageView
+            android:id="@+id/img_thumb"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="right"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:clickable="true"
+            android:onClick="onClick"
+            android:src="@drawable/good" />
+    </LinearLayout>
+
+    <include android:id="@+id/layout_divider"
+        android:visibility="gone"
+        layout="@layout/separate_line_1dp_margin10dp" />
+
+    <TextView
+        android:id="@+id/txt_thumb_persons_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:text="点赞人昵称（姓名）"
+        android:textColor="@color/text_name"
+        android:textSize="@dimen/small_text_size"
+        android:visibility="gone" />
+
+    <com.cdxy.schoolinforapplication.ui.widget.ScrollListView
+        android:id="@+id/scroll_comments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@null"
+        android:paddingBottom="2dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="2dp" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:background="@color/diliver_topic"/>
-    </LinearLayout>
+        android:background="@color/diliver_topic" />
+</LinearLayout>

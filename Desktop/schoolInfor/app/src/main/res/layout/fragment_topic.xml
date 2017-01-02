@@ -5,25 +5,28 @@
     android:background="@color/diliver_topic"
     android:orientation="vertical"
     tools:context="com.cdxy.schoolinforapplication.ui.topic.TopicFragment">
-  <LinearLayout
-      android:background="@color/white"
-      android:id="@+id/layout_progress"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:gravity="center">
-      <ProgressBar
-          android:layout_width="30dp"
-          android:layout_height="30dp" />
-  </LinearLayout>
-   <ScrollView
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content">
-<com.cdxy.schoolinforapplication.ui.widget.ScrollListView
-    android:divider="@null"
-    android:id="@+id/scroll_list_topic"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    />
-   </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/layout_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:gravity="center">
+
+        <ProgressBar
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.cdxy.schoolinforapplication.ui.widget.ScrollListView
+            android:id="@+id/scroll_list_topic"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null" />
+    </ScrollView>
 
 </LinearLayout>
