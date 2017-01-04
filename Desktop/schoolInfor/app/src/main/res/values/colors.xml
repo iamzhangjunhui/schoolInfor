@@ -11,6 +11,7 @@
     <color name="txt_departent_class_color">#f9e908</color>
     <color name="white">#ffffff</color>
     <color name="diliver">#e9e7e7</color>
+    <color name="background_write">#e9e7e7</color>
     <color name="remind_see_more_photo">#fdfdfd</color>
     <color name="my_background_color">@color/top_color</color>
     <color name="main_bottom_tab_color">#ececec</color>

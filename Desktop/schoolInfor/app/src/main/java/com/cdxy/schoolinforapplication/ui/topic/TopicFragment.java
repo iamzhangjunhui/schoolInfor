@@ -8,7 +8,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.adapter.TopicAdapter;
@@ -33,6 +35,12 @@ public class TopicFragment extends BaseFragment {
     LinearLayout layoutProgress;
     @BindView(R.id.scroll_list_topic)
     ScrollListView scrollListTopic;
+    @BindView(R.id.edt_add_comment)
+    EditText edtAddComment;
+    @BindView(R.id.layout_add_comment)
+    LinearLayout layoutAddComment;
+    @BindView(R.id.txt_send_new_comment)
+    TextView txtSendNewComment;
     private TopicAdapter adapter;
     private List<TopicEntity> list;
 
@@ -59,17 +67,18 @@ public class TopicFragment extends BaseFragment {
     @Override
     public void init() {
         list = new ArrayList<>();
-        adapter = new TopicAdapter(list, getContext());
+        adapter = new TopicAdapter(list, getContext(), layoutAddComment, edtAddComment,txtSendNewComment );
         scrollListTopic.setAdapter(adapter);
     }
-//测试数据
+
+    //测试数据
     private void getTopics() {
         new AsyncTask<Void, Void, List<TopicEntity>>() {
             @Override
             protected List<TopicEntity> doInBackground(Void... voids) {
                 List<TopicEntity> topicEntities = new ArrayList<TopicEntity>();
                 //上传的图片
-                List<Object> photos1=new ArrayList<Object>();
+                List<Object> photos1 = new ArrayList<Object>();
                 photos1.add(R.drawable.school);
                 photos1.add(R.drawable.myinfor_backgroud_photo);
                 photos1.add(R.drawable.students);
@@ -77,29 +86,29 @@ public class TopicFragment extends BaseFragment {
                 photos1.add(R.drawable.school);
                 photos1.add(R.drawable.bottom_tap_topic_true);
                 //点赞人姓名
-                List<String> thumbPersonsNickname=new ArrayList<String>();
+                List<String> thumbPersonsNickname = new ArrayList<String>();
                 thumbPersonsNickname.add("Rain");
                 thumbPersonsNickname.add("Andy");
                 //评论
-                List<CommentPerson> commentPersons=new ArrayList<CommentPerson>();
+                List<CommentPerson> commentPersons = new ArrayList<CommentPerson>();
                 //第一个评论人
-                List<CommentContent> commentContents1=new ArrayList<CommentContent>();
-                CommentContent commentContent1=new CommentContent("Rain","kaylee","确实很好，一起去打羽毛球吧");
-                CommentContent commentContent2=new CommentContent( "kaylee","Rain","好呀，半个小时后楼下见");
+                List<CommentContent> commentContents1 = new ArrayList<CommentContent>();
+                CommentContent commentContent1 = new CommentContent("Rain", "kaylee", "确实很好，一起去打羽毛球吧");
+                CommentContent commentContent2 = new CommentContent("kaylee", "Rain", "好呀，半个小时后楼下见");
                 commentContents1.add(commentContent1);
                 commentContents1.add(commentContent2);
-                CommentPerson commentPerson1=new CommentPerson("1001",commentContents1);
+                CommentPerson commentPerson1 = new CommentPerson("1001", commentContents1);
                 //第二个评论人
-                List<CommentContent> commentContents2=new ArrayList<CommentContent>();
-                CommentContent commentContent3=new CommentContent("Andy", "kaylee","我也想打羽毛球了，等一下叫我哦");
-                CommentContent commentContent4=new CommentContent( "kaylee","Andy","要得，好久没和你PK了");
+                List<CommentContent> commentContents2 = new ArrayList<CommentContent>();
+                CommentContent commentContent3 = new CommentContent("Andy", "kaylee", "我也想打羽毛球了，等一下叫我哦");
+                CommentContent commentContent4 = new CommentContent("kaylee", "Andy", "要得，好久没和你PK了");
                 commentContents2.add(commentContent3);
                 commentContents2.add(commentContent4);
-                CommentPerson commentPerson2=new CommentPerson("1002",commentContents2);
+                CommentPerson commentPerson2 = new CommentPerson("1002", commentContents2);
                 commentPersons.add(commentPerson1);
                 commentPersons.add(commentPerson2);
                 TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "2016-12-12", "今天天气好，适合出去玩", null, thumbPersonsNickname, commentPersons);
-                TopicEntity topicEntity2 = new TopicEntity("2",R.drawable.students, "andy","2016-12-31", "走去打球",  null, new ArrayList<String>(),null);
+                TopicEntity topicEntity2 = new TopicEntity("2", R.drawable.students, "andy", "2016-12-31", "走去打球", null, null, null);
                 topicEntities.add(topicEntity1);
                 topicEntities.add(topicEntity2);
                 return topicEntities;

@@ -1,5 +1,6 @@
 package com.cdxy.schoolinforapplication.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,6 +77,9 @@ public class TopicEntity {
     }
 
     public List<String> getThumbPersonsNickname() {
+        if (thumbPersonsNickname==null){
+            thumbPersonsNickname=new ArrayList<>();
+        }
         return thumbPersonsNickname;
     }
 
@@ -84,6 +88,9 @@ public class TopicEntity {
     }
 
     public List<CommentPerson> getCommentPersons() {
+        if (commentPersons==null){
+            commentPersons=new ArrayList<>();
+        }
         return commentPersons;
     }
 

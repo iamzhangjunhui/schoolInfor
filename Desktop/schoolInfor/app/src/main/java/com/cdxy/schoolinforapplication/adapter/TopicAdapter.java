@@ -3,21 +3,22 @@ package com.cdxy.schoolinforapplication.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.model.CommentContent;
 import com.cdxy.schoolinforapplication.model.CommentPerson;
 import com.cdxy.schoolinforapplication.model.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
@@ -40,10 +41,16 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
     private Context context;
     private TopicPhotosAdapter topicPhotosAdapter;
     private TopicCommentPersonsAdapter topicCommentPersonsAdapter;
+    private LinearLayout layoutAddComment;
+    private EditText edtAddComment;
+    private TextView txtSendNewComment;
 
-    public TopicAdapter(List<TopicEntity> list, Context context) {
+    public TopicAdapter(List<TopicEntity> list, Context context, LinearLayout layoutAddComment, EditText edtAddComment, TextView txtSendNewComment) {
         this.list = list;
         this.context = context;
+        this.layoutAddComment = layoutAddComment;
+        this.edtAddComment = edtAddComment;
+        this.txtSendNewComment = txtSendNewComment;
     }
 
     @Override
@@ -73,7 +80,7 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
             viewHolder = (ViewHolder) view.getTag();
         }
         final TopicEntity entity = (TopicEntity) getItem(i);
-        String nickName = entity.getNickName();
+        final String nickName = entity.getNickName();
         if (!TextUtils.isEmpty(nickName)) {
             viewHolder.txtTopicNickname.setText(nickName);
         }
@@ -130,6 +137,54 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
                 viewHolder.txtThumbPersonsNickname.setText(thumbPersonsNameString);
             }
         }
+        final List<CommentPerson> commentPersons = entity.getCommentPersons();
+        if (commentPersons != null) {
+            topicCommentPersonsAdapter = new TopicCommentPersonsAdapter(context, commentPersons);
+            viewHolder.scrollComments.setAdapter(topicCommentPersonsAdapter);
+        }
+        viewHolder.imgComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                edtAddComment.setText("");
+                layoutAddComment.setVisibility(View.VISIBLE);
+                txtSendNewComment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final String newCommentcontent = edtAddComment.getText().toString();
+                        if (TextUtils.isEmpty(newCommentcontent)) {
+                            return;
+                        } else {
+                            //编辑框不再显示
+                            layoutAddComment.setVisibility(View.GONE);
+                            int i = 0;
+                            //该用户是第一个评价这个话题的人
+                            for (; i < commentPersons.size(); i++) {
+                                if (nickName.equals(commentPersons.get(i))) ;
+                                break;
+                            }
+                            //这是该用户对这个话题的第一个评价
+                            if (i == commentPersons.size()) {
+                                //新创建一个评论人对象
+                                ArrayList<CommentContent> commentContents = new ArrayList<>();
+                                //这里的发送方的昵称"小芳"，本应该是用户昵称，这里只是用于测试。
+                                CommentContent commentContent = new CommentContent("小芳", nickName, newCommentcontent);
+                                commentContents.add(commentContent);
+                                //id本应该是从Sharepreference获取，现在暂时随便写一个，作为测试
+                                CommentPerson commentPerson = new CommentPerson("121", commentContents);
+                                commentPersons.add(commentPerson);
+                            } else {
+                                //在该评论人的评论列表中添加一条评论。
+                                //这里的发送者应该是用户昵称，测试阶段暂时使用从列表中获取评论者姓名
+                                String senderNickname = commentPersons.get(i).getCommentContents().get(0).getSenderNickname();
+                                CommentContent commentContent = new CommentContent(senderNickname, nickName, newCommentcontent);
+                                commentPersons.get(i).getCommentContents().add(commentContent);
+                            }
+                            topicCommentPersonsAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+            }
+        });
         viewHolder.imgThumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -151,7 +206,7 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
                 } else {
                     //如果这个人已点过赞，则将这个人从点赞人列表中移除
                     entity.getThumbPersonsNickname().remove(j--);
-                    if (thumbPersonsName.size()==0){
+                    if (thumbPersonsName.size() == 0) {
                         viewHolder.layout_divider.setVisibility(View.GONE);
                         viewHolder.txtThumbPersonsNickname.setVisibility(View.GONE);
                     }
@@ -159,11 +214,6 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
                 TopicAdapter.this.notifyDataSetChanged();
             }
         });
-        List<CommentPerson> commentPersons = entity.getCommentPersons();
-        if (commentPersons != null) {
-            topicCommentPersonsAdapter = new TopicCommentPersonsAdapter(context, commentPersons);
-            viewHolder.scrollComments.setAdapter(topicCommentPersonsAdapter);
-        }
         return view;
     }
 

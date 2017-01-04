@@ -9,11 +9,13 @@ public class CommentContent {
     private String receiverNickname;//接收方昵称
     private String content;//评论内容
 
-    public CommentContent(String senderNickname,  String content) {
+    //对自己的话题的补充说明
+    public CommentContent(String senderNickname, String content) {
         this.senderNickname = senderNickname;
         this.content = content;
     }
 
+    //评价别人的话题
     public CommentContent(String senderNickname, String receiverNickname, String content) {
         this.senderNickname = senderNickname;
         this.receiverNickname = receiverNickname;

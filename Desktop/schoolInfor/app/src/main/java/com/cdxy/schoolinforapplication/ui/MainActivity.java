@@ -86,7 +86,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Fragment[] fragments;
     private int oldPos = 1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
