@@ -26,12 +26,6 @@ import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.adapter.ShowPhotoAdapter;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
-import com.cdxy.schoolinforapplication.util.OnRecyclerItemOnLongClickListener;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,21 +74,6 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         locationClient.registerLocationListener(myListener);
         initLocation();
         locationClient.start();
-        recycleViewAddPhoto.addOnItemTouchListener(new OnRecyclerItemOnLongClickListener(recycleViewAddPhoto) {
-            @Override
-            public void onItemLongClick(final RecyclerView.ViewHolder viewHolder) {
-                View view = LayoutInflater.from(AddNewTopicActivity.this).inflate(R.layout.item_show_photo, null);
-//                ImageView imgDeletePhoto= (ImageView) view.findViewById(img_delete_photo);
-//                imgDeletePhoto.setVisibility(View.VISIBLE);
-//                imgDeletePhoto.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        list.remove((int)viewHolder.getItemId());
-//                        adapter.notifyItemRemoved((int)viewHolder.getItemId());
-//                    }
-//                });
-            }
-        });
     }
 
     @Override

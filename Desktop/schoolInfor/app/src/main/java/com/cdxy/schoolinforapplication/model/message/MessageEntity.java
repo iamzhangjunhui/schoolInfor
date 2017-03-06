@@ -1,4 +1,4 @@
-package com.cdxy.schoolinforapplication.model;
+package com.cdxy.schoolinforapplication.model.message;
 
 import java.io.Serializable;
 

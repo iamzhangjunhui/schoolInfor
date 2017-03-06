@@ -15,10 +15,13 @@ import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
+import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.ChooseInfor.ChooseInforActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.load.RegisterActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
+import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
+import com.cdxy.schoolinforapplication.util.huoqushuju;
 
 import java.util.Calendar;
 
@@ -57,6 +60,8 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
     EditText edtHobby;
     @BindView(R.id.submit_register)
     Button submitRegister;
+    private huoqushuju huoqushuju;
+    private UserInforEntity userInfor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +75,8 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
     @Override
     public void init() {
     txtTitle.setText("修改我的个人信息");
+        huoqushuju = new huoqushuju();
+        setData();
     }
 
     @Override
@@ -134,5 +141,26 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
                 txtNation.setText(nation);
             }
         }
+    }
+    private void setData() {
+        String loginName = SharedPreferenceManager.instance(ModifyMyInforActivity.this).getSharedPreferences().getString(SharedPreferenceManager.LOGIN_NAME, null);
+        if (!TextUtils.isEmpty(loginName)) {
+            userInfor = huoqushuju.huoqushuju(loginName);
+            edtNickname.setText(userInfor.getNicheng() + "");
+            edtRealname.setText(userInfor.getXingming() + "");
+            txtDepartment.setText(userInfor.getXibie() + "");
+            txtClass.setText(userInfor.getBanji() + "");
+            edtStudentId.setText(userInfor.getXuehao() + "");
+            if (userInfor.getXingbie().equals("女")){
+                rgSex.check(R.id.girl);
+            }else {
+                rgSex.check(R.id.boy);
+            }
+            txtBirthday.setText(userInfor.getShengri() + "");
+            txtNation.setText(userInfor.getMinzu() + "");
+            edtAddress.setText(userInfor.getJia() + "");
+            edtHobby.setText(userInfor.getXingqu() + "");
+        }
+
     }
 }

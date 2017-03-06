@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.model.CommentContent;
-import com.cdxy.schoolinforapplication.model.CommentPerson;
+import com.cdxy.schoolinforapplication.model.topic.CommentContent;
+import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 
 import java.util.List;

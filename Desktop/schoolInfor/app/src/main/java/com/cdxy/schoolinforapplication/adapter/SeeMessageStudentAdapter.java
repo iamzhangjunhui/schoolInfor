@@ -9,7 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.model.SeeMeaaseStudentEntity;
+import com.cdxy.schoolinforapplication.model.message.SeeMeaaseStudentEntity;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.cdxy.schoolinforapplication.model;
+package com.cdxy.schoolinforapplication.model.topic;
 
 import java.util.List;
 

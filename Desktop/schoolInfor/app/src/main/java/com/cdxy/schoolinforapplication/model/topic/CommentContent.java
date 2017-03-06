@@ -1,4 +1,4 @@
-package com.cdxy.schoolinforapplication.model;
+package com.cdxy.schoolinforapplication.model.topic;
 
 /**
  * Created by huihui on 2017/1/1.

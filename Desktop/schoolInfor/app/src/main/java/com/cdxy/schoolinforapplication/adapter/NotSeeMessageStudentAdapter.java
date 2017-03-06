@@ -15,8 +15,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.model.MessageEntity;
-import com.cdxy.schoolinforapplication.model.NotSeeMessageStudentEntity;
+import com.cdxy.schoolinforapplication.model.message.MessageEntity;
+import com.cdxy.schoolinforapplication.model.message.NotSeeMessageStudentEntity;
 
 import java.util.List;
 

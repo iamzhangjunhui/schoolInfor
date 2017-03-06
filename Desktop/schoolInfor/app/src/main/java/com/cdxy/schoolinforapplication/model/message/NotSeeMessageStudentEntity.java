@@ -1,22 +1,23 @@
-package com.cdxy.schoolinforapplication.model;
+package com.cdxy.schoolinforapplication.model.message;
 
 /**
  * Created by huihui on 2016/12/27.
  */
 
-public class SeeMeaaseStudentEntity {
+public class NotSeeMessageStudentEntity {
+    //姓名、学号、系、班级、电话号码
     private String name;
     private String id;
     private String department;
     private String clazz;
-    private String accept_time;
+    private String phoneNumber;
 
-    public SeeMeaaseStudentEntity(String name, String id, String department, String clazz, String accept_time) {
+    public NotSeeMessageStudentEntity(String name, String id, String department, String clazz, String phoneNumber) {
         this.name = name;
         this.id = id;
         this.department = department;
         this.clazz = clazz;
-        this.accept_time = accept_time;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getName() {
@@ -51,24 +52,22 @@ public class SeeMeaaseStudentEntity {
         this.clazz = clazz;
     }
 
-    public String getAccept_time() {
-        return accept_time;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setAccept_time(String accept_time) {
-        this.accept_time = accept_time;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     @Override
     public String toString() {
-        return "SeeMeaaseStudentEntity{" +
+        return "NotSeeMessageStudentEntity{" +
                 "name='" + name + '\'' +
                 ", id='" + id + '\'' +
                 ", department='" + department + '\'' +
                 ", clazz='" + clazz + '\'' +
-                ", accept_time='" + accept_time + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
     }
-
-
 }

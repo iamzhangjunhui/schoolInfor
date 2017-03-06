@@ -1,4 +1,6 @@
-package com.cdxy.schoolinforapplication.model;
+package com.cdxy.schoolinforapplication.model.topic;
+
+import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.adapter.NotSeeMessageStudentAdapter;
-import com.cdxy.schoolinforapplication.model.MessageEntity;
-import com.cdxy.schoolinforapplication.model.NotSeeMessageStudentEntity;
+import com.cdxy.schoolinforapplication.model.message.MessageEntity;
+import com.cdxy.schoolinforapplication.model.message.NotSeeMessageStudentEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 

@@ -7,16 +7,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.mobileim.YWAPI;
+import com.alibaba.mobileim.YWIMKit;
+import com.alibaba.mobileim.channel.event.IWxCallback;
+import com.alibaba.mobileim.contact.IYWContactService;
+import com.alibaba.mobileim.contact.IYWDBContact;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MyFriendActivity extends BaseActivity implements View.OnClickListener {
-
-
     @BindView(R.id.img_back)
     ImageView imgBack;
     @BindView(R.id.txt_title)
@@ -26,6 +31,7 @@ public class MyFriendActivity extends BaseActivity implements View.OnClickListen
     @BindView(R.id.activity_my_friend)
     LinearLayout activityMyFriend;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +39,29 @@ public class MyFriendActivity extends BaseActivity implements View.OnClickListen
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
         init();
+        //获取我的好友列表
+        YWIMKit ywimKit = YWAPI.getIMKitInstance("visitor1", "23015524");
+        final IYWContactService iywContactService = ywimKit.getContactService();
+        IWxCallback callback = new IWxCallback() {
+
+
+            @Override
+            public void onSuccess(Object... result) {
+                List<IYWDBContact> contactsFromCache = iywContactService.getContactsFromCache();
+            }
+
+            @Override
+            public void onProgress(int progress) {
+
+            }
+
+
+            @Override
+            public void onError(int code, String info) {
+
+            }
+        };
+        iywContactService.syncContacts(callback);
     }
 
     @Override

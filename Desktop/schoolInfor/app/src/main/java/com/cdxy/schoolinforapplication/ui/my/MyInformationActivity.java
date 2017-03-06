@@ -2,6 +2,7 @@ package com.cdxy.schoolinforapplication.ui.my;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -9,7 +10,10 @@ import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
+import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
+import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
+import com.cdxy.schoolinforapplication.util.huoqushuju;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,6 +49,8 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
     TextView txtHobby;
     @BindView(R.id.activity_my_information)
     LinearLayout activityMyInformation;
+    private huoqushuju huoqushuju;
+    private UserInforEntity userInfor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +65,8 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
     public void init() {
         txtTitle.setText("我的个人信息");
         txtRight.setVisibility(View.VISIBLE);
+        huoqushuju = new huoqushuju();
+        setData();
     }
 
     @Override
@@ -73,4 +81,23 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
                 break;
         }
     }
+
+    private void setData() {
+        String loginName = SharedPreferenceManager.instance(MyInformationActivity.this).getSharedPreferences().getString(SharedPreferenceManager.LOGIN_NAME, null);
+        if (!TextUtils.isEmpty(loginName)) {
+            userInfor = huoqushuju.huoqushuju(loginName);
+            txtNickname.setText(userInfor.getNicheng() + "");
+            txtRealname.setText(userInfor.getXingming() + "");
+            txtDepartment.setText(userInfor.getXibie() + "");
+            txtClass.setText(userInfor.getBanji() + "");
+            txtStudentId.setText(userInfor.getXuehao() + "");
+            txtSex.setText(userInfor.getXingbie() + "");
+            txtBirthday.setText(userInfor.getShengri() + "");
+            txtNation.setText(userInfor.getMinzu() + "");
+            txtAddress.setText(userInfor.getJia() + "");
+            txtHobby.setText(userInfor.getXingqu() + "");
+        }
+
+    }
+
 }

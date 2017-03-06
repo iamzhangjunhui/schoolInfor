@@ -14,9 +14,9 @@ import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.adapter.TopicAdapter;
-import com.cdxy.schoolinforapplication.model.CommentContent;
-import com.cdxy.schoolinforapplication.model.CommentPerson;
-import com.cdxy.schoolinforapplication.model.TopicEntity;
+import com.cdxy.schoolinforapplication.model.topic.CommentContent;
+import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
+import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 

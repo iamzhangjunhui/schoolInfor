@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -18,9 +17,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.model.CommentContent;
-import com.cdxy.schoolinforapplication.model.CommentPerson;
-import com.cdxy.schoolinforapplication.model.TopicEntity;
+import com.cdxy.schoolinforapplication.model.topic.CommentContent;
+import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
+import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 

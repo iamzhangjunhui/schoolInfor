@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.model.MessageEntity;
+import com.cdxy.schoolinforapplication.model.message.MessageEntity;
 import com.cdxy.schoolinforapplication.util.Constant;
 
 import java.util.List;

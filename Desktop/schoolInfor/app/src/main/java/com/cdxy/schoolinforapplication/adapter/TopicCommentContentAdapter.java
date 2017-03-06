@@ -10,7 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.model.CommentContent;
+import com.cdxy.schoolinforapplication.model.topic.CommentContent;
 
 import java.util.List;
 

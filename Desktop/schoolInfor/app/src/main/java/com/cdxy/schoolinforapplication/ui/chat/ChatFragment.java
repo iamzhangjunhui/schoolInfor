@@ -12,10 +12,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.alibaba.mobileim.YWAPI;
+import com.alibaba.mobileim.YWIMKit;
+import com.alibaba.mobileim.channel.event.IWxCallback;
+import com.alibaba.mobileim.contact.IYWContactService;
+import com.alibaba.mobileim.contact.IYWDBContact;
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,7 +32,6 @@ import jp.wasabeef.glide.transformations.CropCircleTransformation;
  * A simple {@link Fragment} subclass.
  */
 public class ChatFragment extends BaseFragment {
-
     public ChatFragment() {
         // Required empty public constructor
     }
@@ -44,10 +50,14 @@ public class ChatFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         init();
+        YWIMKit ywimKit = YWAPI.getIMKitInstance("visitor1", "23015524");
+        Fragment f = ywimKit.getConversationFragment();
+        getActivity().getSupportFragmentManager().beginTransaction().add(R.id.chat_conversation_fragment,f).commit();
     }
 
     @Override
     public void init() {
+
     }
 
 }
