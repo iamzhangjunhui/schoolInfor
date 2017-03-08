@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
 import com.cdxy.schoolinforapplication.util.Constant;
+import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,6 +39,7 @@ public class MessageFragment extends BaseFragment {
     ImageView imgIcon3;
     @BindView(R.id.layout_my_message)
     LinearLayout layoutMyMessage;
+    private String identity;
 
 
     @Override
@@ -58,19 +60,11 @@ public class MessageFragment extends BaseFragment {
 
     @Override
     public void init() {
-        //此处只是用于测试阶段获取用户身份
-        new AlertDialog.Builder(getContext()).setMessage("我的身份是：").setPositiveButton("老师", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        }).setNegativeButton("学生", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                layoutMyMessage.setVisibility(View.GONE);
-                dialogInterface.dismiss();
-            }
-        }).create().show();
+      identity= SharedPreferenceManager.instance(getContext()).getSharedPreferences().getString(SharedPreferenceManager.IDENTITY,null);
+        String identity="老师";
+        if (identity.equals("老师")){
+            layoutMyMessage.setVisibility(View.VISIBLE);
+        }
     }
     private  void addListener(){
         layoutImportantMessage.setOnClickListener(new View.OnClickListener() {

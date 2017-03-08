@@ -7,6 +7,7 @@ package com.cdxy.schoolinforapplication.model.chat;
     public class MyFriendEntity {
     private String name;
     private String icon;
+    private boolean isOnline;
 
     public String getName() {
         return name;
@@ -22,5 +23,13 @@ package com.cdxy.schoolinforapplication.model.chat;
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean online) {
+        isOnline = online;
     }
 }

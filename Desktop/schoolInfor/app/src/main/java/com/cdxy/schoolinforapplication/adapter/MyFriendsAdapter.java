@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.model.chat.MyFriendEntity;
-import com.cdxy.schoolinforapplication.ui.MainActivity;
 
 import java.util.List;
 
@@ -52,22 +51,31 @@ public class MyFriendsAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         if (view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.item_my_friend, null);
-           viewHolder=new ViewHolder(view);
+            viewHolder = new ViewHolder(view);
             view.setTag(viewHolder);
-        }else {
-            viewHolder= (ViewHolder) view.getTag();
+        } else {
+            viewHolder = (ViewHolder) view.getTag();
         }
-        MyFriendEntity myFriendEntity= (MyFriendEntity) getItem(i);
+        MyFriendEntity myFriendEntity = (MyFriendEntity) getItem(i);
         viewHolder.txtName.setText(myFriendEntity.getName());
+        boolean isOnline=myFriendEntity.isOnline();
+        if (isOnline) {
+            viewHolder.txtIsOnline.setText("在线");
+        }else {
+            viewHolder.txtIsOnline.setText("离线");
+        }
         Glide.with(context).load(myFriendEntity.getIcon()).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(context)).into(viewHolder.imgIcon);
         return view;
     }
+
 
     static class ViewHolder {
         @BindView(R.id.img_icon)
         ImageView imgIcon;
         @BindView(R.id.txt_name)
         TextView txtName;
+        @BindView(R.id.txt_is_online)
+        TextView txtIsOnline;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);

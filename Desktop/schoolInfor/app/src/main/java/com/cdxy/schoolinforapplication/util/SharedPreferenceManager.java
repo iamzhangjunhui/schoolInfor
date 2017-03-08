@@ -13,6 +13,8 @@ public class SharedPreferenceManager {
     private Context context;
     public static final String LOGIN_NAME="loginName";
     public static  final String PASSWORD="password";
+    public static final String IDENTITY="identity";
+
 
     public SharedPreferenceManager(Context context) {
         this.context = context;

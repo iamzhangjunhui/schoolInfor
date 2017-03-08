@@ -3,6 +3,7 @@ package com.cdxy.schoolinforapplication.ui;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,6 +21,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
+import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
+import com.cdxy.schoolinforapplication.ui.Message.SendMessageActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity;
 import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
@@ -27,6 +30,8 @@ import com.cdxy.schoolinforapplication.ui.my.ModifyMyPswActivity;
 import com.cdxy.schoolinforapplication.ui.my.MyInformationActivity;
 import com.cdxy.schoolinforapplication.ui.topic.AddNewTopicActivity;
 import com.cdxy.schoolinforapplication.ui.widget.DragLayout;
+import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
+import com.cdxy.schoolinforapplication.util.huoqushuju;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -261,7 +266,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.layout_bottom_message:
                 txtTitle.setText("消息中心");
-                btnRight.setText("");
+//                String identity=SharedPreferenceManager.instance(MainActivity.this).getSharedPreferences().getString(SharedPreferenceManager.IDENTITY,null);
+                String identity = "老师";
+                if (identity.equals("老师")) {
+                    btnRight.setText("发送消息");
+                    btnRight.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(MainActivity.this, SendMessageActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+                } else {
+                    btnRight.setText("");
+                }
                 setFragments(2);
                 break;
 

@@ -6,9 +6,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity">
-<include layout="@layout/view_title"/>
+
+    <include layout="@layout/view_title" />
+
     <ListView
         android:id="@+id/listview_my_friend"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 </LinearLayout>

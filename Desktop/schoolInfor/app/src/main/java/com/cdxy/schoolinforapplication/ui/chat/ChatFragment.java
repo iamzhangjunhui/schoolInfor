@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
+import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
 
 import java.util.List;
 
@@ -50,8 +51,7 @@ public class ChatFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         init();
-        YWIMKit ywimKit = YWAPI.getIMKitInstance("visitor1", "23015524");
-        Fragment f = ywimKit.getConversationFragment();
+        Fragment f = LoginActivity.ywimKit.getConversationFragment();
         getActivity().getSupportFragmentManager().beginTransaction().add(R.id.chat_conversation_fragment,f).commit();
     }
 

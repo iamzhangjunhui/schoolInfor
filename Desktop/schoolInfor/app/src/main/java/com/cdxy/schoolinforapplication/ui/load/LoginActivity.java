@@ -21,9 +21,11 @@ import com.alibaba.mobileim.YWLoginParam;
 import com.alibaba.mobileim.channel.event.IWxCallback;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
+import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
+import com.cdxy.schoolinforapplication.util.huoqushuju;
 
 import org.json.JSONObject;
 
@@ -38,9 +40,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
-
-    @BindView(R.id.txt_skip)
-    TextView txtSkip;
     @BindView(R.id.edt_login_name)
     EditText edtLoginName;
     @BindView(R.id.edt_login_password)
@@ -50,9 +49,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @BindView(R.id.btn_register)
     Button btnRegister;
     private String userid;
-    private String appKay = "23015524";
-    private YWIMKit ywimKit;
+    private String appKay = "23666123";
+    public static YWIMKit ywimKit;
     private String loginName;
+    private huoqushuju huoqushuju;
+    private UserInforEntity userInforEntity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +73,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.txt_skip:
-                //只是用于实现登录功能前
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                break;
             case R.id.btn_register:
                 new AlertDialog.Builder(LoginActivity.this).setMessage("只有学生才需要注册，老师的账号学校已经配好，详情可以咨询教务处")
                         .setNegativeButton("我是老师", new DialogInterface.OnClickListener() {
@@ -97,22 +93,23 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             case R.id.btn_login:
                 loginName = edtLoginName.getText().toString();
                 String loginPassword = edtLoginPassword.getText().toString();
-                if (TextUtils.isEmpty(loginName)) {
-                    toast("请输入账号");
-                    return;
-                }
-                if (TextUtils.isEmpty(loginPassword)) {
-                    toast("请输入登录密码");
-                    return;
-                }
-                login(loginName, loginPassword);
-                intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
+//                if (TextUtils.isEmpty(loginName)) {
+//                    toast("请输入账号");
+//                    return;
+//                }
+//                if (TextUtils.isEmpty(loginPassword)) {
+//                    toast("请输入登录密码");
+//                    return;
+//                }
+//                login(loginName, loginPassword);
                 //获取SDK对象
-                userid = "visitor1";
+                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                getUserIdentity();
+                userid = "zhangjunhui";
                 ywimKit = YWAPI.getIMKitInstance(userid, appKay);
                 //开始登录(测试使用，到时正式使用的时候需要放在登录我们的服务器成功之后)
-                String password = "taobao1234";
+                String password = "123456";
                 IYWLoginService loginService = ywimKit.getLoginService();
                 YWLoginParam param = new YWLoginParam(userid, password, appKay);
                 loginService.login(param, new IWxCallback() {
@@ -174,16 +171,22 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 @Override
                 public void onNext(String s) {
                     if (s.equals("true")) {
-                       SharedPreferences.Editor editor= SharedPreferenceManager.instance(LoginActivity.this).getEditor();
-                        editor.putString(SharedPreferenceManager.LOGIN_NAME,a);//a为登录账号
-                        editor.putString(SharedPreferenceManager.PASSWORD,b);//b为登录密码
+                        SharedPreferences.Editor editor = SharedPreferenceManager.instance(LoginActivity.this).getEditor();
+                        editor.putString(SharedPreferenceManager.LOGIN_NAME, a);//a为登录账号
+                        editor.putString(SharedPreferenceManager.PASSWORD, b);//b为登录密码
                         editor.commit();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.putExtra("lianxi", a);
                         startActivity(intent);
                     }
                 }
             });
         }
+    }
+    private void getUserIdentity(){
+        huoqushuju=new huoqushuju();
+        userInforEntity=huoqushuju.huoqushuju(SharedPreferenceManager.instance(LoginActivity.this).getSharedPreferences().getString(SharedPreferenceManager.LOGIN_NAME,null));
+        SharedPreferences.Editor editor=SharedPreferenceManager.instance(LoginActivity.this).getEditor();
+        editor.putString(SharedPreferenceManager.IDENTITY,userInforEntity.getShenfen());
+        editor.commit();
     }
 }
