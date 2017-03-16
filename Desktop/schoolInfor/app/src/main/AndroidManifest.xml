@@ -43,11 +43,10 @@
             android:name=".ui.MainActivity"
             android:windowSoftInputMode="stateVisible|adjustPan" />
         <activity android:name=".ui.load.LoginActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+<intent-filter>
+    <action android:name="android.intent.action.MAIN"/>
+    <category android:name="android.intent.category.LAUNCHER"/>
+</intent-filter>
         </activity>
         <activity android:name=".ui.load.RegisterActivity" />
         <activity android:name=".ui.load.RegisterCodeActivity" />
@@ -73,6 +72,8 @@
 
         <activity android:name=".ui.topic.ShowBigPhotosActivity" />
         <activity android:name=".ui.Message.SendMessageActivity" />
+        <activity android:name=".swipemenulistviewsample.SimpleActivity"/>
+
     </application>
 
 </manifest>

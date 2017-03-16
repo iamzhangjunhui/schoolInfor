@@ -2,10 +2,7 @@ package com.cdxy.schoolinforapplication.ui.chat;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.alibaba.mobileim.aop.Pointcut;
@@ -15,16 +12,16 @@ import com.alibaba.mobileim.conversation.YWConversation;
 import com.alibaba.mobileim.conversation.YWConversationType;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.SchoolInforManager;
-import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
-import com.cdxy.schoolinforapplication.ui.widget.IsAddFriendDialog;
+import com.cdxy.schoolinforapplication.ui.widget.EdtDialog;
+import com.cdxy.schoolinforapplication.util.Constant;
 
 /**
  * Created by huihui on 2017/3/9.
  */
 
 public class ConversationListOperationCustomSample extends IMConversationListOperation {
-    private IsAddFriendDialog isAddFriendDialog;
+    private EdtDialog isAddFriendDialog;
 
     public ConversationListOperationCustomSample(Pointcut pointcut) {
         super(pointcut);
@@ -50,20 +47,20 @@ public class ConversationListOperationCustomSample extends IMConversationListOpe
         } else if (type == YWConversationType.Tribe) {
             return true;
         } else if (type == YWConversationType.Custom) {
-            isAddFriendDialog = new IsAddFriendDialog(fragment.getContext(), R.style.MyDialog, new IsAddFriendDialog.AddFriendListener() {
+            isAddFriendDialog = new EdtDialog(fragment.getContext(), R.style.MyDialog, new EdtDialog.AddFriendListener() {
                 @Override
                 public void onClick(View view) {
                     switch (view.getId()) {
-                        case R.id.btn_add:
+                        case R.id.btn_sure:
                             addFriend(fragment,conversation.getLatestMessageAuthorId());
                             isAddFriendDialog.dismiss();
                             break;
-                        case R.id.btn_not_add:
+                        case R.id.btn_cancel:
                             isAddFriendDialog.dismiss();
                             break;
                     }
                 }
-            },fragment.getActivity());
+            },fragment.getActivity(), Constant.EDTDIALOG_TYPE_ADD_FRIEND);
             isAddFriendDialog.show();
 
             return true;
@@ -102,7 +99,7 @@ public class ConversationListOperationCustomSample extends IMConversationListOpe
 
             }
         };
-        LoginActivity.iywContactService.ackAddContact(target, SchoolInforManager.appKay, true, isAddFriendDialog.respond, callback);
+        LoginActivity.iywContactService.ackAddContact(target, SchoolInforManager.appKay, true, isAddFriendDialog.content, callback);
 
     }
 }

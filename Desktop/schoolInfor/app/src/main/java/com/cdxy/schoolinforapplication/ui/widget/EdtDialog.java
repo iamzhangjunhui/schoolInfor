@@ -10,8 +10,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.util.Constant;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,26 +22,30 @@ import butterknife.ButterKnife;
  * Created by huihui on 2017/3/15.
  */
 
-public class IsAddFriendDialog extends Dialog implements View.OnClickListener {
-    @BindView(R.id.edt_respond)
-    EditText edtRespond;
-    @BindView(R.id.btn_add)
-    Button btnAdd;
-    @BindView(R.id.btn_not_add)
-    Button btnNotAdd;
+public class EdtDialog extends Dialog implements View.OnClickListener {
+    @BindView(R.id.edt_content)
+    EditText edtContent;
+    @BindView(R.id.btn_sure)
+    Button btnSure;
+    @BindView(R.id.btn_cancel)
+    Button btnCancel;
+    @BindView(R.id.txt_title)
+    TextView txtTitle;
     private AddFriendListener addFriendListener;
-    public String respond = "";
+    public static String content = "";
     private Activity activity;
+    private String type;
 
-    public IsAddFriendDialog(@NonNull Context context, @StyleRes int themeResId, AddFriendListener addFriendListener,Activity activity) {
+    public EdtDialog(@NonNull Context context, @StyleRes int themeResId, AddFriendListener addFriendListener, Activity activity, String type) {
         super(context, themeResId);
         this.addFriendListener = addFriendListener;
-        this.activity=activity;
+        this.activity = activity;
+        this.type = type;
     }
 
     @Override
     public void onClick(View view) {
-        respond = edtRespond.getText().toString();
+        content = edtContent.getText().toString();
         addFriendListener.onClick(view);
     }
 
@@ -53,10 +59,15 @@ public class IsAddFriendDialog extends Dialog implements View.OnClickListener {
         setContentView(R.layout.dialog_add_friend);
         ButterKnife.bind(this);
         //设置dialog显示的宽度
-        WindowManager.LayoutParams params=getWindow().getAttributes();
-        params.width=activity.getWindowManager().getDefaultDisplay().getWidth()-40;
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.width = activity.getWindowManager().getDefaultDisplay().getWidth() - 40;
         getWindow().setAttributes(params);
-        btnAdd.setOnClickListener(this);
-        btnNotAdd.setOnClickListener(this);
+        btnSure.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
+        if (type.equals(Constant.EDTDIALOG_TYPE_UPDATE_NAME)) {
+            txtTitle.setText("修改备注为：");
+            btnSure.setText("确定");
+            btnCancel.setText("取消");
+        }
     }
 }
