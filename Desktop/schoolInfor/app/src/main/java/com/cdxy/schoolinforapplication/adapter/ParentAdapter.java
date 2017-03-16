@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
@@ -25,7 +24,6 @@ public class ParentAdapter extends BaseExpandableListAdapter {
     private Context context;
     private CheckBox checkBox;
     private TextView textView;
-    private ImageView imageView;
     private CheckBox childCheckBox;
     private TextView childTextView;
 
@@ -74,7 +72,6 @@ public class ParentAdapter extends BaseExpandableListAdapter {
         view = LayoutInflater.from(context).inflate(R.layout.item_tree_parent, null);
         checkBox = (CheckBox) view.findViewById(R.id.ck_parent);
         textView = (TextView) view.findViewById(R.id.txt_parent_name);
-        imageView= (ImageView) view.findViewById(R.id.image);
         final ParentEntity entity = (ParentEntity) getGroup(i);
         textView.setText(entity.getName());
         textView.setTextColor(entity.getColor());
@@ -82,11 +79,6 @@ public class ParentAdapter extends BaseExpandableListAdapter {
             checkBox.setChecked(true);
         } else {
             checkBox.setChecked(false);
-        }
-        if (entity.isExpand()){
-            imageView.setImageResource(R.drawable.up);
-        }else {
-            imageView.setImageResource(R.drawable.down);
         }
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

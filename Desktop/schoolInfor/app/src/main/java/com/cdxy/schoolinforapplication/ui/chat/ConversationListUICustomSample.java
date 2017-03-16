@@ -4,6 +4,8 @@ import android.support.v4.app.Fragment;
 
 import com.alibaba.mobileim.aop.Pointcut;
 import com.alibaba.mobileim.aop.custom.IMConversationListUI;
+import com.alibaba.mobileim.conversation.YWConversation;
+import com.alibaba.mobileim.conversation.YWConversationType;
 
 /**
  * Created by huihui on 2017/2/26.
@@ -20,6 +22,11 @@ public class ConversationListUICustomSample extends IMConversationListUI {
     //不显示标题栏
     @Override
     public boolean needHideTitleView(Fragment fragment) {
+        return true;
+    }
+
+    @Override
+    public boolean getPullToRefreshEnabled() {
         return true;
     }
 }

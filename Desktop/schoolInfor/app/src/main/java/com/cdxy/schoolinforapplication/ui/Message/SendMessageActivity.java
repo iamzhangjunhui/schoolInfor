@@ -15,6 +15,7 @@ import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.adapter.ParentAdapter;
 import com.cdxy.schoolinforapplication.model.tree.ChildEntity;
 import com.cdxy.schoolinforapplication.model.tree.ParentEntity;
+import com.cdxy.schoolinforapplication.ui.widget.ScollerExpandableListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SendMessageActivity extends Activity implements View.OnClickListener,ExpandableListView.OnGroupClickListener, CompoundButton.OnCheckedChangeListener {
+public class SendMessageActivity extends Activity implements View.OnClickListener, ExpandableListView.OnGroupClickListener, CompoundButton.OnCheckedChangeListener {
     @BindView(R.id.img_back)
     ImageView imgBack;
     @BindView(R.id.txt_title)
@@ -31,10 +32,12 @@ public class SendMessageActivity extends Activity implements View.OnClickListene
     Button btnRight;
     @BindView(R.id.txt_child_name)
     TextView txtChildName;
-    @BindView(R.id.eList)
-    ExpandableListView eList;
     @BindView(R.id.ck_all)
     CheckBox ckAll;
+    @BindView(R.id.eList)
+    ScollerExpandableListView eList;
+    @BindView(R.id.activity_send_message)
+    LinearLayout activitySendMessage;
     private ParentAdapter adapter;
     private List<ParentEntity> list;
 
@@ -106,7 +109,7 @@ public class SendMessageActivity extends Activity implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.img_back:
                 finish();
                 break;

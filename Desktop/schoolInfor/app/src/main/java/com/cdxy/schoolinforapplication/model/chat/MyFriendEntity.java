@@ -8,6 +8,7 @@ package com.cdxy.schoolinforapplication.model.chat;
     private String name;
     private String icon;
     private boolean isOnline;
+    private String userId;
 
     public String getName() {
         return name;
@@ -31,5 +32,13 @@ package com.cdxy.schoolinforapplication.model.chat;
 
     public void setOnline(boolean online) {
         isOnline = online;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

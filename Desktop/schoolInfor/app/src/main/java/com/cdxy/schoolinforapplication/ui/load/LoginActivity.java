@@ -19,7 +19,9 @@ import com.alibaba.mobileim.YWAPI;
 import com.alibaba.mobileim.YWIMKit;
 import com.alibaba.mobileim.YWLoginParam;
 import com.alibaba.mobileim.channel.event.IWxCallback;
+import com.alibaba.mobileim.contact.IYWContactService;
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.SchoolInforManager;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
@@ -48,9 +50,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     Button btnLogin;
     @BindView(R.id.btn_register)
     Button btnRegister;
-    private String userid;
-    private String appKay = "23666123";
+    public static String userid;
     public static YWIMKit ywimKit;
+    public static IYWContactService iywContactService;
     private String loginName;
     private huoqushuju huoqushuju;
     private UserInforEntity userInforEntity;
@@ -93,7 +95,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             case R.id.btn_login:
                 loginName = edtLoginName.getText().toString();
                 String loginPassword = edtLoginPassword.getText().toString();
-//                if (TextUtils.isEmpty(loginName)) {
+//         (TextUtils.isEmpty(loginName)) {
 //                    toast("请输入账号");
 //                    return;
 //                }
@@ -103,15 +105,16 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 //                }
 //                login(loginName, loginPassword);
                 //获取SDK对象
-                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 getUserIdentity();
-                userid = "zhangjunhui";
-                ywimKit = YWAPI.getIMKitInstance(userid, appKay);
+                userid =loginPassword;
+                ywimKit = YWAPI.getIMKitInstance(userid, SchoolInforManager.appKay);
+                iywContactService = ywimKit.getContactService();
                 //开始登录(测试使用，到时正式使用的时候需要放在登录我们的服务器成功之后)
                 String password = "123456";
                 IYWLoginService loginService = ywimKit.getLoginService();
-                YWLoginParam param = new YWLoginParam(userid, password, appKay);
+                YWLoginParam param = new YWLoginParam(userid, password, SchoolInforManager.appKay);
                 loginService.login(param, new IWxCallback() {
                     @Override
                     public void onSuccess(Object... objects) {
@@ -182,11 +185,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             });
         }
     }
-    private void getUserIdentity(){
-        huoqushuju=new huoqushuju();
-        userInforEntity=huoqushuju.huoqushuju(SharedPreferenceManager.instance(LoginActivity.this).getSharedPreferences().getString(SharedPreferenceManager.LOGIN_NAME,null));
-        SharedPreferences.Editor editor=SharedPreferenceManager.instance(LoginActivity.this).getEditor();
-        editor.putString(SharedPreferenceManager.IDENTITY,userInforEntity.getShenfen());
+
+    private void getUserIdentity() {
+        huoqushuju = new huoqushuju();
+        userInforEntity = huoqushuju.huoqushuju(SharedPreferenceManager.instance(LoginActivity.this).getSharedPreferences().getString(SharedPreferenceManager.LOGIN_NAME, null));
+        SharedPreferences.Editor editor = SharedPreferenceManager.instance(LoginActivity.this).getEditor();
+        editor.putString(SharedPreferenceManager.IDENTITY, userInforEntity.getShenfen());
         editor.commit();
     }
 }

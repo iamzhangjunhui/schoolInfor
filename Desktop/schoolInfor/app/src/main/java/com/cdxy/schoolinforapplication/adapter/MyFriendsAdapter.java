@@ -58,12 +58,6 @@ public class MyFriendsAdapter extends BaseAdapter {
         }
         MyFriendEntity myFriendEntity = (MyFriendEntity) getItem(i);
         viewHolder.txtName.setText(myFriendEntity.getName());
-        boolean isOnline=myFriendEntity.isOnline();
-        if (isOnline) {
-            viewHolder.txtIsOnline.setText("在线");
-        }else {
-            viewHolder.txtIsOnline.setText("离线");
-        }
         Glide.with(context).load(myFriendEntity.getIcon()).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(context)).into(viewHolder.imgIcon);
         return view;
     }
@@ -74,8 +68,6 @@ public class MyFriendsAdapter extends BaseAdapter {
         ImageView imgIcon;
         @BindView(R.id.txt_name)
         TextView txtName;
-        @BindView(R.id.txt_is_online)
-        TextView txtIsOnline;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);

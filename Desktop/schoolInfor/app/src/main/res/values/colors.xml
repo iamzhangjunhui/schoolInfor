@@ -19,5 +19,6 @@
     <color name="my_background_color">@color/top_color</color>
     <color name="main_bottom_tab_color">#ececec</color>
     <color name="diliver_topic">#f9f7f7</color>
+    <color name="transparent_background">#00000000</color>
 
     </resources>
