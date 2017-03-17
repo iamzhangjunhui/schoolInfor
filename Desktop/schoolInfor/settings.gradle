@@ -1,1 +1,2 @@
 include ':app', ':wx'
+include ':swipeMenuListView'
