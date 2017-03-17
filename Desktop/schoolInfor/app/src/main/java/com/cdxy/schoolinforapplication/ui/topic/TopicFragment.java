@@ -5,11 +5,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
@@ -18,7 +20,7 @@ import com.cdxy.schoolinforapplication.model.topic.CommentContent;
 import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
-import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
+import com.cdxy.schoolinforapplication.ui.widget.RefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +35,16 @@ public class TopicFragment extends BaseFragment {
 
     @BindView(R.id.layout_progress)
     LinearLayout layoutProgress;
-    @BindView(R.id.scroll_list_topic)
-    ScrollListView scrollListTopic;
     @BindView(R.id.edt_add_comment)
     EditText edtAddComment;
     @BindView(R.id.layout_add_comment)
     LinearLayout layoutAddComment;
     @BindView(R.id.txt_send_new_comment)
     TextView txtSendNewComment;
+    @BindView(R.id.refresh_layout)
+    RefreshLayout refreshLayout;
+    @BindView(R.id.list_topic)
+    ListView listTopic;
     private TopicAdapter adapter;
     private List<TopicEntity> list;
 
@@ -62,13 +66,56 @@ public class TopicFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
         init();
         getTopics();
+        adapter.notifyDataSetChanged();
     }
 
     @Override
     public void init() {
         list = new ArrayList<>();
-        adapter = new TopicAdapter(list, getContext(), layoutAddComment, edtAddComment,txtSendNewComment );
-        scrollListTopic.setAdapter(adapter);
+        /**
+         * 在 refreshLayout.setLoading(false);方法中添加了footerView
+         * footerView的添加必须setAdapter之前
+         * public void setAdapter(ListAdapter adapter) {
+         ........
+         if (mHeaderViewInfos.size() > 0|| mFooterViewInfos.size() > 0) {
+         mAdapter = new HeaderViewListAdapter(mHeaderViewInfos, mFooterViewInfos, adapter);
+         } else {
+         mAdapter = adapter;
+         }
+         ........
+         }
+         * 通过adapter的setAdapter()方法可以看出
+         * 在setAdapter之前要判断该是否存在headView或footerView，如果存在就创建并传HeaderViewListAdapter，否则传adapter
+         */
+        refreshLayout.setLoading(false);
+        adapter = new TopicAdapter(list, getActivity(), layoutAddComment, edtAddComment, txtSendNewComment);
+        listTopic.setAdapter(adapter);
+        //设置下拉刷新时的颜色值，颜色需要定义在xml中
+        refreshLayout.setColorSchemeColors(R.color.top_color, R.color.colorAccent, R.color.text_red_color, R.color.txt_departent_class_color);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toast("刷新");
+                        refreshLayout.setRefreshing(false);
+                    }
+                }, 2000);
+            }
+        });
+        refreshLayout.setOnLoadListener(new RefreshLayout.OnLoadListener() {
+            @Override
+            public void onLoad() {
+                refreshLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        toast("加载");
+                        refreshLayout.setLoading(false);
+                    }
+                }, 2000);
+            }
+        });
     }
 
     //测试数据
@@ -107,7 +154,13 @@ public class TopicFragment extends BaseFragment {
                 CommentPerson commentPerson2 = new CommentPerson("1002", commentContents2);
                 commentPersons.add(commentPerson1);
                 commentPersons.add(commentPerson2);
-                TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "2016-12-12", "今天天气好，适合出去玩", null, thumbPersonsNickname, commentPersons);
+                List<Object> photos = new ArrayList<>();
+                photos.add(R.drawable.bottom_tap_chat_false);
+                photos.add(R.drawable.bottom_tap_chat_false);
+                photos.add(R.drawable.bottom_tap_chat_false);
+                photos.add(R.drawable.bottom_tap_chat_false);
+                photos.add(R.drawable.bottom_tap_chat_false);
+                TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "2016-12-12", "今天天气好，适合出去玩", photos, thumbPersonsNickname, commentPersons);
                 TopicEntity topicEntity2 = new TopicEntity("2", R.drawable.students, "andy", "2016-12-31", "走去打球", null, null, null);
                 topicEntities.add(topicEntity1);
                 topicEntities.add(topicEntity2);

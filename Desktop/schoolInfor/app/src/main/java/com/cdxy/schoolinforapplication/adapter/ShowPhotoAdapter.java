@@ -1,16 +1,21 @@
 package com.cdxy.schoolinforapplication.adapter;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
@@ -63,6 +68,10 @@ public class ShowPhotoAdapter extends RecyclerView.Adapter<ShowPhotoAdapter.View
                             public void onClick(View view) {
                                 //打开系统拍照程序，选择拍照图片
                                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
+                                    Toast.makeText(activity,"拍照的权限申请失败",Toast.LENGTH_LONG).show();
+                                    return;
+                                }
                                 activity.startActivityForResult(intent, Constant.REQUEST_CODE_CAMERA);
                                 dialog.dismiss();
                             }

@@ -12,15 +12,25 @@ import com.cdxy.schoolinforapplication.SchoolInforManager;
 import butterknife.ButterKnife;
 
 public abstract class BaseActivity extends FragmentActivity {
-
+private Toast toast;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
     }
    public abstract void  init();
-  public void toast(String s){
-      Toast.makeText(SchoolInforManager.getContext(),s,Toast.LENGTH_SHORT).show();
-  }
+    public void toast(String s) {
+        if (toast == null) {
+            toast = Toast.makeText(SchoolInforManager.getContext(), s, Toast.LENGTH_SHORT);
+        }
+        toast.show();
+    }
+
+    public void toastLongShow(String s) {
+        if (toast == null) {
+            toast = Toast.makeText(SchoolInforManager.getContext(), s, Toast.LENGTH_LONG);
+        }
+        toast.show();
+    }
 
 }

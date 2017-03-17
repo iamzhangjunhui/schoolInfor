@@ -66,12 +66,13 @@
         <GridView
             android:id="@+id/gridView_photos"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:numColumns="3" />
+            android:layout_height="80dp"
+            android:numColumns="4"
+            android:horizontalSpacing="5dp"/>
 
         <TextView
             android:id="@+id/txt_more_photo_number"
-            android:layout_width="122dp"
+            android:layout_width="80dp"
             android:layout_height="match_parent"
             android:layout_gravity="right"
             android:gravity="center"

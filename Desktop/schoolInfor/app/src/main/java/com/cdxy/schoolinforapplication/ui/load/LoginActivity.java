@@ -108,7 +108,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 getUserIdentity();
-                userid =loginPassword;
+                userid ="zhangjunhui";
                 ywimKit = YWAPI.getIMKitInstance(userid, SchoolInforManager.appKay);
                 iywContactService = ywimKit.getContactService();
                 //开始登录(测试使用，到时正式使用的时候需要放在登录我们的服务器成功之后)

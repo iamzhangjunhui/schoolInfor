@@ -62,7 +62,7 @@ public class MyFriendActivity extends BaseActivity implements View.OnClickListen
 
             @Override
             public void onSuccess(Object... result) {
-                toast("成功添加好友");
+                toast("请求添加好友成功");
             }
 
             @Override
@@ -72,10 +72,9 @@ public class MyFriendActivity extends BaseActivity implements View.OnClickListen
 
             @Override
             public void onError(int code, String info) {
-                Log.i("iywContactService", "onError");
             }
         };
-        LoginActivity.iywContactService.addContact("jiangguangguo", SchoolInforManager.appKay, "蒋光国", "你好，我是蒋光国", addFriendCallback);
+        LoginActivity.iywContactService.addContact("suhang", SchoolInforManager.appKay, "苏杭", "你好，我是王振南", addFriendCallback);
 
         //获取是否在线
 //        final IWxCallback iWxCallbackIsOnline = new IWxCallback() {
@@ -134,8 +133,7 @@ public class MyFriendActivity extends BaseActivity implements View.OnClickListen
 
             @Override
             public void onError(int code, String info) {
-                toast(info);
-                Log.i("iywContactService", info);
+                toast("获取好友列表出错");
             }
         };
         LoginActivity.iywContactService.syncContacts(callback);

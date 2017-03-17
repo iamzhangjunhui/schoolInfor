@@ -35,7 +35,7 @@ public class NotSeeMessageStudentAdapter extends BaseAdapter {
     public NotSeeMessageStudentAdapter(Context context, List<NotSeeMessageStudentEntity> list, MessageEntity messageEntity) {
         this.context = context;
         this.list = list;
-        this.messageEntity=messageEntity;
+        this.messageEntity = messageEntity;
     }
 
     @Override
@@ -109,12 +109,12 @@ public class NotSeeMessageStudentAdapter extends BaseAdapter {
                 txtSendSMS.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent=new Intent(Intent.ACTION_SENDTO,Uri.parse("smsto:"+phoneNumber));
-                        String sender=messageEntity.getSender();
-                        String content=messageEntity.getContent();
-                        if ((!TextUtils.isEmpty(sender))&&(!TextUtils.isEmpty(content)))
-                        intent.putExtra("sms_body",content+"    --"+sender);
-                       context.startActivity(intent);
+                        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + phoneNumber));
+                        String sender = messageEntity.getSender();
+                        String content = messageEntity.getContent();
+                        if ((!TextUtils.isEmpty(sender)) && (!TextUtils.isEmpty(content)))
+                            intent.putExtra("sms_body", content + "    --" + sender);
+                        context.startActivity(intent);
                         dialog.dismiss();
                     }
                 });
@@ -139,6 +139,7 @@ public class NotSeeMessageStudentAdapter extends BaseAdapter {
             ButterKnife.bind(this, view);
         }
     }
+
     @Override
     public boolean isEnabled(int position) {
         return false;

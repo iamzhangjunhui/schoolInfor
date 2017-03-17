@@ -1,8 +1,10 @@
 package com.cdxy.schoolinforapplication.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,16 +39,16 @@ import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
     private List<TopicEntity> list;
-    private Context context;
+    private Activity activity;
     private TopicPhotosAdapter topicPhotosAdapter;
     private TopicCommentPersonsAdapter topicCommentPersonsAdapter;
     private LinearLayout layoutAddComment;
     private EditText edtAddComment;
     private TextView txtSendNewComment;
 
-    public TopicAdapter(List<TopicEntity> list, Context context, LinearLayout layoutAddComment, EditText edtAddComment, TextView txtSendNewComment) {
+    public TopicAdapter(List<TopicEntity> list, Activity activity, LinearLayout layoutAddComment, EditText edtAddComment, TextView txtSendNewComment) {
         this.list = list;
-        this.context = context;
+        this.activity=activity;
         this.layoutAddComment = layoutAddComment;
         this.edtAddComment = edtAddComment;
         this.txtSendNewComment = txtSendNewComment;
@@ -71,7 +73,7 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
     public View getView(final int i, View view, ViewGroup viewGroup) {
         final ViewHolder viewHolder;
         if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.item_topic, null);
+            view = LayoutInflater.from(activity).inflate(R.layout.item_topic, null);
             viewHolder = new ViewHolder(view);
             viewHolder.layout_divider = (LinearLayout) view.findViewById(R.id.layout_divider);
             view.setTag(viewHolder);
@@ -90,7 +92,7 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
         Object icon = entity.getIcon();
         if (icon != null) {
             //这儿的头像类型要分几种（int（drawable），网络图片）
-            Glide.with(context).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(context)).into(viewHolder.imgTopicIcon);
+            Glide.with(activity).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(activity)).into(viewHolder.imgTopicIcon);
         }
         String topicContent = entity.getContent();
         if (!TextUtils.isEmpty(topicContent)) {
@@ -98,22 +100,22 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
         }
         final List<Object> photos = entity.getPhotos();
         if (photos != null) {
-            int width = context.getResources().getDisplayMetrics().widthPixels / 3;
-            viewHolder.gridViewPhotos.setColumnWidth(width);
+//            int width = activity.getResources().getDisplayMetrics().widthPixels / 3;
+//            viewHolder.gridViewPhotos.setColumnWidth(width);
             viewHolder.framePhotos.setVisibility(View.VISIBLE);
-            topicPhotosAdapter = new TopicPhotosAdapter(context, photos);
+            topicPhotosAdapter = new TopicPhotosAdapter(activity, photos);
             viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
             if (photos.size() > 3) {
                 viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
-                viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 3));
+                viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 4));
             }
             viewHolder.gridViewPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Intent intent = new Intent(context, ShowBigPhotosActivity.class);
+                    Intent intent = new Intent(activity, ShowBigPhotosActivity.class);
                     intent.putExtra("position", i);
                     intent.putExtra("photos", (Serializable) photos);
-                    context.startActivity(intent);
+                    activity.startActivity(intent);
                 }
             });
         }
@@ -138,7 +140,7 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
         }
         final List<CommentPerson> commentPersons = entity.getCommentPersons();
         if (commentPersons != null) {
-            topicCommentPersonsAdapter = new TopicCommentPersonsAdapter(context, commentPersons);
+            topicCommentPersonsAdapter = new TopicCommentPersonsAdapter(activity, commentPersons);
             viewHolder.scrollComments.setAdapter(topicCommentPersonsAdapter);
         }
         viewHolder.imgComment.setOnClickListener(new View.OnClickListener() {

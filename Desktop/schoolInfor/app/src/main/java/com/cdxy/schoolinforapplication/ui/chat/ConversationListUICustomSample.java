@@ -29,4 +29,8 @@ public class ConversationListUICustomSample extends IMConversationListUI {
     public boolean getPullToRefreshEnabled() {
         return true;
     }
+    @Override
+    public boolean enableSearchConversations(Fragment fragment){
+        return true;
+    }
 }

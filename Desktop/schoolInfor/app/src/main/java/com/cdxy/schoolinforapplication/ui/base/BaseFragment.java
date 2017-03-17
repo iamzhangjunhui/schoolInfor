@@ -15,7 +15,7 @@ import com.cdxy.schoolinforapplication.SchoolInforManager;
  * A simple {@link Fragment} subclass.
  */
 public abstract class BaseFragment extends Fragment {
-
+    private Toast toast;
 
     public BaseFragment() {
         // Required empty public constructor
@@ -27,8 +27,20 @@ public abstract class BaseFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_base, container, false);
     }
-public abstract void init();
-    public void toast(String s){
-        Toast.makeText(SchoolInforManager.getContext(),s,Toast.LENGTH_SHORT).show();
+
+    public abstract void init();
+
+    public void toast(String s) {
+        if (toast == null) {
+            toast = Toast.makeText(SchoolInforManager.getContext(), s, Toast.LENGTH_SHORT);
+        }
+        toast.show();
+    }
+
+    public void toastLongShow(String s) {
+        if (toast == null) {
+            toast = Toast.makeText(SchoolInforManager.getContext(), s, Toast.LENGTH_LONG);
+        }
+        toast.show();
     }
 }

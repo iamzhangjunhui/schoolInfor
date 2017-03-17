@@ -10,6 +10,8 @@ import com.alibaba.mobileim.aop.custom.IMConversationListOperation;
 import com.alibaba.mobileim.channel.event.IWxCallback;
 import com.alibaba.mobileim.conversation.YWConversation;
 import com.alibaba.mobileim.conversation.YWConversationType;
+import com.alibaba.mobileim.conversation.YWMessage;
+import com.alibaba.mobileim.lib.model.message.YWSystemMessage;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.SchoolInforManager;
 import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
@@ -36,9 +38,6 @@ public class ConversationListOperationCustomSample extends IMConversationListOpe
                 */
         @Override
         public boolean onItemClick(final Fragment fragment, final YWConversation conversation) {
-            String s1=conversation.getLatestEServiceContactId();
-        String s2=conversation.getConversationId();
-        String s3=conversation.getLatestMessageAuthorId();
         YWConversationType type = conversation.getConversationType();
         if (type == YWConversationType.P2P) {
             Intent intent = LoginActivity.ywimKit.getChattingActivityIntent(conversation.getLatestEServiceContactId(), SchoolInforManager.appKay);
@@ -100,6 +99,7 @@ public class ConversationListOperationCustomSample extends IMConversationListOpe
             }
         };
         LoginActivity.iywContactService.ackAddContact(target, SchoolInforManager.appKay, true, isAddFriendDialog.content, callback);
-
+        LoginActivity.iywContactService.updateContactSystemMessage(new YWSystemMessage());
     }
+
 }
