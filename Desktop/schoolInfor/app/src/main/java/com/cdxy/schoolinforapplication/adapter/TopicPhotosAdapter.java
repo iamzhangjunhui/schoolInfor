@@ -1,6 +1,7 @@
 package com.cdxy.schoolinforapplication.adapter;
 
-import android.content.Context;
+import android.app.Activity;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +21,11 @@ import butterknife.ButterKnife;
  */
 
 public class TopicPhotosAdapter extends BaseAdapter {
-    private Context context;
+    private Activity activity;
     private List<Object> list;
 
-    public TopicPhotosAdapter(Context context, List<Object> list) {
-        this.context = context;
+    public TopicPhotosAdapter(Activity activity, List<Object> list) {
+        this.activity = activity;
         this.list = list;
     }
 
@@ -44,23 +45,48 @@ public class TopicPhotosAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder viewHolder;
+    public View getView(final int i, View view, ViewGroup viewGroup) {
+        final ViewHolder viewHolder;
         if (view == null) {
-            view = LayoutInflater.from(context).inflate(R.layout.item_topic_img, null);
-            viewHolder=new ViewHolder(view);
+            view = LayoutInflater.from(activity).inflate(R.layout.item_show_photo, null);
+            viewHolder = new ViewHolder(view);
             view.setTag(viewHolder);
-        }else {
-            viewHolder= (ViewHolder) view.getTag();
+        } else {
+            viewHolder = (ViewHolder) view.getTag();
         }
-        Object photo=getItem(i);
-        Glide.with(context).load(photo).placeholder(R.drawable.loading).into(viewHolder.imgTopicPhoto);
+        Object photo = getItem(i);
+        if (photo instanceof Integer) {
+            if ((int) photo == R.drawable.remind_add_photo) {
+                viewHolder.imgPhoto.setImageDrawable(activity.getResources().getDrawable(R.drawable.remind_add_photo));
+            } else {
+                viewHolder.imgPhoto.setImageResource((int) photo);
+            }
+
+        } else {
+            //通过照相获取的图片
+            if (photo instanceof Bitmap)
+                viewHolder.imgPhoto.setImageBitmap((Bitmap) photo);
+
+            //从相册获取的图片
+            if (photo instanceof String)
+                Glide.with(activity).load(photo).placeholder(R.drawable.loading).into(viewHolder.imgPhoto);
+        }
+        viewHolder.imgDeletePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                list.remove(i);
+                TopicPhotosAdapter.this.notifyDataSetChanged();
+                viewHolder.imgDeletePhoto.setVisibility(View.GONE);
+            }
+        });
         return view;
     }
 
     static class ViewHolder {
-        @BindView(R.id.img_topic_photo)
-        ImageView imgTopicPhoto;
+        @BindView(R.id.img_photo)
+        ImageView imgPhoto;
+        @BindView(R.id.img_delete_photo)
+        ImageView imgDeletePhoto;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);

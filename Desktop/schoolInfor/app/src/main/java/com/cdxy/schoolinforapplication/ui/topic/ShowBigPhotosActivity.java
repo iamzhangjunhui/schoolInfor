@@ -1,6 +1,7 @@
 package com.cdxy.schoolinforapplication.ui.topic;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -13,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
+import com.cdxy.schoolinforapplication.util.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ public class ShowBigPhotosActivity extends BaseActivity  {
     private int position;
     private PagerAdapter adapter;
     private List<View> views;
+    private String type="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +50,19 @@ public class ShowBigPhotosActivity extends BaseActivity  {
         Intent intent=getIntent();
         photos= (List<Object>) intent.getSerializableExtra("photos");
         position=intent.getIntExtra("position",0);
+        type=intent.getStringExtra("photosType");
         views=new ArrayList<>();
+        if (type.equals(Constant.SHOW_BIG_PHOTO_ADD_TOPIC)){
+            photos.remove(photos.size()-1);
+        }
         for (int i=0;i<photos.size();i++){
             ImageView imageView=new ImageView(ShowBigPhotosActivity.this);
-            Glide.with(ShowBigPhotosActivity.this).load(photos.get(i)).placeholder(R.drawable.loading).into(imageView);
+            Object photo=photos.get(i);
+            if (photo instanceof Bitmap){
+                imageView.setImageBitmap((Bitmap) photo);
+            }else {
+                Glide.with(ShowBigPhotosActivity.this).load(photo).placeholder(R.drawable.loading).into(imageView);
+            }
             views.add(imageView);
         }
         adapter=new PagerAdapter() {

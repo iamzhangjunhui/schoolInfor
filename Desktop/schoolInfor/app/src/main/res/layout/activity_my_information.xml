@@ -4,7 +4,6 @@
     android:id="@+id/activity_my_information"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/my_background_color"
     android:orientation="vertical"
     tools:context="com.cdxy.schoolinforapplication.ui.my.MyInformationActivity">
     <include layout="@layout/view_title_my"/>
@@ -30,7 +29,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="昵       称："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -38,7 +37,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -53,7 +52,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="姓       名："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -61,7 +60,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -76,7 +75,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text=" 所 在 系："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -84,7 +83,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
             </LinearLayout>
@@ -100,7 +99,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="班       级："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
 
@@ -109,7 +108,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -124,7 +123,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="学       号："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -132,7 +131,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -147,7 +146,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="性       别："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -155,7 +154,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -170,7 +169,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="出生年月："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -178,7 +177,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -193,7 +192,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="民       族："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -201,7 +200,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -216,7 +215,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="家庭住址："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -224,7 +223,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -239,7 +238,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="兴趣爱好："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -247,7 +246,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
         </LinearLayout>

@@ -69,12 +69,11 @@
         <!-- debug版的密钥，如果需要需要打签名文件的包，需要使用签名文件申请的密钥 -->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="wvUoAWY8YEPddSsmuLBaxZEGvYeBUioB" />
+            android:value="1pi2WDDLIQ8HYNzkTCG73DMLmPNb5tce" />
 
         <activity android:name=".ui.topic.ShowBigPhotosActivity" />
         <activity android:name=".ui.Message.SendMessageActivity" />
-        <activity android:name=".swipemenulistviewsample.SimpleActivity"/>
-
+        <activity android:name=".ui.topic.SelectPhotoActivity"/>
     </application>
 
 </manifest>

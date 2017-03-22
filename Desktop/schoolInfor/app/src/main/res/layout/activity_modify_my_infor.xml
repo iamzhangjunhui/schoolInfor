@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/my_background_color"
     tools:context="com.cdxy.schoolinforapplication.ui.load.RegisterActivity">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,7 +28,7 @@
             android:layout_centerInParent="true"
             android:gravity="center_vertical"
             android:text="主页"
-            android:textColor="@color/white"
+            android:textColor="@color/text_color"
             android:textSize="@dimen/text_size" />
     </RelativeLayout>
 
@@ -52,7 +51,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="昵       称："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <EditText
@@ -62,7 +61,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
             <LinearLayout
@@ -76,7 +75,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="姓       名："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <EditText
@@ -86,7 +85,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -101,7 +100,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text=" 所 在 系："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -113,7 +112,7 @@
                     android:clickable="true"
                     android:gravity="center_vertical"
                     android:onClick="onClick"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -128,7 +127,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="班       级："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -140,7 +139,7 @@
                     android:clickable="true"
                     android:gravity="center_vertical"
                     android:onClick="onClick"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -155,7 +154,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="学       号："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <EditText
@@ -165,7 +164,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -180,7 +179,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="性       别："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <RadioGroup
@@ -198,7 +197,7 @@
                         android:layout_marginLeft="20dp"
                         android:layout_weight="1"
                         android:text="女"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_color"
                         android:textSize="@dimen/content_text_size" />
 
                     <RadioButton
@@ -207,7 +206,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:text="男"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_color"
                         android:textSize="@dimen/content_text_size" />
                 </RadioGroup>
 
@@ -224,7 +223,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="出生年月："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -236,7 +235,7 @@
                     android:clickable="true"
                     android:gravity="center_vertical"
                     android:onClick="onClick"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -251,7 +250,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="民       族："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <TextView
@@ -263,7 +262,7 @@
                     android:clickable="true"
                     android:gravity="center_vertical"
                     android:onClick="onClick"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -278,7 +277,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="家庭住址："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <EditText
@@ -288,7 +287,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 
@@ -303,7 +302,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:text="兴趣爱好："
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
 
                 <EditText
@@ -313,7 +312,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:gravity="center_vertical"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_color"
                     android:textSize="@dimen/content_text_size" />
             </LinearLayout>
 

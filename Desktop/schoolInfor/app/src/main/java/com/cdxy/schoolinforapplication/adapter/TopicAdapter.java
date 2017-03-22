@@ -24,6 +24,7 @@ import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
+import com.cdxy.schoolinforapplication.util.Constant;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -115,6 +116,7 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
                     Intent intent = new Intent(activity, ShowBigPhotosActivity.class);
                     intent.putExtra("position", i);
                     intent.putExtra("photos", (Serializable) photos);
+                    intent.putExtra("photosType", Constant.SHOW_BIG_PHOTO_TOPIC_FRAGMENT);
                     activity.startActivity(intent);
                 }
             });

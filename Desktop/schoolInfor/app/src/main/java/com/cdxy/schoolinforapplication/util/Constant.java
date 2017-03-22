@@ -21,4 +21,7 @@ public class Constant {
     public static final int REQUEST_CODE_PICTURE=8;
     public static final String EDTDIALOG_TYPE_ADD_FRIEND="addFriend";
     public static final String EDTDIALOG_TYPE_UPDATE_NAME="updateName";
+    public static final String SHOW_BIG_PHOTO_ADD_TOPIC="addTopic";
+    public static final String SHOW_BIG_PHOTO_TOPIC_FRAGMENT="topicFragment";
+
 }

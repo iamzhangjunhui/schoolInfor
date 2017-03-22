@@ -68,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:numColumns="4"
-            android:horizontalSpacing="5dp"/>
+            android:horizontalSpacing="3dp"/>
 
         <TextView
             android:id="@+id/txt_more_photo_number"
