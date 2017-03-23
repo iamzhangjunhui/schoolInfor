@@ -19,7 +19,7 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.SchoolInforManager;
 import com.cdxy.schoolinforapplication.ScreenManager;
-import com.cdxy.schoolinforapplication.adapter.MyFriendsAdapter;
+import com.cdxy.schoolinforapplication.adapter.chat.MyFriendsAdapter;
 import com.cdxy.schoolinforapplication.model.chat.MyFriendEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.load.LoginActivity;

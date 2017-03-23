@@ -1,4 +1,4 @@
-package com.cdxy.schoolinforapplication.adapter;
+package com.cdxy.schoolinforapplication.adapter.message;
 
 import android.Manifest;
 import android.app.AlertDialog;

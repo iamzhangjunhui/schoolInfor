@@ -1,4 +1,4 @@
-package com.cdxy.schoolinforapplication.adapter;
+package com.cdxy.schoolinforapplication.adapter.chat;
 
 import android.content.Context;
 import android.view.LayoutInflater;

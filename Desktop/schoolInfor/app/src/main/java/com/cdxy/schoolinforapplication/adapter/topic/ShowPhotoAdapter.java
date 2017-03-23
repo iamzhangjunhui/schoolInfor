@@ -1,4 +1,4 @@
-package com.cdxy.schoolinforapplication.adapter;
+package com.cdxy.schoolinforapplication.adapter.topic;
 
 import android.Manifest;
 import android.app.Activity;
@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
@@ -22,8 +21,6 @@ import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.util.Constant;
 
 import java.util.List;
-
-import butterknife.BindView;
 
 /**
  * Created by huihui on 2016/12/28.

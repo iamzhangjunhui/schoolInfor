@@ -1,4 +1,4 @@
-package com.cdxy.schoolinforapplication.adapter;
+package com.cdxy.schoolinforapplication.adapter.topic;
 
 import android.app.Activity;
 import android.graphics.Bitmap;

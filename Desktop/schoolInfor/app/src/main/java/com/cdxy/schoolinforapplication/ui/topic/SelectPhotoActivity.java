@@ -3,7 +3,6 @@ package com.cdxy.schoolinforapplication.ui.topic;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -15,15 +14,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListPopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.adapter.FolderAdapter;
-import com.cdxy.schoolinforapplication.adapter.SelectPhotoAdapter;
+import com.cdxy.schoolinforapplication.adapter.topic.FolderAdapter;
+import com.cdxy.schoolinforapplication.adapter.topic.SelectPhotoAdapter;
 import com.cdxy.schoolinforapplication.model.topic.Folder;
 import com.cdxy.schoolinforapplication.model.topic.SelectPhoto;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
-import com.cdxy.schoolinforapplication.util.Constant;
 
 import java.io.File;
 import java.util.ArrayList;

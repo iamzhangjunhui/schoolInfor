@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.adapter.ParentAdapter;
+import com.cdxy.schoolinforapplication.adapter.topic.ParentAdapter;
 import com.cdxy.schoolinforapplication.model.tree.ChildEntity;
 import com.cdxy.schoolinforapplication.model.tree.ParentEntity;
 import com.cdxy.schoolinforapplication.ui.widget.ScollerExpandableListView;

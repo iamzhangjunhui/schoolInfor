@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,9 +25,11 @@ import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
-import com.cdxy.schoolinforapplication.adapter.TopicPhotosAdapter;
+import com.cdxy.schoolinforapplication.adapter.Text1ListAdapter;
+import com.cdxy.schoolinforapplication.adapter.topic.TopicPhotosAdapter;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScollerGridView;
+import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 import com.cdxy.schoolinforapplication.util.Constant;
 
 import java.io.Serializable;
@@ -52,18 +53,23 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     EditText edtNewTopic;
     @BindView(R.id.txt_remind_show_address)
     TextView txtRemindShowAddress;
-    @BindView(R.id.txt_now_address)
-    TextView txtNowAddress;
     @BindView(R.id.layout_show_address)
     LinearLayout layoutShowAddress;
     @BindView(R.id.gridView_photos)
     ScollerGridView gridViewPhotos;
+    @BindView(R.id.listview_address)
+    ScrollListView listviewAddress;
+    @BindView(R.id.img_indicator)
+    ImageView imgIndicator;
     private List<Object> list;
     private TopicPhotosAdapter adapter;
     private String newTopic;
-    private boolean isShowAddress = false;
+    private boolean isShowAddress;
     public LocationClient locationClient;
     public BDLocationListener myListener = new MyLocationListener();
+    private Text1ListAdapter addressAdapter;
+    private static List<String> addressList = new ArrayList<>();
+    ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +85,8 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         initLocation();
         //注册监听函数
         locationClient.registerLocationListener(myListener);
-
         locationClient.start();
+        listviewAddress.setOnItemClickListener(this);
     }
 
     @Override
@@ -93,6 +99,9 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         gridViewPhotos.setAdapter(adapter);
         gridViewPhotos.setOnItemClickListener(this);
         gridViewPhotos.setOnItemLongClickListener(this);
+        addressAdapter = new Text1ListAdapter(AddNewTopicActivity.this, addressList);
+        listviewAddress.setAdapter(addressAdapter);
+
     }
 
     @Override
@@ -100,6 +109,20 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         switch (view.getId()) {
             case R.id.img_back:
                 ScreenManager.getScreenManager().popActivty(this);
+                break;
+            case R.id.txt_remind_show_address:
+                if (isShowAddress) {
+                    isShowAddress=false;
+                    listviewAddress.setVisibility(View.GONE);
+                    imgIndicator.setImageResource(R.drawable.show);
+                } else {
+                    isShowAddress=true;
+                    listviewAddress.setVisibility(View.VISIBLE);
+                    imgIndicator.setImageResource(R.drawable.not_show);
+                    if (addressList == null || addressList.size() == 0) {
+                        toast("定位失败，没有获取到位置信息");
+                    }
+                }
                 break;
 
         }
@@ -156,55 +179,77 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Object photo = adapter.getItem(i);
-        if (photo instanceof Integer) {
-            if ((int) photo == R.drawable.remind_add_photo) {
-                View dialogView = LayoutInflater.from(AddNewTopicActivity.this).inflate(R.layout.dialog_choose_way, null);
-                TextView txtWay1 = (TextView) dialogView.findViewById(R.id.txt_way1);
-                TextView txtWay2 = (TextView) dialogView.findViewById(R.id.txt_way2);
-                txtWay1.setText("拍照");
-                txtWay2.setText("从相册中获取");
-                final AlertDialog dialog = new AlertDialog.Builder(AddNewTopicActivity.this).setView(dialogView).create();
-                dialog.show();
-                txtWay1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        //打开系统拍照程序，选择拍照图片
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        if (ActivityCompat.checkSelfPermission(AddNewTopicActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(AddNewTopicActivity.this, "拍照的权限申请失败", Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        AddNewTopicActivity.this.startActivityForResult(intent, Constant.REQUEST_CODE_CAMERA);
-                        dialog.dismiss();
-                    }
-                });
-                txtWay2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ////打开系统图库程序，选择图片
+        switch (adapterView.getId()) {
+            case R.id.gridView_photos:
+                Object photo = adapter.getItem(i);
+                if (photo instanceof Integer) {
+                    if ((int) photo == R.drawable.remind_add_photo) {
+                        View dialogView = LayoutInflater.from(AddNewTopicActivity.this).inflate(R.layout.dialog_choose_way, null);
+                        TextView txtWay1 = (TextView) dialogView.findViewById(R.id.txt_way1);
+                        TextView txtWay2 = (TextView) dialogView.findViewById(R.id.txt_way2);
+                        txtWay1.setText("拍照");
+                        txtWay2.setText("从相册中获取");
+                        final AlertDialog dialog = new AlertDialog.Builder(AddNewTopicActivity.this).setView(dialogView).create();
+                        dialog.show();
+                        txtWay1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                //打开系统拍照程序，选择拍照图片
+                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                if (ActivityCompat.checkSelfPermission(AddNewTopicActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                    Toast.makeText(AddNewTopicActivity.this, "拍照的权限申请失败", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                AddNewTopicActivity.this.startActivityForResult(intent, Constant.REQUEST_CODE_CAMERA);
+                                dialog.dismiss();
+                            }
+                        });
+                        txtWay2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                ////打开系统图库程序，选择图片
 //                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                        AddNewTopicActivity.this.startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
-                        //自定义的获取图片的Activity
-                        Intent intent = new Intent(AddNewTopicActivity.this, SelectPhotoActivity.class);
-                        startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
-                        dialog.dismiss();
+                                //自定义的获取图片的Activity
+                                Intent intent = new Intent(AddNewTopicActivity.this, SelectPhotoActivity.class);
+                                startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
+                                dialog.dismiss();
+                            }
+                        });
+                    } else {
+                        Intent intent = new Intent(AddNewTopicActivity.this, ShowBigPhotosActivity.class);
+                        intent.putExtra("position", i);
+                        intent.putExtra("photos", (Serializable) list);
+                        intent.putExtra("photosType", Constant.SHOW_BIG_PHOTO_ADD_TOPIC);
+                        AddNewTopicActivity.this.startActivity(intent);
                     }
-                });
-            } else {
-                Intent intent = new Intent(AddNewTopicActivity.this, ShowBigPhotosActivity.class);
-                intent.putExtra("position", i);
-                intent.putExtra("photos", (Serializable) list);
-                intent.putExtra("photosType", Constant.SHOW_BIG_PHOTO_ADD_TOPIC);
-                AddNewTopicActivity.this.startActivity(intent);
-            }
-        } else {
-            Intent intent = new Intent(AddNewTopicActivity.this, ShowBigPhotosActivity.class);
-            intent.putExtra("position", i);
-            intent.putExtra("photos", (Serializable) list);
-            intent.putExtra("photosType", Constant.SHOW_BIG_PHOTO_ADD_TOPIC);
-            startActivity(intent);
+                } else {
+                    Intent intent = new Intent(AddNewTopicActivity.this, ShowBigPhotosActivity.class);
+                    intent.putExtra("position", i);
+                    intent.putExtra("photos", (Serializable) list);
+                    intent.putExtra("photosType", Constant.SHOW_BIG_PHOTO_ADD_TOPIC);
+                    startActivity(intent);
+                }
+                break;
+            case R.id.listview_address:
+                String addressInfor = addressList.get(i);
+                newTopic = edtNewTopic.getText().toString();//创建话题编辑框的内容
+                if (newTopic.contains("   --")) {//判断是否已经显示了地址信息
+                    int j=newTopic.indexOf("   --");
+                    if (newTopic.indexOf("   --") == 0) {//判断是否只显示了地址信息
+                      newTopic="";
+                    }else {
+                        newTopic = newTopic.split("   --")[0];//如果是，去除地址信息
+                    }
+                }
+                if (!addressInfor.equals("不显示地址")) {
+                    edtNewTopic.setText(newTopic + "   --" + addressInfor);
+                }else {
+                    edtNewTopic.setText(newTopic);
+                }
+                break;
         }
+
     }
 
     @Override
@@ -222,7 +267,16 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         @Override
         public void onReceiveLocation(BDLocation location) {
             //Receive Location
-            final List<Poi> addressList = location.getPoiList();
+            final List<Poi> addresses = location.getPoiList();
+            if (addresses.size() > 0) {
+                addressList.clear();
+                addressList.add("不显示地址");
+                for (int i = 0; i < addresses.size(); i++) {
+                    addressList.add(addresses.get(i).getName());
+                }
+                addressAdapter.notifyDataSetChanged();
+            }
+
 //            if (!TextUtils.isEmpty(address)) {
 //                layoutShowAddress.setVisibility(View.VISIBLE);
 //                txtNowAddress.setText(address);

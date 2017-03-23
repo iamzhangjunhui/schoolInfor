@@ -1,4 +1,4 @@
-package com.cdxy.schoolinforapplication.adapter;
+package com.cdxy.schoolinforapplication.adapter.message;
 
 import android.content.Context;
 import android.text.TextUtils;

@@ -1,4 +1,4 @@
-package com.cdxy.schoolinforapplication.adapter;
+package com.cdxy.schoolinforapplication.adapter.topic;
 
 import android.content.Context;
 import android.graphics.Point;

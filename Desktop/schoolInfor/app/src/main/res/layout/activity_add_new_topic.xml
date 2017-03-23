@@ -8,13 +8,16 @@
     tools:context="com.cdxy.schoolinforapplication.ui.topic.AddNewTopicActivity">
 
     <include layout="@layout/view_title" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <EditText
                 android:id="@+id/edt_new_topic"
                 android:layout_width="match_parent"
@@ -26,42 +29,48 @@
                 android:padding="10dp"
                 android:textColor="@color/text_color"
                 android:textSize="@dimen/content_text_size" />
+
             <com.cdxy.schoolinforapplication.ui.widget.ScollerGridView
                 android:id="@+id/gridView_photos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:horizontalSpacing="5dp"
                 android:numColumns="4"
                 android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:horizontalSpacing="5dp"/>
+                android:paddingRight="5dp" />
+
             <LinearLayout
                 android:id="@+id/layout_show_address"
-                android:layout_marginTop="5dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/img_indicator"
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/not_show"
+                    android:layout_gravity="center"
+                    android:scaleType="fitXY"/>
                 <TextView
-                    android:onClick="onClick"
-                    android:clickable="true"
-                    android:background="@drawable/add_border_light_color"
                     android:id="@+id/txt_remind_show_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/show_now_address"
-                    android:textColor="@color/text_color"
-                    android:textSize="@dimen/content_text_size"/>
-                <TextView
-                    android:paddingLeft="10dp"
-                    android:singleLine="true"
-                    android:id="@+id/txt_now_address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/content_text_size"
-                    android:textColor="@color/text_light_colored"/>
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:text="@string/select_show_now_address"
+                    android:textColor="@color/text_message_title"
+                    android:textSize="@dimen/text_size" />
             </LinearLayout>
+            <com.cdxy.schoolinforapplication.ui.widget.ScrollListView
+                android:id="@+id/listview_address"
+                android:paddingTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
     </ScrollView>

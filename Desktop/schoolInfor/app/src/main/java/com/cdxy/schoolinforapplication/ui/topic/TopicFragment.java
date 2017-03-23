@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.adapter.TopicAdapter;
+import com.cdxy.schoolinforapplication.adapter.topic.TopicAdapter;
 import com.cdxy.schoolinforapplication.model.topic.CommentContent;
 import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
