@@ -3,7 +3,6 @@ package com.cdxy.schoolinforapplication.ui;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
-import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.Message.SendMessageActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity;
@@ -30,8 +28,7 @@ import com.cdxy.schoolinforapplication.ui.my.ModifyMyPswActivity;
 import com.cdxy.schoolinforapplication.ui.my.MyInformationActivity;
 import com.cdxy.schoolinforapplication.ui.topic.AddNewTopicActivity;
 import com.cdxy.schoolinforapplication.ui.widget.DragLayout;
-import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
-import com.cdxy.schoolinforapplication.util.huoqushuju;
+import com.cdxy.schoolinforapplication.ui.widget.ModifyMyMottoDialog;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -90,6 +87,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private ImageView[] imageViews;
     private Fragment[] fragments;
     private int oldPos = 1;
+    private ModifyMyMottoDialog modifyMyMottoDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,28 +200,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
             case R.id.txt_my_motto:
-                //修改我的座右铭
-                View dialogView = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_my_modify_psd, null);
-                EditText edtModifyMyMotto = (EditText) dialogView.findViewById(R.id.edt_modify_my_motto);
-                Button btnSaveModifyMotto = (Button) dialogView.findViewById(R.id.btn_save_modify_motto);
-                Button btnCancelMyModifyMotto = (Button) dialogView.findViewById(R.id.btn_cancel_my_modify_motto);
-                final Dialog dialog = new AlertDialog.Builder(MainActivity.this).setView(dialogView).create();
-                dialog.show();
-                final String modifyMotto = edtModifyMyMotto.getText().toString();
-                btnSaveModifyMotto.setOnClickListener(new View.OnClickListener() {
+                modifyMyMottoDialog = new ModifyMyMottoDialog(MainActivity.this, R.style.MyDialog, new ModifyMyMottoDialog.ModifyMottoDialogListener() {
                     @Override
                     public void onClick(View view) {
-                        //此处将修改后的motto上传至服务器。
+                        switch (view.getId()) {
+                            case R.id.btn_save_modify_motto:
+                                //此处将修改后的motto上传至服务器。
+                                toast(modifyMyMottoDialog.newMotto);
+                                modifyMyMottoDialog.dismiss();
+                                break;
+                            case R.id.btn_cancel_my_modify_motto:
+                                modifyMyMottoDialog.dismiss();
+                                break;
 
-                        dialog.dismiss();
+                        }
                     }
-                });
-                btnCancelMyModifyMotto.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                    }
-                });
+                }, MainActivity.this);
+                modifyMyMottoDialog.show();
                 break;
             case R.id.txt_my_information:
                 //进入我的信息详情界面

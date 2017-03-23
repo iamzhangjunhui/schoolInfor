@@ -35,10 +35,12 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:text="消息梗概"
+                android:singleLine="true"
                 android:textColor="@color/text_color"
                 android:textSize="@dimen/content_text_size" />
 
             <TextView
+                android:paddingLeft="10dp"
                 android:id="@+id/txt_message_sender"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -65,7 +67,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:text="接收人" />
+                android:text="接收人"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <TextView

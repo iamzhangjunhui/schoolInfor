@@ -71,6 +71,8 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_register_next:
+                Intent intent=new Intent(RegisterCodeActivity.this,RegisterActivity.class);
+                startActivity(intent);
                 registerName = edtRegisterName.getText().toString();
                 registerPassword = edtRegisterPassword.getText().toString();
                 String registerSurePassword = edtRegisterSurePassword.getText().toString();

@@ -26,6 +26,7 @@ import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
+import com.cdxy.schoolinforapplication.ui.widget.ChooseIdentityTypeDialog;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 import com.cdxy.schoolinforapplication.util.huoqushuju;
 
@@ -56,6 +57,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private String loginName;
     private huoqushuju huoqushuju;
     private UserInforEntity userInforEntity;
+    private ChooseIdentityTypeDialog chooseIdentityTypeDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,21 +78,35 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_register:
-                new AlertDialog.Builder(LoginActivity.this).setMessage("只有学生才需要注册，老师的账号学校已经配好，详情可以咨询教务处")
-                        .setNegativeButton("我是老师", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        }).setPositiveButton("我是学生", new DialogInterface.OnClickListener() {
+//                new AlertDialog.Builder(LoginActivity.this).setMessage("如果你是老师的话无需注册，教务处将统一配置教师账号，详情请咨询教务处")
+//                        .setNegativeButton("我是老师", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                dialogInterface.dismiss();
+//                            }
+//                        }).setPositiveButton("我是学生", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        Intent intent = new Intent(LoginActivity.this, RegisterCodeActivity.class);
+//                        startActivity(intent);
+//                        dialogInterface.dismiss();
+//                    }
+//                }).create().show();
+                chooseIdentityTypeDialog = new ChooseIdentityTypeDialog(LoginActivity.this, R.style.MyDialog, new ChooseIdentityTypeDialog.ChooseIdentityTypeDialogListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent = new Intent(LoginActivity.this, RegisterCodeActivity.class);
-                        startActivity(intent);
-                        dialogInterface.dismiss();
+                    public void onClick(View view) {
+                        switch (view.getId()) {
+                            case R.id.btn_teacher:
+                                chooseIdentityTypeDialog.dismiss();
+                            case R.id.btn_student:
+                                Intent intent = new Intent(LoginActivity.this, RegisterCodeActivity.class);
+                                startActivity(intent);
+                                chooseIdentityTypeDialog.dismiss();
+                                break;
+                        }
                     }
-                }).create().show();
-
+                }, LoginActivity.this);
+                chooseIdentityTypeDialog.show();
                 break;
             case R.id.btn_login:
                 loginName = edtLoginName.getText().toString();
@@ -108,7 +124,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 getUserIdentity();
-                userid ="zhangjunhui";
+                userid = "zhangjunhui";
                 ywimKit = YWAPI.getIMKitInstance(userid, SchoolInforManager.appKay);
                 iywContactService = ywimKit.getContactService();
                 //开始登录(测试使用，到时正式使用的时候需要放在登录我们的服务器成功之后)

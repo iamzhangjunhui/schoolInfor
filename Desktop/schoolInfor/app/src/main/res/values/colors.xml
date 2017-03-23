@@ -6,6 +6,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="text_color">#302f2f</color>
     <color name="text_light_colored">#565656</color>
+    <color name="edt_line_color">#808080</color>
     <color name="text_bottom_tap_color">@color/top_color</color>
     <color name="text_message_title">#1a24d9</color>
     <color name="text_name">#51789c</color>
@@ -20,5 +21,6 @@
     <color name="main_bottom_tab_color">#ececec</color>
     <color name="diliver_topic">#f9f7f7</color>
     <color name="transparent_background">#00000000</color>
+    <color name="modify_my_friend_name">#77ed91</color>
 
     </resources>

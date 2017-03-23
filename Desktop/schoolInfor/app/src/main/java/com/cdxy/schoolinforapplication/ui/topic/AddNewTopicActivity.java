@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.text.Selection;
+import android.text.Spannable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -114,11 +116,11 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                 if (isShowAddress) {
                     isShowAddress=false;
                     listviewAddress.setVisibility(View.GONE);
-                    imgIndicator.setImageResource(R.drawable.show);
+                    imgIndicator.setImageResource(R.drawable.not_show);
                 } else {
                     isShowAddress=true;
                     listviewAddress.setVisibility(View.VISIBLE);
-                    imgIndicator.setImageResource(R.drawable.not_show);
+                    imgIndicator.setImageResource(R.drawable.show);
                     if (addressList == null || addressList.size() == 0) {
                         toast("定位失败，没有获取到位置信息");
                     }
@@ -247,6 +249,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                 }else {
                     edtNewTopic.setText(newTopic);
                 }
+                Selection.setSelection((Spannable)edtNewTopic.getText(), edtNewTopic.getText().toString().length());
                 break;
         }
 

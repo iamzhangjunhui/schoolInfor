@@ -42,7 +42,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.MainActivity"
-            android:windowSoftInputMode="stateVisible|adjustPan" />
+            android:windowSoftInputMode="stateHidden|adjustUnspecified" />
         <activity android:name=".ui.load.LoginActivity">
 <intent-filter>
     <action android:name="android.intent.action.MAIN"/>

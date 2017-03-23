@@ -45,7 +45,6 @@
                         android:layout_weight="1"
                         android:background="@null"
                         android:paddingLeft="10dp"
-                        android:text="1212121"
                         android:textColor="@color/text_color"
                         android:textSize="@dimen/text_size" />
 
@@ -72,7 +71,6 @@
                 android:background="@drawable/add_border_light_color"
                 android:gravity="top"
                 android:padding="10dp"
-                android:text="121"
                 android:textColor="@color/text_color"
                 android:textSize="@dimen/content_text_size" />
 

@@ -55,7 +55,8 @@
     <string name="explain_no_my_message">我还没有发送消息</string>
     <string name="accept_group">接收群体：</string>
     <string name="accept_time">接收时间：</string>
-    <string name="see_students_number">查看学生数：</string>
+    <string name="see_students_number">已查看的学生数：</string>
+    <string name="not_see_students_number">未查看的学生数：</string>
     <string name="phoneNumber">电话号码：</string>
     <string name="call">打电话</string>
     <string name="send_SMS">发短信</string>

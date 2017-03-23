@@ -53,7 +53,7 @@
                     android:id="@+id/img_indicator"
                     android:layout_width="20dp"
                     android:layout_height="match_parent"
-                    android:src="@drawable/not_show"
+                    android:src="@drawable/show"
                     android:layout_gravity="center"
                     android:scaleType="fitXY"/>
                 <TextView
@@ -69,6 +69,8 @@
             <com.cdxy.schoolinforapplication.ui.widget.ScrollListView
                 android:id="@+id/listview_address"
                 android:paddingTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>

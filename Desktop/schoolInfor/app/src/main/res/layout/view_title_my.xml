@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:clickable="true"
         android:onClick="onClick"
-        android:src="@drawable/my_finish" />
+        android:src="@drawable/finish_write" />
 
     <TextView
         android:id="@+id/txt_title"
