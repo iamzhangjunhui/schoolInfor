@@ -23,5 +23,7 @@ public class Constant {
     public static final String EDTDIALOG_TYPE_UPDATE_NAME="updateName";
     public static final String SHOW_BIG_PHOTO_ADD_TOPIC="addTopic";
     public static final String SHOW_BIG_PHOTO_TOPIC_FRAGMENT="topicFragment";
+    public static final String CHOOSE_WAY_DIALOG_TYPE_GET_PHOTO="photo";
+    public static final String CHOOSE_WAY_DIALOG_TYPE_NOTIFY_NOT_SEE="notifyNotSee";
 
 }

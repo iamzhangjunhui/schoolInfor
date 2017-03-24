@@ -30,6 +30,7 @@ import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.adapter.Text1ListAdapter;
 import com.cdxy.schoolinforapplication.adapter.topic.TopicPhotosAdapter;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
+import com.cdxy.schoolinforapplication.ui.widget.ChooseWayDialog;
 import com.cdxy.schoolinforapplication.ui.widget.ScollerGridView;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 import com.cdxy.schoolinforapplication.util.Constant;
@@ -71,7 +72,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     public BDLocationListener myListener = new MyLocationListener();
     private Text1ListAdapter addressAdapter;
     private static List<String> addressList = new ArrayList<>();
-    ;
+    private ChooseWayDialog chooseWayDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,11 +115,11 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                 break;
             case R.id.txt_remind_show_address:
                 if (isShowAddress) {
-                    isShowAddress=false;
+                    isShowAddress = false;
                     listviewAddress.setVisibility(View.GONE);
                     imgIndicator.setImageResource(R.drawable.not_show);
                 } else {
-                    isShowAddress=true;
+                    isShowAddress = true;
                     listviewAddress.setVisibility(View.VISIBLE);
                     imgIndicator.setImageResource(R.drawable.show);
                     if (addressList == null || addressList.size() == 0) {
@@ -186,38 +187,33 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                 Object photo = adapter.getItem(i);
                 if (photo instanceof Integer) {
                     if ((int) photo == R.drawable.remind_add_photo) {
-                        View dialogView = LayoutInflater.from(AddNewTopicActivity.this).inflate(R.layout.dialog_choose_way, null);
-                        TextView txtWay1 = (TextView) dialogView.findViewById(R.id.txt_way1);
-                        TextView txtWay2 = (TextView) dialogView.findViewById(R.id.txt_way2);
-                        txtWay1.setText("拍照");
-                        txtWay2.setText("从相册中获取");
-                        final AlertDialog dialog = new AlertDialog.Builder(AddNewTopicActivity.this).setView(dialogView).create();
-                        dialog.show();
-                        txtWay1.setOnClickListener(new View.OnClickListener() {
+                        chooseWayDialog = new ChooseWayDialog(AddNewTopicActivity.this, R.style.MyDialog, new ChooseWayDialog.ChooseWayDialogListener() {
                             @Override
                             public void onClick(View view) {
-                                //打开系统拍照程序，选择拍照图片
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                if (ActivityCompat.checkSelfPermission(AddNewTopicActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                                    Toast.makeText(AddNewTopicActivity.this, "拍照的权限申请失败", Toast.LENGTH_LONG).show();
-                                    return;
-                                }
-                                AddNewTopicActivity.this.startActivityForResult(intent, Constant.REQUEST_CODE_CAMERA);
-                                dialog.dismiss();
-                            }
-                        });
-                        txtWay2.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                ////打开系统图库程序，选择图片
+                                switch (view.getId()) {
+                                    case R.id.txt_way1:
+                                        //打开系统拍照程序，选择拍照图片
+                                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                        if (ActivityCompat.checkSelfPermission(AddNewTopicActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                            Toast.makeText(AddNewTopicActivity.this, "拍照的权限申请失败", Toast.LENGTH_LONG).show();
+                                            return;
+                                        }
+                                        AddNewTopicActivity.this.startActivityForResult(intent, Constant.REQUEST_CODE_CAMERA);
+                                        chooseWayDialog.dismiss();
+                                        break;
+                                    case R.id.txt_way2:
+                                        ////打开系统图库程序，选择图片
 //                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                        AddNewTopicActivity.this.startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
-                                //自定义的获取图片的Activity
-                                Intent intent = new Intent(AddNewTopicActivity.this, SelectPhotoActivity.class);
-                                startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
-                                dialog.dismiss();
+                                        //自定义的获取图片的Activity
+                                        intent = new Intent(AddNewTopicActivity.this, SelectPhotoActivity.class);
+                                        startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
+                                        chooseWayDialog.dismiss();
+                                        break;
+                                }
                             }
-                        });
+                        }, AddNewTopicActivity.this, Constant.CHOOSE_WAY_DIALOG_TYPE_GET_PHOTO);
+                        chooseWayDialog.show();
                     } else {
                         Intent intent = new Intent(AddNewTopicActivity.this, ShowBigPhotosActivity.class);
                         intent.putExtra("position", i);
@@ -237,19 +233,19 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                 String addressInfor = addressList.get(i);
                 newTopic = edtNewTopic.getText().toString();//创建话题编辑框的内容
                 if (newTopic.contains("   --")) {//判断是否已经显示了地址信息
-                    int j=newTopic.indexOf("   --");
+                    int j = newTopic.indexOf("   --");
                     if (newTopic.indexOf("   --") == 0) {//判断是否只显示了地址信息
-                      newTopic="";
-                    }else {
+                        newTopic = "";
+                    } else {
                         newTopic = newTopic.split("   --")[0];//如果是，去除地址信息
                     }
                 }
                 if (!addressInfor.equals("不显示地址")) {
                     edtNewTopic.setText(newTopic + "   --" + addressInfor);
-                }else {
+                } else {
                     edtNewTopic.setText(newTopic);
                 }
-                Selection.setSelection((Spannable)edtNewTopic.getText(), edtNewTopic.getText().toString().length());
+                Selection.setSelection((Spannable) edtNewTopic.getText(), edtNewTopic.getText().toString().length());
                 break;
         }
 
@@ -279,30 +275,6 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                 }
                 addressAdapter.notifyDataSetChanged();
             }
-
-//            if (!TextUtils.isEmpty(address)) {
-//                layoutShowAddress.setVisibility(View.VISIBLE);
-//                txtNowAddress.setText(address);
-//                txtRemindShowAddress.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        if (isShowAddress == false) {
-//                            isShowAddress = true;
-//                            newTopic = edtNewTopic.getText().toString();//创建话题编辑框的内容
-//                            txtRemindShowAddress.setText("取消显示当前地址");
-//                            edtNewTopic.setText(newTopic + "   --" + address);
-//                        } else {
-//                            isShowAddress = false;
-//                            newTopic = edtNewTopic.getText().toString();
-//                            txtRemindShowAddress.setText("显示当前地址");
-//                            String newTopicContent = newTopic.substring(0, newTopic.lastIndexOf("--") - 1);
-//                            edtNewTopic.setText(newTopicContent + "");
-//                        }
-//                    }
-//                });
-//            }
-
-
         }
     }
 

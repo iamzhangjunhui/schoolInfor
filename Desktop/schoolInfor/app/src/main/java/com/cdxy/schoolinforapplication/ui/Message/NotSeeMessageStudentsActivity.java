@@ -59,7 +59,7 @@ public class NotSeeMessageStudentsActivity extends BaseActivity implements View.
         messageEntity= (MessageEntity) intent.getSerializableExtra("messageEntity");
         txtTitle.setText("未查看名单");
         list=new ArrayList<>();
-        adapter=new NotSeeMessageStudentAdapter(NotSeeMessageStudentsActivity.this,list,messageEntity);
+        adapter=new NotSeeMessageStudentAdapter(NotSeeMessageStudentsActivity.this,list,messageEntity,NotSeeMessageStudentsActivity.this);
         scrollNotSeeMessageStudent.setAdapter(adapter);
     }
 

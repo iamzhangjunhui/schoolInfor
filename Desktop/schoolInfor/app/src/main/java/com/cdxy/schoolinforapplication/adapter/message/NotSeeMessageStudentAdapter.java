@@ -1,6 +1,7 @@
 package com.cdxy.schoolinforapplication.adapter.message;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,9 @@ import android.widget.TextView;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.model.message.MessageEntity;
 import com.cdxy.schoolinforapplication.model.message.NotSeeMessageStudentEntity;
+import com.cdxy.schoolinforapplication.ui.Message.NotSeeMessageStudentsActivity;
+import com.cdxy.schoolinforapplication.ui.widget.ChooseWayDialog;
+import com.cdxy.schoolinforapplication.util.Constant;
 
 import java.util.List;
 
@@ -31,11 +35,14 @@ public class NotSeeMessageStudentAdapter extends BaseAdapter {
     private Context context;
     private List<NotSeeMessageStudentEntity> list;
     private MessageEntity messageEntity;
+    private ChooseWayDialog chooseWayDialog;
+    private Activity activity;
 
-    public NotSeeMessageStudentAdapter(Context context, List<NotSeeMessageStudentEntity> list, MessageEntity messageEntity) {
+    public NotSeeMessageStudentAdapter(Context context, List<NotSeeMessageStudentEntity> list, MessageEntity messageEntity, Activity activity) {
         this.context = context;
         this.list = list;
         this.messageEntity = messageEntity;
+        this.activity = activity;
     }
 
     @Override
@@ -82,42 +89,39 @@ public class NotSeeMessageStudentAdapter extends BaseAdapter {
         viewHolder.txtNoSeeMessageStudentPhoneNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_choose_way, null);
-                TextView txtCall = (TextView) dialogView.findViewById(R.id.txt_way1);
-                TextView txtSendSMS = (TextView) dialogView.findViewById(R.id.txt_way2);
-                final AlertDialog dialog = new AlertDialog.Builder(context).setView(dialogView).create();
-                dialog.show();
-                txtCall.setOnClickListener(new View.OnClickListener() {
+                chooseWayDialog = new ChooseWayDialog(context, R.style.MyDialog, new ChooseWayDialog.ChooseWayDialogListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                            // TODO: Consider calling
-                            //    ActivityCompat#requestPermissions
-                            // here to request the missing permissions, and then overriding
-                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                            //                                          int[] grantResults)
-                            // to handle the case where the user grants the permission. See the documentation
-                            // for ActivityCompat#requestPermissions for more details.
+                        switch (view.getId()) {
+                            case R.id.txt_way1:
+                                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
+                                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                    // TODO: Consider calling
+                                    //    ActivityCompat#requestPermissions
+                                    // here to request the missing permissions, and then overriding
+                                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                    //                                          int[] grantResults)
+                                    // to handle the case where the user grants the permission. See the documentation
+                                    // for ActivityCompat#requestPermissions for more details.
 
-                            return;
+                                    return;
+                                }
+                                context.startActivity(intent);
+                                chooseWayDialog.dismiss();
+                                break;
+                            case R.id.txt_way2:
+                                intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + phoneNumber));
+                                String sender = messageEntity.getSender();
+                                String content = messageEntity.getContent();
+                                if ((!TextUtils.isEmpty(sender)) && (!TextUtils.isEmpty(content)))
+                                    intent.putExtra("sms_body", content + "    --" + sender);
+                                context.startActivity(intent);
+                                chooseWayDialog.dismiss();
+                                break;
                         }
-                        context.startActivity(intent);
-                        dialog.dismiss();
                     }
-                });
-                txtSendSMS.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + phoneNumber));
-                        String sender = messageEntity.getSender();
-                        String content = messageEntity.getContent();
-                        if ((!TextUtils.isEmpty(sender)) && (!TextUtils.isEmpty(content)))
-                            intent.putExtra("sms_body", content + "    --" + sender);
-                        context.startActivity(intent);
-                        dialog.dismiss();
-                    }
-                });
+                }, activity, Constant.CHOOSE_WAY_DIALOG_TYPE_NOTIFY_NOT_SEE);
+                chooseWayDialog.show();
             }
         });
         return view;
