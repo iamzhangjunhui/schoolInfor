@@ -1,6 +1,5 @@
 package com.cdxy.schoolinforapplication.model.topic;
 
-import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +16,9 @@ public class TopicEntity {
     private String content;//内容
     private List<Object> photos;//照片
     private List<String> thumbPersonsNickname;//点赞人姓名
-    private List<CommentPerson> commentPersons;//评论
+    private List<CommentContent> commentContents;//评论
 
-    public TopicEntity(String id, Object icon, String nickName, String create_time, String content, List<Object> photos, List<String> thumbPersonsNickname, List<CommentPerson> commentPersons) {
+    public TopicEntity(String id, Object icon, String nickName, String create_time, String content, List<Object> photos, List<String> thumbPersonsNickname, List<CommentContent> commentContents) {
         this.id = id;
         this.icon = icon;
         this.nickName = nickName;
@@ -27,7 +26,7 @@ public class TopicEntity {
         this.content = content;
         this.photos = photos;
         this.thumbPersonsNickname = thumbPersonsNickname;
-        this.commentPersons = commentPersons;
+        this.commentContents = commentContents;
     }
 
     public String getId() {
@@ -89,15 +88,15 @@ public class TopicEntity {
         this.thumbPersonsNickname = thumbPersonsNickname;
     }
 
-    public List<CommentPerson> getCommentPersons() {
-        if (commentPersons==null){
-            commentPersons=new ArrayList<>();
+    public List<CommentContent> getCommentContents() {
+        if (commentContents==null){
+            commentContents=new ArrayList<>();
         }
-        return commentPersons;
+        return commentContents;
     }
 
-    public void setCommentPersons(List<CommentPerson> commentPersons) {
-        this.commentPersons = commentPersons;
+    public void setCommentContents(List<CommentContent> commentPersons) {
+        this.commentContents = commentPersons;
     }
 
     @Override
@@ -110,7 +109,7 @@ public class TopicEntity {
                 ", content='" + content + '\'' +
                 ", photos=" + photos +
                 ", thumbPersonsNickname=" + thumbPersonsNickname +
-                ", commentPersons=" + commentPersons +
+                ", commentPersons=" + commentContents +
                 '}';
     }
 }

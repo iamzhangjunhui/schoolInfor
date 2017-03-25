@@ -60,7 +60,8 @@
         <activity android:name=".ui.Message.SeeMessageStudentsActivity" />
         <activity android:name=".ui.Message.NotSeeMessageStudentsActivity" />
         <activity android:name=".ui.chat.MyFriendActivity" />
-        <activity android:name=".ui.topic.AddNewTopicActivity" />
+        <activity android:name=".ui.topic.AddNewTopicActivity"
+            android:windowSoftInputMode="stateHidden|adjustUnspecified"/>
         <!-- 百度地图相关 -->
         <service
             android:name="com.baidu.location.f"

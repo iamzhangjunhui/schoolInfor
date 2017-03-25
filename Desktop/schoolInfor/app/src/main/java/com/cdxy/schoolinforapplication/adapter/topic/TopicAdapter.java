@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.model.topic.CommentContent;
-import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
@@ -40,7 +39,7 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
     private List<TopicEntity> list;
     private Activity activity;
     private TopicPhotosAdapter topicPhotosAdapter;
-    private TopicCommentPersonsAdapter topicCommentPersonsAdapter;
+    private TopicCommentContentAdapter topicCommentContentAdapter;
     private LinearLayout layoutAddComment;
     private EditText edtAddComment;
     private TextView txtSendNewComment;
@@ -138,10 +137,10 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
                 viewHolder.txtThumbPersonsNickname.setText(thumbPersonsNameString);
             }
         }
-        final List<CommentPerson> commentPersons = entity.getCommentPersons();
-        if (commentPersons != null) {
-            topicCommentPersonsAdapter = new TopicCommentPersonsAdapter(activity, commentPersons);
-            viewHolder.scrollComments.setAdapter(topicCommentPersonsAdapter);
+        final List<CommentContent> commentContents = entity.getCommentContents();
+        if (commentContents != null) {
+            topicCommentContentAdapter = new TopicCommentContentAdapter(activity, commentContents);
+            viewHolder.scrollComments.setAdapter(topicCommentContentAdapter);
         }
         viewHolder.imgComment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,34 +153,31 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
                         final String newCommentcontent = edtAddComment.getText().toString();
                         if (TextUtils.isEmpty(newCommentcontent)) {
                             return;
-                        } else {
-                            //编辑框不再显示
-                            layoutAddComment.setVisibility(View.GONE);
-                            int i = 0;
-                            //该用户是第一个评价这个话题的人
-                            for (; i < commentPersons.size(); i++) {
-                                if (nickName.equals(commentPersons.get(i))) ;
-                                break;
-                            }
-                            //这是该用户对这个话题的第一个评价
-                            if (i == commentPersons.size()) {
-                                //新创建一个评论人对象
-                                ArrayList<CommentContent> commentContents = new ArrayList<>();
-                                //这里的发送方的昵称"小芳"，本应该是用户昵称，这里只是用于测试。
-                                CommentContent commentContent = new CommentContent("小芳", nickName, newCommentcontent);
-                                commentContents.add(commentContent);
-                                //id本应该是从Sharepreference获取，现在暂时随便写一个，作为测试
-                                CommentPerson commentPerson = new CommentPerson("121", commentContents);
-                                commentPersons.add(commentPerson);
-                            } else {
-                                //在该评论人的评论列表中添加一条评论。
-                                //这里的发送者应该是用户昵称，测试阶段暂时使用从列表中获取评论者姓名
-                                String senderNickname = commentPersons.get(i).getCommentContents().get(0).getSenderNickname();
-                                CommentContent commentContent = new CommentContent(senderNickname, nickName, newCommentcontent);
-                                commentPersons.get(i).getCommentContents().add(commentContent);
-                            }
-                            topicCommentPersonsAdapter.notifyDataSetChanged();
                         }
+//                            //编辑框不再显示
+//                            layoutAddComment.setVisibility(View.GONE);
+//                            int i = 0;
+//                            //该用户是第一个评价这个话题的人
+//                            for (; i < commentPersons.size(); i++) {
+//                                if (nickName.equals(commentPersons.get(i))) ;
+//                                break;
+//                            }
+//                            //这是该用户对这个话题的第一个评价
+//                            if (i == commentPersons.size()) {
+//                                //新创建一个评论人对象
+//                                ArrayList<CommentContent> commentContents = new ArrayList<>();
+//                                //这里的发送方的昵称"小芳"，本应该是用户昵称，这里只是用于测试。
+//                                CommentContent commentContent = new CommentContent("小芳", nickName, newCommentcontent);
+//                                commentPersons.add(commentPerson);
+//                            } else {
+//                                //在该评论人的评论列表中添加一条评论。
+//                                //这里的发送者应该是用户昵称，测试阶段暂时使用从列表中获取评论者姓名
+//                                String senderNickname = commentPersons.get(i).getCommentContents().get(0).getSenderNickname();
+//                                CommentContent commentContent = new CommentContent(senderNickname, nickName, newCommentcontent);
+//                                commentPersons.get(i).getCommentContents().add(commentContent);
+//                            }
+//                            topicCommentPersonsAdapter.notifyDataSetChanged();
+
                     }
                 });
             }
@@ -264,5 +260,4 @@ public class TopicAdapter extends BaseAdapter implements View.OnClickListener {
             ButterKnife.bind(this, view);
         }
     }
-
 }

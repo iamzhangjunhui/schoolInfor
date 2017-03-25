@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.adapter.topic.TopicAdapter;
 import com.cdxy.schoolinforapplication.model.topic.CommentContent;
-import com.cdxy.schoolinforapplication.model.topic.CommentPerson;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
 import com.cdxy.schoolinforapplication.ui.widget.RefreshLayout;
@@ -136,32 +135,26 @@ public class TopicFragment extends BaseFragment {
                 List<String> thumbPersonsNickname = new ArrayList<String>();
                 thumbPersonsNickname.add("Rain");
                 thumbPersonsNickname.add("Andy");
-                //评论
-                List<CommentPerson> commentPersons = new ArrayList<CommentPerson>();
                 //第一个评论人
                 List<CommentContent> commentContents1 = new ArrayList<CommentContent>();
                 CommentContent commentContent1 = new CommentContent("Rain", "kaylee", "确实很好，一起去打羽毛球吧");
                 CommentContent commentContent2 = new CommentContent("kaylee", "Rain", "好呀，半个小时后楼下见");
                 commentContents1.add(commentContent1);
                 commentContents1.add(commentContent2);
-                CommentPerson commentPerson1 = new CommentPerson("1001", commentContents1);
                 //第二个评论人
                 List<CommentContent> commentContents2 = new ArrayList<CommentContent>();
                 CommentContent commentContent3 = new CommentContent("Andy", "kaylee", "我也想打羽毛球了，等一下叫我哦");
                 CommentContent commentContent4 = new CommentContent("kaylee", "Andy", "要得，好久没和你PK了");
                 commentContents2.add(commentContent3);
                 commentContents2.add(commentContent4);
-                CommentPerson commentPerson2 = new CommentPerson("1002", commentContents2);
-                commentPersons.add(commentPerson1);
-                commentPersons.add(commentPerson2);
                 List<Object> photos = new ArrayList<>();
                 photos.add(R.drawable.bottom_tap_chat_false);
                 photos.add(R.drawable.bottom_tap_chat_false);
                 photos.add(R.drawable.bottom_tap_chat_false);
                 photos.add(R.drawable.bottom_tap_chat_false);
                 photos.add(R.drawable.bottom_tap_chat_false);
-                TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "2016-12-12", "今天天气好，适合出去玩", photos, thumbPersonsNickname, commentPersons);
-                TopicEntity topicEntity2 = new TopicEntity("2", R.drawable.students, "andy", "2016-12-31", "走去打球", null, null, null);
+                TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "2016-12-12", "今天天气好，适合出去玩", photos, thumbPersonsNickname, commentContents1);
+                TopicEntity topicEntity2 = new TopicEntity("2", R.drawable.students, "andy", "2016-12-31", "走去打球", null, null, commentContents2);
                 topicEntities.add(topicEntity1);
                 topicEntities.add(topicEntity2);
                 return topicEntities;
