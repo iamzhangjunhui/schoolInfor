@@ -66,8 +66,10 @@
                     android:textColor="@color/text_message_title"
                     android:textSize="@dimen/text_size" />
             </LinearLayout>
+
             <com.cdxy.schoolinforapplication.ui.widget.ScrollListView
                 android:id="@+id/listview_address"
+                android:visibility="gone"
                 android:paddingTop="10dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"

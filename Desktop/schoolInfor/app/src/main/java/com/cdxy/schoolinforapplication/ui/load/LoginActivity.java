@@ -67,6 +67,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         ScreenManager.getScreenManager().pushActivity(this);
         loginName = getIntent().getStringExtra("loginName");
         edtLoginName.setText(loginName);
+
     }
 
     @Override
@@ -78,26 +79,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_register:
-//                new AlertDialog.Builder(LoginActivity.this).setMessage("如果你是老师的话无需注册，教务处将统一配置教师账号，详情请咨询教务处")
-//                        .setNegativeButton("我是老师", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                dialogInterface.dismiss();
-//                            }
-//                        }).setPositiveButton("我是学生", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        Intent intent = new Intent(LoginActivity.this, RegisterCodeActivity.class);
-//                        startActivity(intent);
-//                        dialogInterface.dismiss();
-//                    }
-//                }).create().show();
                 chooseIdentityTypeDialog = new ChooseIdentityTypeDialog(LoginActivity.this, R.style.MyDialog, new ChooseIdentityTypeDialog.ChooseIdentityTypeDialogListener() {
                     @Override
                     public void onClick(View view) {
                         switch (view.getId()) {
                             case R.id.btn_teacher:
                                 chooseIdentityTypeDialog.dismiss();
+                                break;
                             case R.id.btn_student:
                                 Intent intent = new Intent(LoginActivity.this, RegisterCodeActivity.class);
                                 startActivity(intent);

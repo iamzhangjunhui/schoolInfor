@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -145,18 +146,19 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
             }
             //从相册获取图片
             if (requestCode == Constant.REQUEST_CODE_PICTURE) {
-//                Uri selectedImage = data.getData();
-//                String[] filePathColumns = {MediaStore.Images.Media.DATA};
-//                Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null, null, null);
-//                c.moveToFirst();
-//                int columnIndex = c.getColumnIndex(filePathColumns[0]);
-//                String picturePath = c.getString(columnIndex);
-//                list.add(0, picturePath);
-//                adapter.notifyDataSetChanged();
-//                c.close();
+/*                Uri selectedImage = data.getData();
+                String[] filePathColumns = {MediaStore.Images.Media.DATA};
+                Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null, null, null);
+                c.moveToFirst();
+                int columnIndex = c.getColumnIndex(filePathColumns[0]);
+                String picturePath = c.getString(columnIndex);
+                list.add(0, picturePath);
+                adapter.notifyDataSetChanged();
+                c.close();*/
                 ArrayList<String> photos = data.getStringArrayListExtra("selectResult");
                 for (int i = photos.size() - 1; i > -1; i--) {
-                    list.add(0, photos.get(i));
+                  Bitmap bitmap=  BitmapFactory.decodeFile(photos.get(i));
+                    list.add(0, bitmap);
                 }
                 adapter.notifyDataSetChanged();
 
