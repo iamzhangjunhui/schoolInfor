@@ -32,18 +32,18 @@ import butterknife.ButterKnife;
  */
 public class TopicFragment extends BaseFragment {
 
-    @BindView(R.id.layout_progress)
-    LinearLayout layoutProgress;
-    @BindView(R.id.edt_add_comment)
-    EditText edtAddComment;
-    @BindView(R.id.layout_add_comment)
-    LinearLayout layoutAddComment;
-    @BindView(R.id.txt_send_new_comment)
-    TextView txtSendNewComment;
     @BindView(R.id.refresh_layout)
     RefreshLayout refreshLayout;
     @BindView(R.id.list_topic)
     ListView listTopic;
+    @BindView(R.id.layout_progress)
+    LinearLayout layoutProgress;
+    @BindView(R.id.edt_add_comment)
+    EditText edtAddComment;
+    @BindView(R.id.txt_send_new_comment)
+    TextView txtSendNewComment;
+    @BindView(R.id.layout_add_comment)
+    LinearLayout layoutAddComment;
     private TopicAdapter adapter;
     private List<TopicEntity> list;
 
@@ -156,6 +156,7 @@ public class TopicFragment extends BaseFragment {
                 TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "2016-12-12", "今天天气好，适合出去玩", photos, thumbPersonsNickname, commentContents1);
                 TopicEntity topicEntity2 = new TopicEntity("2", R.drawable.students, "andy", "2016-12-31", "走去打球", null, null, commentContents2);
                 topicEntities.add(topicEntity1);
+                topicEntities.add(topicEntity2);
                 topicEntities.add(topicEntity2);
                 return topicEntities;
             }

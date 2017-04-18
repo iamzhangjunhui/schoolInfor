@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SchoolInforApplication</string>
+    <string name="app_name">校园资讯</string>
 
     <!--login-->
     <string name="skip">跳过</string>
