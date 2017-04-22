@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 
 import com.alibaba.mobileim.YWAPI;
 import com.alibaba.mobileim.aop.AdviceBinder;
@@ -18,7 +19,7 @@ import java.util.Stack;
  * Created by huihui on 2016/12/20.
  */
 
-public class SchoolInforManager extends Application {
+public class SchoolInforManager extends MultiDexApplication {
     private static Context context;
     private static SchoolInforManager application;
     public static String appKay = "23666123";
