@@ -15,6 +15,9 @@ public class MessageEntity implements Serializable {
     private String title;//消息标题
     private String content;//消息详情
 
+    public MessageEntity() {
+    }
+
     public MessageEntity(int type, String sender, String sendTime, String acceptGroup, String senderIcon, String title, String content) {
         this.type = type;
         this.sender = sender;

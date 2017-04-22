@@ -3,8 +3,12 @@ package com.cdxy.schoolinforapplication;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.alibaba.mobileim.YWAPI;
 import com.alibaba.mobileim.aop.AdviceBinder;
@@ -12,8 +16,14 @@ import com.alibaba.mobileim.aop.PointCutEnum;
 import com.alibaba.wxlib.util.SysUtil;
 import com.cdxy.schoolinforapplication.ui.chat.ConversationListOperationCustomSample;
 import com.cdxy.schoolinforapplication.ui.chat.ConversationListUICustomSample;
+import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
+
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
 
 /**
  * Created by huihui on 2016/12/20.
@@ -23,13 +33,12 @@ public class SchoolInforManager extends MultiDexApplication {
     private static Context context;
     private static SchoolInforManager application;
     public static String appKay = "23666123";
-
-public static SchoolInforManager getInstance(){
+    public static SchoolInforManager getInstance(){
     if (application==null){
         application=new SchoolInforManager();
     }
     return application;
-}
+   }
     @Override
     public void onCreate() {
         super.onCreate();
@@ -47,6 +56,9 @@ public static SchoolInforManager getInstance(){
         //阿里云自定义会话列表的相关类。
         AdviceBinder.bindAdvice(PointCutEnum.CONVERSATION_FRAGMENT_UI_POINTCUT, ConversationListUICustomSample.class);
         AdviceBinder.bindAdvice(PointCutEnum.CONVERSATION_FRAGMENT_OPERATION_POINTCUT, ConversationListOperationCustomSample.class);
+        //极光推送初始化
+        JPushInterface.setDebugMode(true);
+        JPushInterface.init(this);
     }
     public static Context getContext(){
         return context;

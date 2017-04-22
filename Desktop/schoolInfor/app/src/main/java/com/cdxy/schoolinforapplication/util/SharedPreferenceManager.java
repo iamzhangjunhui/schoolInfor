@@ -14,6 +14,7 @@ public class SharedPreferenceManager {
     public static final String LOGIN_NAME="loginName";
     public static  final String PASSWORD="password";
     public static final String IDENTITY="identity";
+    public static final String ISADDTAG="isAddTag";
 
 
     public SharedPreferenceManager(Context context) {

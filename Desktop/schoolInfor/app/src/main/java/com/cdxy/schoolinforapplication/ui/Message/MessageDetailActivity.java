@@ -54,31 +54,31 @@ public class MessageDetailActivity extends BaseActivity implements View.OnClickL
         String content = messageEntity.getContent();
         if (!TextUtils.isEmpty(content))
             txtMessageDetailContent.setText("  " +content);
-        String acceptGroup = messageEntity.getAcceptGroup();
-        if (!TextUtils.isEmpty(acceptGroup))
-            txtMessageDetailAcceptGroup.setText(acceptGroup);
-        String sender = messageEntity.getSender();
-        if (!TextUtils.isEmpty(sender))
-            txtMessageDetailSender.setText(sender);
+//        String acceptGroup = messageEntity.getAcceptGroup();
+//        if (!TextUtils.isEmpty(acceptGroup))
+//            txtMessageDetailAcceptGroup.setText(acceptGroup);
+//        String sender = messageEntity.getSender();
+//        if (!TextUtils.isEmpty(sender))
+//            txtMessageDetailSender.setText(sender);
         String sendTime = messageEntity.getSendTime();
         if (!TextUtils.isEmpty(sendTime))
             txtMessageDetailSendTime.setText(sendTime);
         int type=messageEntity.getType();
-        switch (messageType) {
-            case Constant.MY_SEND_MESSAGE:
-                if (type==1) {
-                    btnRight.setText("查看情况");
-                    btnRight.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent=new Intent(MessageDetailActivity.this,SeeMessageStudentsActivity.class);
-                            intent.putExtra("messageEntity",messageEntity);
-                            startActivity(intent);
-                        }
-                    });
-                }
-                break;
-        }
+//        switch (messageType) {
+//            case Constant.MY_SEND_MESSAGE:
+//                if (type==1) {
+//                    btnRight.setText("查看情况");
+//                    btnRight.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View view) {
+//                            Intent intent=new Intent(MessageDetailActivity.this,SeeMessageStudentsActivity.class);
+//                            intent.putExtra("messageEntity",messageEntity);
+//                            startActivity(intent);
+//                        }
+//                    });
+//                }
+//                break;
+//        }
     }
 
     @Override
@@ -86,7 +86,7 @@ public class MessageDetailActivity extends BaseActivity implements View.OnClickL
         txtTitle.setText("消息详情");
         Intent intent = getIntent();
         messageEntity = (MessageEntity) intent.getSerializableExtra("message");
-        messageType = intent.getStringExtra("message_type");
+//        messageType = intent.getStringExtra("message_type");
     }
 
     @Override

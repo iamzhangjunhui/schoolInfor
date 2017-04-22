@@ -3,10 +3,13 @@ package com.cdxy.schoolinforapplication.ui;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
@@ -29,9 +33,15 @@ import com.cdxy.schoolinforapplication.ui.my.MyInformationActivity;
 import com.cdxy.schoolinforapplication.ui.topic.AddNewTopicActivity;
 import com.cdxy.schoolinforapplication.ui.widget.DragLayout;
 import com.cdxy.schoolinforapplication.ui.widget.ModifyMyMottoDialog;
+import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.jpush.android.api.JPushInterface;
+import cn.jpush.android.api.TagAliasCallback;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -88,6 +98,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Fragment[] fragments;
     private int oldPos = 1;
     private ModifyMyMottoDialog modifyMyMottoDialog;
+    public static String TAG = "SchoolInforManager";
+    private static final int MSG_SET_TAGS = 1001;
+    private Handler mHandler;
+    Set<String> tags = new HashSet<>();
+    private TagAliasCallback mAliasCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +168,60 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 textViews[i].setTextColor(getResources().getColor(R.color.white));
                 setImage(i, false);
             }
+        }
+        JPushAddTags();
+    }
+
+    //极光推送添加Tags
+    private void JPushAddTags() {
+        //极光推送设置Tag的回调
+        mAliasCallback = new TagAliasCallback() {
+            @Override
+            public void gotResult(int code, String alias, Set<String> tags) {
+                String logs;
+                switch (code) {
+                    case 0:
+                        logs = "Set tag success";
+                        SharedPreferences.Editor editor = SharedPreferenceManager.instance(MainActivity.this).getEditor();
+                        editor.putBoolean(SharedPreferenceManager.ISADDTAG, true);
+                        editor.commit();
+                        Log.i(TAG, logs);
+                        // 建议这里往 SharePreference 里写一个成功设置的状态。成功设置一次后，以后不必再次设置了。
+                        break;
+                    case 6002:
+                        logs = "Failed to tags due to timeout. Try again after 60s.";
+                        Log.i(TAG, logs);
+                        // 延迟 60 秒来调用 Handler 设置别名
+                        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_SET_TAGS, alias), 1000 * 60);
+                        break;
+                    default:
+                        logs = "Failed with errorCode = " + code;
+                        Log.e(TAG, logs);
+                }
+                Toast.makeText(MainActivity.this, logs, Toast.LENGTH_SHORT).show();
+            }
+        };
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(android.os.Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case MSG_SET_TAGS:
+                        Log.d(TAG, "Set alias in handler.");
+                        // 调用 JPush 接口来设置标签。
+                        JPushInterface.setTags(MainActivity.this, tags, mAliasCallback);
+                        break;
+                    default:
+                        Log.i(TAG, "Unhandled msg - " + msg.what);
+                }
+            }
+        };
+        tags.add("计算机系");
+        tags.add("嵌入式");
+        SharedPreferences sharedPreferences = SharedPreferenceManager.instance(MainActivity.this).getSharedPreferences();
+        boolean isAddTags = sharedPreferences.getBoolean(SharedPreferenceManager.ISADDTAG, false);
+        if (!isAddTags) {
+            mHandler.sendMessage(mHandler.obtainMessage(MSG_SET_TAGS, tags));
         }
     }
 
