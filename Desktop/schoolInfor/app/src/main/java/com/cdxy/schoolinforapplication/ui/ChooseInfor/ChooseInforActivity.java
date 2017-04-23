@@ -97,21 +97,11 @@ public class ChooseInforActivity extends BaseActivity implements View.OnClickLis
                     }
                     listAdapterClass.notifyDataSetChanged();
                     break;
-                case "航空分院":
+                case "云计算系":
                     if (listClass!=null){
                         listClass.clear();
                     }
-                    clazz=getResources().getStringArray(R.array.航空分院);
-                    for (int i=0;i<clazz.length;i++){
-                        listClass.add(clazz[i]);
-                    }
-                    listAdapterClass.notifyDataSetChanged();
-                    break;
-                case "行知学院":
-                    if (listClass!=null){
-                        listClass.clear();
-                    }
-                    clazz=getResources().getStringArray(R.array.行知学院);
+                    clazz=getResources().getStringArray(R.array.云计算系);
                     for (int i=0;i<clazz.length;i++){
                         listClass.add(clazz[i]);
                     }

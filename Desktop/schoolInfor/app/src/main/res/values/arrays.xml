@@ -3,8 +3,7 @@
     <array name="department">
         <item>计算机系</item>
         <item>经管系</item>
-        <item>航空分院</item>
-        <item>行知学院</item>
+        <item>云计算系</item>
     </array>
     <array name="计算机系">
         <item>嵌入式1班</item>
@@ -18,22 +17,12 @@
         <item>网络安全1班</item>
     </array>
     <array name="经管系">
-        <item>经管1班</item>
-        <item>经管2班</item>
-        <item>经管3班</item>
-        <item>经管4班</item>
+        <item>国民经济管理</item>
+        <item>现代经济管理</item>
+        <item>工(商)业经济管理</item>
     </array>
-    <array name="航空分院">
-        <item>航空分院1班</item>
-        <item>航空分院2班</item>
-        <item>航空分院3班</item>
-        <item>航空分院4班</item>
-    </array>
-    <array name="行知学院">
-        <item>行知1班</item>
-        <item>行知2班</item>
-        <item>行知3班</item>
-        <item>行知4班</item>
+    <array name="云计算系">
+        <item>云计算</item>
     </array>
     <string-array name="nation">
         <item>汉族</item>

@@ -99,7 +99,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     public void init() {
-        txtTitle.setText("注册");
+        txtTitle.setText("信息填写");
     }
 
 
