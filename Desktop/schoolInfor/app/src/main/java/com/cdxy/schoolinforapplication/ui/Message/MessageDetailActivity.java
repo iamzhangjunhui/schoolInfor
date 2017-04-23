@@ -54,12 +54,12 @@ public class MessageDetailActivity extends BaseActivity implements View.OnClickL
         String content = messageEntity.getContent();
         if (!TextUtils.isEmpty(content))
             txtMessageDetailContent.setText("  " +content);
-//        String acceptGroup = messageEntity.getAcceptGroup();
-//        if (!TextUtils.isEmpty(acceptGroup))
-//            txtMessageDetailAcceptGroup.setText(acceptGroup);
-//        String sender = messageEntity.getSender();
-//        if (!TextUtils.isEmpty(sender))
-//            txtMessageDetailSender.setText(sender);
+        String acceptGroup = messageEntity.getAcceptGroup();
+        if (!TextUtils.isEmpty(acceptGroup))
+            txtMessageDetailAcceptGroup.setText(acceptGroup);
+        String sender = messageEntity.getSender();
+        if (!TextUtils.isEmpty(sender))
+            txtMessageDetailSender.setText(sender);
         String sendTime = messageEntity.getSendTime();
         if (!TextUtils.isEmpty(sendTime))
             txtMessageDetailSendTime.setText(sendTime);
@@ -86,7 +86,6 @@ public class MessageDetailActivity extends BaseActivity implements View.OnClickL
         txtTitle.setText("消息详情");
         Intent intent = getIntent();
         messageEntity = (MessageEntity) intent.getSerializableExtra("message");
-//        messageType = intent.getStringExtra("message_type");
     }
 
     @Override
