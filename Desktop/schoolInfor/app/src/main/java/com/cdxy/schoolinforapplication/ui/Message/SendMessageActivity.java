@@ -236,7 +236,7 @@ public class SendMessageActivity extends BaseActivity implements View.OnClickLis
             public void call(Subscriber<? super String> subscriber) {
                 MediaType JSON = MediaType.parse("application/json; charset=utf-8");
                 OkHttpClient okHttpClient = new OkHttpClient();
-                SendMessageEntity sendMessageEntity = new SendMessageEntity(title, content, messageTye, sendTo);
+                SendMessageEntity sendMessageEntity = new SendMessageEntity(title, content, messageTye, sendTo,"kaylee");
                 Gson gson = new Gson();
                 String json = gson.toJson(sendMessageEntity);
                 RequestBody formBody = RequestBody.create(JSON, json);
