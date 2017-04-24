@@ -75,7 +75,6 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
                 Intent intent = new Intent(MessageListActivity.this, MessageDetailActivity.class);
                 MessageEntity entity = list.get(i);
                 intent.putExtra("message", entity);
-                intent.putExtra("message_type", messageType);
                 startActivity(intent);
             }
         });
