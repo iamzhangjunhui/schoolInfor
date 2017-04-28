@@ -187,7 +187,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                     File imageFile = new File(imagePath);
                     try {
                         imageFile.createNewFile();
-                        saveMyBitmap(imagePath, bitmap, AddNewTopicActivity.this);
+                        saveMyBitmap(imagePath, bitmap);
                         paths.add(imagePath);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -350,11 +350,9 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
      *
      * @param path
      * @param mBitmap
-     * @param context
      * @return
      */
-    public boolean saveMyBitmap(String path, Bitmap mBitmap,
-                                Context context) {
+    public boolean saveMyBitmap(String path, Bitmap mBitmap) {
         FileOutputStream fOut = null;
         try {
             fOut = new FileOutputStream(new File(path));

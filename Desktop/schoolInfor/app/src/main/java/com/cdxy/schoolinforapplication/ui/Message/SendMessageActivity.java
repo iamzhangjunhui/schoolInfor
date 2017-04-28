@@ -107,7 +107,7 @@ public class SendMessageActivity extends BaseActivity implements View.OnClickLis
         children1.add(childEntitya3);
         ChildEntity childEntitya4 = new ChildEntity(getResources().getColor(R.color.colorPrimary), "软件技术1班");
         children1.add(childEntitya4);
-        ChildEntity childEntitya5= new ChildEntity(getResources().getColor(R.color.colorPrimary), "软件技术2班");
+        ChildEntity childEntitya5 = new ChildEntity(getResources().getColor(R.color.colorPrimary), "软件技术2班");
         children1.add(childEntitya5);
         ChildEntity childEntitya6 = new ChildEntity(getResources().getColor(R.color.colorPrimary), "软件技术3班");
         children1.add(childEntitya6);
@@ -236,7 +236,7 @@ public class SendMessageActivity extends BaseActivity implements View.OnClickLis
             public void call(Subscriber<? super String> subscriber) {
                 MediaType JSON = MediaType.parse("application/json; charset=utf-8");
                 OkHttpClient okHttpClient = new OkHttpClient();
-                SendMessageEntity sendMessageEntity = new SendMessageEntity(title, content, messageTye, sendTo,"kaylee");
+                SendMessageEntity sendMessageEntity = new SendMessageEntity(title, content, messageTye, sendTo, "kaylee");
                 Gson gson = new Gson();
                 String json = gson.toJson(sendMessageEntity);
                 RequestBody formBody = RequestBody.create(JSON, json);
@@ -261,7 +261,7 @@ public class SendMessageActivity extends BaseActivity implements View.OnClickLis
 
             @Override
             public void onError(Throwable e) {
-
+                e.printStackTrace();
             }
 
             @Override

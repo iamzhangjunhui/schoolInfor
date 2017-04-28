@@ -7,12 +7,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
+import com.cdxy.schoolinforapplication.HttpUrl;
+import com.cdxy.schoolinforapplication.model.message.ExtraMessageEntity;
 import com.cdxy.schoolinforapplication.model.message.MessageEntity;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cn.jpush.android.api.JPushInterface;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * 极光推送消息处理类
@@ -44,7 +53,7 @@ public class MyReceiver extends BroadcastReceiver {
 
         } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
             Log.d(TAG, "[MyReceiver] 用户点击打开了通知");
-
+            sureReceiveMessage();
             //打开自定义的Activity
             Intent i = new Intent(context, MessageDetailActivity.class);
             MessageEntity messageEntity = new MessageEntity();
@@ -52,6 +61,8 @@ public class MyReceiver extends BroadcastReceiver {
             messageEntity.setContent(bundle.getString(JPushInterface.EXTRA_ALERT));
            //获取并解析附加信息
             String extreMessage = bundle.getString(JPushInterface.EXTRA_EXTRA);
+//           Gson gson=new Gson();
+//            ExtraMessageEntity extraMessageEntity=gson.fromJson(extreMessage,ExtraMessageEntity.class);
             String[] values = extreMessage.split(",");
             String value1_key = (values[0].split(":"))[0];
             String value1 = (values[0].split(":"))[1];
@@ -109,5 +120,20 @@ public class MyReceiver extends BroadcastReceiver {
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(i);
         }
+    }
+    private void sureReceiveMessage(){
+        OkHttpClient okHttpClient=new OkHttpClient();
+        Request request=new Request.Builder().url(HttpUrl.SURE_RECEIVE_MESSAGE).get().build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+            }
+        });
     }
 }

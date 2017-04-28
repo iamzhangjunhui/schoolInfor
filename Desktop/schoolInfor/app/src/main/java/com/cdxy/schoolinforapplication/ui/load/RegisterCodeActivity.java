@@ -14,16 +14,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
+import com.cdxy.schoolinforapplication.model.ReturnEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
 import com.cdxy.schoolinforapplication.util.NumberCheckUtil;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -31,6 +38,8 @@ import okhttp3.Response;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class RegisterCodeActivity extends BaseActivity implements View.OnClickListener {
@@ -74,14 +83,6 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
                 registerName = edtRegisterName.getText().toString();
                 registerPassword = edtRegisterPassword.getText().toString();
                 String registerSurePassword = edtRegisterSurePassword.getText().toString();
-                if (TextUtils.isEmpty(registerName)) {
-                    toast("请输入手机号");
-                    return;
-                }
-                if (!NumberCheckUtil.isMoibleNumber(registerName)) {
-                    toast("你输入的手机号格式不正确");
-                    return;
-                }
                 if (TextUtils.isEmpty(registerPassword)) {
                     toast("请设置密码");
                     return;
@@ -99,7 +100,7 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
                     edtRegisterSurePassword.setText("");
                     return;
                 }
-                register1(registerName, registerPassword);
+                register1();
                 break;
             case R.id.img_back:
                 ScreenManager.getScreenManager().popActivty(this);
@@ -110,64 +111,62 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
     }
 
     //苏杭    注册接口第一步 register1  此处只向数据库加入账号和密码  如果返回了false说明账号被注册了需要重新注册下面的onNext中
-    public void register1(final String a, final String b) {
-
-        Observable.create(new Observable.OnSubscribe<String>() {
+    public void register1() {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder().url(HttpUrl.REGISTER + "?userid=" + registerName + "&&password" + registerPassword).get().build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void call(Subscriber<? super String> subscriber) {
-                OkHttpClient okHttpClient = new OkHttpClient();
-                FormBody formBody = new FormBody.Builder().add("lianxi", a).add("mima", b).build();
-                Request request = new Request.Builder().url("http://192.168.191.1:8080/schoolinfor/register").post(formBody).build();
-                try {
-                    Response response = okHttpClient.newCall(request).execute();
-                    JSONObject jsonObject = new JSONObject(response.body().string());
-
-                    Log.d("aaaaaaaaaa", jsonObject.getString("result"));
-                    subscriber.onNext(jsonObject.getString("result"));
-                    subscriber.onCompleted();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<String>() {
-            @Override
-            public void onCompleted() {
-
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
             }
 
             @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(String s) {
-                Log.i("ssssss", s);
-
-                if (s.equals("true")) {
-                    Intent intent = new Intent(RegisterCodeActivity.this, RegisterActivity.class);
-                    intent.putExtra("registerName", registerName);
-                    intent.putExtra("registerPassword", registerPassword);
-                    startActivity(intent);
-                } else {
-                    new AlertDialog.Builder(RegisterCodeActivity.this).setMessage("该手机号已经注册过，请直接登录").setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Intent intent = new Intent(RegisterCodeActivity.this, LoginActivity.class);
-                            intent.putExtra("loginName", registerName);
-                            startActivity(intent);
-                            dialogInterface.dismiss();
-                        }
-                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    }).create().show();
-                }
+            public void onResponse(Call call, Response response) throws IOException {
+                Observable.just(response.body().string()).map(new Func1<String, ReturnEntity>() {
+                    @Override
+                    public ReturnEntity call(String s) {
+                        Gson gson = new Gson();
+                        ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
+                        return returnEntity;
+                    }
+                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Action1<ReturnEntity>() {
+                            @Override
+                            public void call(ReturnEntity returnEntity) {
+                                if (returnEntity != null) {
+                                    if (returnEntity.getCode() == 1) {
+                                        toast("注册成功");
+                                        Intent intent = new Intent(RegisterCodeActivity.this, RegisterActivity.class);
+                                        intent.putExtra("registerName", registerName);
+                                        intent.putExtra("registerPassword", registerPassword);
+                                        startActivity(intent);
+                                    }else {
+                                        toast(returnEntity.getMsg()+"");
+                                    }
+//                                        else if () {
+                                    //该账号已经注册过了
+//                                            new AlertDialog.Builder(RegisterCodeActivity.this).setMessage("该手机号已经注册过，请直接登录").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                                                @Override
+//                                                public void onClick(DialogInterface dialogInterface, int i) {
+//                                                    Intent intent = new Intent(RegisterCodeActivity.this, LoginActivity.class);
+//                                                    intent.putExtra("loginName", registerName);
+//                                                    startActivity(intent);
+//                                                    dialogInterface.dismiss();
+//                                                }
+//                                            }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//                                                @Override
+//                                                public void onClick(DialogInterface dialogInterface, int i) {
+//                                                    dialogInterface.dismiss();
+//                                                }
+//                                            }).create().show();
+//                                        }
+                                } else {
+                                    toast("注册失败");
+                                }
+                            }
+                        });
             }
         });
 
     }
-
 }

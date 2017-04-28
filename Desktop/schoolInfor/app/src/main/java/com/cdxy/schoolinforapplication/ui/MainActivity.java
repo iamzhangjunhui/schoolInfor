@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.mobileim.utility.IMPrefsTools;
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
@@ -301,6 +302,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 ScreenManager.getScreenManager().appExit(this);
                 intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
+                //退出时将保存在本地的数据置空
+                IMPrefsTools.setStringPrefs(MainActivity.this,"USER_ID","");
+                IMPrefsTools.setStringPrefs(MainActivity.this,"PASSWORD","");
                 break;
             case R.id.layout_bottom_chat:
                 setFragments(0);

@@ -97,7 +97,6 @@ public class TopicFragment extends BaseFragment {
                 refreshLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        toast("刷新");
                         refreshLayout.setRefreshing(false);
                     }
                 }, 2000);
@@ -109,7 +108,6 @@ public class TopicFragment extends BaseFragment {
                 refreshLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        toast("加载");
                         refreshLayout.setLoading(false);
                     }
                 }, 2000);
