@@ -12,16 +12,18 @@ public class SendMessageEntity {
     private int messageType;
     private List<String> sendTo;
     private String sendPersonName;
+    private int isSelectAll;
 
     public SendMessageEntity() {
     }
 
-    public SendMessageEntity(String title, String content, int messageType, List<String> sendTo, String sendPersonName) {
+    public SendMessageEntity(String title, String content, int messageType, List<String> sendTo, String sendPersonName, int isSelectAll) {
         this.title = title;
         this.content = content;
         this.messageType = messageType;
         this.sendTo = sendTo;
         this.sendPersonName = sendPersonName;
+        this.isSelectAll = isSelectAll;
     }
 
     public String getTitle() {
@@ -64,14 +66,11 @@ public class SendMessageEntity {
         this.sendPersonName = sendPersonName;
     }
 
-    @Override
-    public String toString() {
-        return "SendMessageEntity{" +
-                "title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", messageType=" + messageType +
-                ", sendTo=" + sendTo +
-                ", sendPersonName='" + sendPersonName + '\'' +
-                '}';
+    public int getIsSelectAll() {
+        return isSelectAll;
+    }
+
+    public void setIsSelectAll(int isSelectAll) {
+        this.isSelectAll = isSelectAll;
     }
 }
