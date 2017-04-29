@@ -37,6 +37,7 @@ public class MyReceiver extends BroadcastReceiver {
     private String acceptGroup;
     private String messageTypeString;
     private String messageType;
+    private String messageId;
 
     @Override
     public void onReceive(Context context, Intent intent) {

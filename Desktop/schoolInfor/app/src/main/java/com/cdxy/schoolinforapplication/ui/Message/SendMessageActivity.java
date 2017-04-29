@@ -76,7 +76,7 @@ public class SendMessageActivity extends BaseActivity implements View.OnClickLis
     private ParentAdapter adapter;
     private List<ParentEntity> list;
     int messageTye = 0;
-    int isSelectAll=0;
+    int isSelectAll = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,16 +207,14 @@ public class SendMessageActivity extends BaseActivity implements View.OnClickLis
 
         if (ckAll.isChecked()) {
             //如果全选
-            for (int i = 0; i < list.size(); i++) {
-                sendTo.add(list.get(i).getName());
-            }
+            isSelectAll = 1;
         } else {
+            isSelectAll = 0;
             for (int i = 0; i < list.size(); i++) {
                 ParentEntity parentEntity = list.get(i);
                 if (parentEntity.isSelect()) {
                     //如果选择了整个系
                     sendTo.add(parentEntity.getName());
-                    isSelectAll=1;
                 } else {
                     //分班选择
                     List<ChildEntity> childEntityList = parentEntity.getChildren();
@@ -229,17 +227,12 @@ public class SendMessageActivity extends BaseActivity implements View.OnClickLis
                 }
             }
         }
-
-        if (sendTo.size() == 0) {
-            toast("请选择发送对象");
-            return;
-        }
         Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 MediaType JSON = MediaType.parse("application/json; charset=utf-8");
                 OkHttpClient okHttpClient = new OkHttpClient();
-                SendMessageEntity sendMessageEntity = new SendMessageEntity(title, content, messageTye, sendTo, "kaylee");
+                SendMessageEntity sendMessageEntity = new SendMessageEntity(title, content, messageTye, sendTo, "kaylee", isSelectAll);
                 Gson gson = new Gson();
                 String json = gson.toJson(sendMessageEntity);
                 RequestBody formBody = RequestBody.create(JSON, json);
