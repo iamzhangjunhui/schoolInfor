@@ -1,7 +1,6 @@
 package com.cdxy.schoolinforapplication.ui.load;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -14,7 +13,6 @@ import com.alibaba.mobileim.YWIMKit;
 import com.alibaba.mobileim.YWLoginParam;
 import com.alibaba.mobileim.channel.event.IWxCallback;
 import com.alibaba.mobileim.contact.IYWContactService;
-import com.alibaba.mobileim.utility.IMPrefsTools;
 import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.SchoolInforManager;
@@ -25,8 +23,8 @@ import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ChooseIdentityTypeDialog;
+import com.cdxy.schoolinforapplication.util.GetUserInfor;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
-import com.cdxy.schoolinforapplication.util.huoqushuju;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -57,9 +55,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public static YWIMKit ywimKit;
     public static IYWContactService iywContactService;
     private String loginName;
-    private huoqushuju huoqushuju;
-    private UserInforEntity userInforEntity;
     private ChooseIdentityTypeDialog chooseIdentityTypeDialog;
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +74,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         edtLoginName.setText(loginName);
         //如果本地有登录信息就实现自动登录
         autoLogin();
+        gson = new Gson();
     }
 
     @Override
@@ -112,7 +110,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     return;
                 }
                 login(loginName, loginPassword);
-//                getUserIdentity();
             default:
                 break;
         }
@@ -134,7 +131,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 Observable.just(result).map(new Func1<String, ReturnEntity<LoginReturnEntity>>() {
                     @Override
                     public ReturnEntity<LoginReturnEntity> call(String s) {
-                        Gson gson = new Gson();
                         ReturnEntity<LoginReturnEntity> returnEntity = gson.fromJson(s, ReturnEntity.class);
                         if (returnEntity != null) {
                             returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<LoginReturnEntity>>() {
@@ -151,6 +147,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 if (loginReturnEntityReturnEntity.getCode() == 1) {
                                     LoginReturnEntity loginReturnEntity = loginReturnEntityReturnEntity.getData();
                                     aliLogin(loginReturnEntity.getUserid(), loginReturnEntity.getPassword());
+                                    new GetUserInfor().getMyInfor(LoginActivity.this,loginReturnEntity.getUserid());
                                 } else {
                                     toast("登录出现异常");
                                 }
@@ -159,14 +156,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             }
 
         });
-    }
-
-    private void getUserIdentity() {
-        huoqushuju = new huoqushuju();
-        userInforEntity = huoqushuju.huoqushuju(SharedPreferenceManager.instance(LoginActivity.this).getSharedPreferences().getString(SharedPreferenceManager.LOGIN_NAME, null));
-        SharedPreferences.Editor editor = SharedPreferenceManager.instance(LoginActivity.this).getEditor();
-        editor.putString(SharedPreferenceManager.IDENTITY, userInforEntity.getShenfen());
-        editor.commit();
     }
 
     private void aliLogin(final String userid, final String password) {
@@ -178,7 +167,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         loginService.login(param, new IWxCallback() {
             @Override
             public void onSuccess(Object... objects) {
-                saveLoginInforToLocal(userid, password);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             }
@@ -195,19 +183,20 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         });
     }
 
-    private void saveLoginInforToLocal(String userid, String password) {
-        IMPrefsTools.setStringPrefs(LoginActivity.this, "USER_ID", userid);
-        IMPrefsTools.setStringPrefs(LoginActivity.this, "PASSWORD", password);
-    }
 
     private void autoLogin() {
-        String userid = IMPrefsTools.getStringPrefs(LoginActivity.this, "USER_ID");
-        String password = IMPrefsTools.getStringPrefs(LoginActivity.this, "PASSWORD");
-        if (!TextUtils.isEmpty(userid) && (!TextUtils.isEmpty(password))) {
-            ywimKit = YWAPI.getIMKitInstance(userid, SchoolInforManager.appKay);
-            iywContactService = ywimKit.getContactService();
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
+        UserInforEntity userInforEntity= SharedPreferenceManager.instance(LoginActivity.this).getUserInfor();
+        if (userInforEntity!=null) {
+            String userid = userInforEntity.getUserid();
+            String password = userInforEntity.getMima();
+            if (!TextUtils.isEmpty(userid) && (!TextUtils.isEmpty(password))) {
+                ywimKit = YWAPI.getIMKitInstance(userid, SchoolInforManager.appKay);
+                iywContactService = ywimKit.getContactService();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
         }
     }
+
+
 }

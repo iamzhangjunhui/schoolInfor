@@ -113,7 +113,7 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
     //苏杭    注册接口第一步 register1  此处只向数据库加入账号和密码  如果返回了false说明账号被注册了需要重新注册下面的onNext中
     public void register1() {
         OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.REGISTER + "?userid=" + registerName + "&&password" + registerPassword).get().build();
+        Request request = new Request.Builder().url(HttpUrl.REGISTER + "?userid=" + registerName + "&&password=" + registerPassword).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

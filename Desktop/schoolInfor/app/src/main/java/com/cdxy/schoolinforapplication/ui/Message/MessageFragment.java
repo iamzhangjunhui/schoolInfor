@@ -60,7 +60,7 @@ public class MessageFragment extends BaseFragment {
 
     @Override
     public void init() {
-      identity= SharedPreferenceManager.instance(getContext()).getSharedPreferences().getString(SharedPreferenceManager.IDENTITY,null);
+//      identity= SharedPreferenceManager.instance(getContext()).getUserInfor().getShenfen();
         String identity="老师";
         if (identity.equals("老师")){
             layoutMyMessage.setVisibility(View.VISIBLE);

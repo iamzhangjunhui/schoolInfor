@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -23,8 +24,11 @@ import android.widget.Toast;
 
 import com.alibaba.mobileim.utility.IMPrefsTools;
 import com.bumptech.glide.Glide;
+import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
+import com.cdxy.schoolinforapplication.model.ReturnEntity;
+import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.Message.SendMessageActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity;
@@ -36,6 +40,7 @@ import com.cdxy.schoolinforapplication.ui.widget.DragLayout;
 import com.cdxy.schoolinforapplication.ui.widget.ModifyMyMottoDialog;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,6 +49,13 @@ import butterknife.ButterKnife;
 import cn.jpush.android.api.JPushInterface;
 import cn.jpush.android.api.TagAliasCallback;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import rx.Observable;
+import rx.functions.Func1;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -104,6 +116,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Handler mHandler;
     Set<String> tags = new HashSet<>();
     private TagAliasCallback mAliasCallback;
+    private UserInforEntity userInfor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +150,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 fragmentManager.findFragmentById(R.id.message_fragment)};
         textViews = new TextView[]{txtBottomChat, txtBottomTopic, txtBottomMessage};
         imageViews = new ImageView[]{imgBottomChat, imgBottomTopic, imgBottomMessage};
+        userInfor = SharedPreferenceManager.instance(MainActivity.this).getUserInfor();
+        if (userInfor != null) {
+            String icon = userInfor.getTouxiang();
+            if (!TextUtils.isEmpty(icon)){
+                Glide.with(MainActivity.this).load(icon).placeholder(R.drawable.loading).into(imgMyIcon);
+            }
+            txtMyName.setText(userInfor.getXingming() + "");
+            txtMyClazz.setText(userInfor.getBanji() + "");
+            txtMyMotto.setText(userInfor.getXibie() + "");
+            txtMyDepartment.setText(userInfor.getXingbie());
+        }
 
     }
 
@@ -183,9 +207,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 switch (code) {
                     case 0:
                         logs = "Set tag success";
-                        SharedPreferences.Editor editor = SharedPreferenceManager.instance(MainActivity.this).getEditor();
-                        editor.putBoolean(SharedPreferenceManager.ISADDTAG, true);
-                        editor.commit();
+                        SharedPreferenceManager.instance(MainActivity.this).setIsAddtag(true);
                         Log.i(TAG, logs);
                         // 建议这里往 SharePreference 里写一个成功设置的状态。成功设置一次后，以后不必再次设置了。
                         break;
@@ -219,8 +241,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         };
         tags.add("计算机系");
         tags.add("嵌入式");
-        SharedPreferences sharedPreferences = SharedPreferenceManager.instance(MainActivity.this).getSharedPreferences();
-        boolean isAddTags = sharedPreferences.getBoolean(SharedPreferenceManager.ISADDTAG, false);
+        boolean isAddTags = SharedPreferenceManager.instance(MainActivity.this).getIsAddtag();
         if (!isAddTags) {
             mHandler.sendMessage(mHandler.obtainMessage(MSG_SET_TAGS, tags));
         }
@@ -303,8 +324,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 //退出时将保存在本地的数据置空
-                IMPrefsTools.setStringPrefs(MainActivity.this,"USER_ID","");
-                IMPrefsTools.setStringPrefs(MainActivity.this,"PASSWORD","");
+                IMPrefsTools.setStringPrefs(MainActivity.this, "USER_ID", "");
+                IMPrefsTools.setStringPrefs(MainActivity.this, "PASSWORD", "");
                 break;
             case R.id.layout_bottom_chat:
                 setFragments(0);

@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -13,22 +14,28 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.ChooseInfor.ChooseInforActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
-import com.cdxy.schoolinforapplication.ui.load.RegisterActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
-import com.cdxy.schoolinforapplication.util.huoqushuju;
+import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
-public class ModifyMyInforActivity extends BaseActivity implements View.OnClickListener{
+public class ModifyMyInforActivity extends BaseActivity implements View.OnClickListener {
 
     @BindView(R.id.img_back)
     ImageView imgBack;
@@ -60,7 +67,6 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
     EditText edtHobby;
     @BindView(R.id.submit_register)
     Button submitRegister;
-    private huoqushuju huoqushuju;
     private UserInforEntity userInfor;
 
     @Override
@@ -74,14 +80,14 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
 
     @Override
     public void init() {
-    txtTitle.setText("修改我的个人信息");
-        huoqushuju = new huoqushuju();
+        txtTitle.setText("修改我的个人信息");
+        userInfor= (UserInforEntity) getIntent().getSerializableExtra("userInfor");
         setData();
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.img_back:
                 ScreenManager.getScreenManager().popActivty(this);
                 break;
@@ -116,10 +122,29 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;
+            case R.id.submit_register:
+                String sex = null;
+                if (girl.isChecked()) {
+                    sex = "女";
+                } else if (boy.isChecked()) {
+                    sex = "男";
+                }
+                userInfor.getUserid();
+                userInfor.getMima();
+                edtRealname.getText().toString();
+                UserInforEntity userInforEntity = new UserInforEntity(userInfor.getUserid(), userInfor.getMima(), edtNickname.getText().toString(), edtRealname.getText().toString(),
+                        txtDepartment.getText().toString(), txtClass.getText().toString(), edtStudentId.getText().toString(),
+                        sex, txtBirthday.getText().toString(), txtNation.getText().toString(), edtAddress.getText().toString(),
+                        edtHobby.getText().toString(), userInfor.getShenfen(), userInfor.getTouxiang(), userInfor.getZuoyouming());
+                Gson gson = new Gson();
+                String userInforJson = gson.toJson(userInforEntity);
+                updateUserInfor(userInforJson);
+                break;
             default:
                 break;
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -142,25 +167,41 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
             }
         }
     }
-    private void setData() {
-        String loginName = SharedPreferenceManager.instance(ModifyMyInforActivity.this).getSharedPreferences().getString(SharedPreferenceManager.LOGIN_NAME, null);
-        if (!TextUtils.isEmpty(loginName)) {
-            userInfor = huoqushuju.huoqushuju(loginName);
-            edtNickname.setText(userInfor.getNicheng() + "");
-            edtRealname.setText(userInfor.getXingming() + "");
-            txtDepartment.setText(userInfor.getXibie() + "");
-            txtClass.setText(userInfor.getBanji() + "");
-            edtStudentId.setText(userInfor.getXuehao() + "");
-            if (userInfor.getXingbie().equals("女")){
-                rgSex.check(R.id.girl);
-            }else {
-                rgSex.check(R.id.boy);
-            }
-            txtBirthday.setText(userInfor.getShengri() + "");
-            txtNation.setText(userInfor.getMinzu() + "");
-            edtAddress.setText(userInfor.getJia() + "");
-            edtHobby.setText(userInfor.getXingqu() + "");
-        }
 
+    private void setData() {
+        if (userInfor != null) {
+            if (!TextUtils.isEmpty(userInfor.getUserid())) {
+                edtNickname.setText(userInfor.getNicheng() + "");
+                edtRealname.setText(userInfor.getXingming() + "");
+                txtDepartment.setText(userInfor.getXibie() + "");
+                txtClass.setText(userInfor.getBanji() + "");
+                edtStudentId.setText(userInfor.getXuehao() + "");
+                if ((userInfor.getXingbie()+"").equals("女")) {
+                    rgSex.check(R.id.girl);
+                } else if ((userInfor.getXingbie()+"").equals("男")){
+                    rgSex.check(R.id.boy);
+                }
+                txtBirthday.setText(userInfor.getShengri() + "");
+                txtNation.setText(userInfor.getMinzu() + "");
+                edtAddress.setText(userInfor.getJia() + "");
+                edtHobby.setText(userInfor.getXingqu() + "");
+            }
+        }
+    }
+
+    private void updateUserInfor(String userInforJsonString) {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_INFOR + "?userInfor=" + userInforJsonString).get().build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                finish();
+            }
+        });
     }
 }

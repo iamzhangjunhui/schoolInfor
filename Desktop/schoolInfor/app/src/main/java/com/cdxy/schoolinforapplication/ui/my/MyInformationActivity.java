@@ -12,8 +12,9 @@ import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
+import com.cdxy.schoolinforapplication.util.GetUserInfor;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
-import com.cdxy.schoolinforapplication.util.huoqushuju;
+import com.google.gson.Gson;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,8 +50,9 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
     TextView txtHobby;
     @BindView(R.id.activity_my_information)
     LinearLayout activityMyInformation;
-    private huoqushuju huoqushuju;
     private UserInforEntity userInfor;
+    private String userId;
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,10 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
     public void init() {
         txtTitle.setText("我的个人信息");
         txtRight.setVisibility(View.VISIBLE);
-        huoqushuju = new huoqushuju();
+        gson = new Gson();
+        userId = SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor().getUserid();
+        new GetUserInfor().getMyInfor(MyInformationActivity.this, userId);
+        userInfor=SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor();
         setData();
     }
 
@@ -77,27 +82,34 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
                 break;
             case R.id.txt_right:
                 Intent intent = new Intent(MyInformationActivity.this, ModifyMyInforActivity.class);
+                intent.putExtra("userInfor", userInfor);
                 startActivity(intent);
                 break;
         }
     }
 
     private void setData() {
-        String loginName = SharedPreferenceManager.instance(MyInformationActivity.this).getSharedPreferences().getString(SharedPreferenceManager.LOGIN_NAME, null);
-        if (!TextUtils.isEmpty(loginName)) {
-            userInfor = huoqushuju.huoqushuju(loginName);
-            txtNickname.setText(userInfor.getNicheng() + "");
-            txtRealname.setText(userInfor.getXingming() + "");
-            txtDepartment.setText(userInfor.getXibie() + "");
-            txtClass.setText(userInfor.getBanji() + "");
-            txtStudentId.setText(userInfor.getXuehao() + "");
-            txtSex.setText(userInfor.getXingbie() + "");
-            txtBirthday.setText(userInfor.getShengri() + "");
-            txtNation.setText(userInfor.getMinzu() + "");
-            txtAddress.setText(userInfor.getJia() + "");
-            txtHobby.setText(userInfor.getXingqu() + "");
+        if (userInfor != null) {
+            if (!TextUtils.isEmpty(userInfor.getUserid())) {
+                txtNickname.setText(userInfor.getNicheng() + "");
+                txtRealname.setText(userInfor.getXingming() + "");
+                txtDepartment.setText(userInfor.getXibie() + "");
+                txtClass.setText(userInfor.getBanji() + "");
+                txtStudentId.setText(userInfor.getXuehao() + "");
+                txtSex.setText(userInfor.getXingbie() + "");
+                txtBirthday.setText(userInfor.getShengri() + "");
+                txtNation.setText(userInfor.getMinzu() + "");
+                txtAddress.setText(userInfor.getJia() + "");
+                txtHobby.setText(userInfor.getXingqu() + "");
+            }
         }
-
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        new GetUserInfor().getMyInfor(MyInformationActivity.this, userId);
+        userInfor=SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor();
+        setData();
+    }
 }

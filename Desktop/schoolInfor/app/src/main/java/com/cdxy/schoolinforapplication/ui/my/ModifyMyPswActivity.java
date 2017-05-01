@@ -1,8 +1,6 @@
 package com.cdxy.schoolinforapplication.ui.my;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -11,10 +9,8 @@ import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
-import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
-import com.cdxy.schoolinforapplication.util.huoqushuju;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,7 +47,7 @@ public class ModifyMyPswActivity extends BaseActivity implements View.OnClickLis
         txtTitle.setText("修改密码");
         txtRight.setText("保存");
         txtRight.setVisibility(View.VISIBLE);
-        oldPassword=SharedPreferenceManager.instance(ModifyMyPswActivity.this).getSharedPreferences().getString(SharedPreferenceManager.PASSWORD,null);
+        oldPassword=SharedPreferenceManager.instance(ModifyMyPswActivity.this).getUserInfor().getMima();
         edtMyPsw.setText(oldPassword+"");
     }
 

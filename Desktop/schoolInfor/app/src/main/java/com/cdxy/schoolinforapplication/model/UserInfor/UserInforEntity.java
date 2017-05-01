@@ -1,24 +1,56 @@
 package com.cdxy.schoolinforapplication.model.UserInfor;
 
+import java.io.Serializable;
+
 /**
  * Created by huihui on 2017/3/6.
  */
 
-public class UserInforEntity {
-    private  String mima;
-    private  String  nicheng;
-    private  String  xingming;
-    private  String  xibie;
-    private  String  banji;
-    private  String  xuehao;
-    private  String xingbie;
-    private  String  shengri;
-    private  String  minzu;
-    private  String  jia;
-    private  String  xingqu;
-    private  String  shenfen;
-    private  String  touxiang;
-    private  String  zuoyouming;
+public class UserInforEntity implements Serializable {
+    private String userid;
+    private String mima;
+    private String nicheng;
+    private String xingming;
+    private String xibie;
+    private String banji;
+    private String xuehao;
+    private String xingbie;
+    private String shengri;
+    private String minzu;
+    private String jia;
+    private String xingqu;
+    private String shenfen;
+    private String touxiang;
+    private String zuoyouming;
+
+    public UserInforEntity() {
+    }
+
+    public UserInforEntity(String userid, String mima, String nicheng, String xingming, String xibie, String banji, String xuehao, String xingbie, String shengri, String minzu, String jia, String xingqu, String shenfen, String touxiang, String zuoyouming) {
+        this.userid = userid;
+        this.mima = mima;
+        this.nicheng = nicheng;
+        this.xingming = xingming;
+        this.xibie = xibie;
+        this.banji = banji;
+        this.xuehao = xuehao;
+        this.xingbie = xingbie;
+        this.shengri = shengri;
+        this.minzu = minzu;
+        this.jia = jia;
+        this.xingqu = xingqu;
+        this.shenfen = shenfen;
+        this.touxiang = touxiang;
+        this.zuoyouming = zuoyouming;
+    }
+
+    public String getUserid() {
+        return userid;
+    }
+
+    public void setUserid(String userid) {
+        this.userid = userid;
+    }
 
     public String getMima() {
         return mima;
@@ -135,7 +167,8 @@ public class UserInforEntity {
     @Override
     public String toString() {
         return "UserInforEntity{" +
-                "mima='" + mima + '\'' +
+                "userid='" + userid + '\'' +
+                ", mima='" + mima + '\'' +
                 ", nicheng='" + nicheng + '\'' +
                 ", xingming='" + xingming + '\'' +
                 ", xibie='" + xibie + '\'' +
