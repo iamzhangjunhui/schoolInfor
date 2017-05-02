@@ -55,6 +55,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -153,12 +155,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         userInfor = SharedPreferenceManager.instance(MainActivity.this).getUserInfor();
         if (userInfor != null) {
             String icon = userInfor.getTouxiang();
-            if (!TextUtils.isEmpty(icon)){
+            if (!TextUtils.isEmpty(icon)) {
                 Glide.with(MainActivity.this).load(icon).placeholder(R.drawable.loading).into(imgMyIcon);
             }
             txtMyName.setText(userInfor.getXingming() + "");
             txtMyClazz.setText(userInfor.getBanji() + "");
-            txtMyMotto.setText(userInfor.getXibie() + "");
+            String motto = userInfor.getZuoyouming();
+            if (TextUtils.isEmpty(motto)) {
+                txtMyMotto.setText("我的座右铭");
+            } else {
+                txtMyMotto.setText(motto);
+            }
             txtMyDepartment.setText(userInfor.getXingbie());
         }
 
@@ -297,7 +304,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         switch (view.getId()) {
                             case R.id.btn_save_modify_motto:
                                 //此处将修改后的motto上传至服务器。
-                                toast(modifyMyMottoDialog.newMotto);
+                                String userid=SharedPreferenceManager.instance(MainActivity.this).getUserInfor().getUserid();
+                                if (TextUtils.isEmpty(userid)){
+                                    toast("登录失效");
+                                }else {
+                                    updateMyMotto(userid,modifyMyMottoDialog.newMotto);
+                                }
                                 modifyMyMottoDialog.dismiss();
                                 break;
                             case R.id.btn_cancel_my_modify_motto:
@@ -323,9 +335,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 ScreenManager.getScreenManager().appExit(this);
                 intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
-                //退出时将保存在本地的数据置空
-                IMPrefsTools.setStringPrefs(MainActivity.this, "USER_ID", "");
-                IMPrefsTools.setStringPrefs(MainActivity.this, "PASSWORD", "");
                 break;
             case R.id.layout_bottom_chat:
                 setFragments(0);
@@ -371,5 +380,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
 
         }
+    }
+
+    private void updateMyMotto(String userid, final String zuoyouming) {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_MOTTO + "?userid=" + userid + "&&zuoyouming=" + zuoyouming).get().build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Observable.just(zuoyouming).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        txtMyMotto.setText(zuoyouming);
+                    }
+                });
+            }
+        });
+
     }
 }
