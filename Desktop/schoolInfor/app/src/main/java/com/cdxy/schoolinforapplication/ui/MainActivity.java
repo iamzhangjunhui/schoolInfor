@@ -1,11 +1,20 @@
 package com.cdxy.schoolinforapplication.ui;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -36,11 +45,17 @@ import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
 import com.cdxy.schoolinforapplication.ui.my.ModifyMyPswActivity;
 import com.cdxy.schoolinforapplication.ui.my.MyInformationActivity;
 import com.cdxy.schoolinforapplication.ui.topic.AddNewTopicActivity;
+import com.cdxy.schoolinforapplication.ui.widget.ChooseWayDialog;
 import com.cdxy.schoolinforapplication.ui.widget.DragLayout;
 import com.cdxy.schoolinforapplication.ui.widget.ModifyMyMottoDialog;
+import com.cdxy.schoolinforapplication.util.Constant;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -116,8 +131,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public static String TAG = "SchoolInforManager";
     private static final int MSG_SET_TAGS = 1001;
     private Handler mHandler;
-    Set<String> tags = new HashSet<>();
+    private Set<String> tags = new HashSet<>();
     private TagAliasCallback mAliasCallback;
+    private ChooseWayDialog chooseWayDialog;
+    private File file;
     private UserInforEntity userInfor;
 
     @Override
@@ -141,8 +158,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void init() {
-        Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
-        Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
         if (fragmentManager == null) {
 
             fragmentManager = getSupportFragmentManager();
@@ -156,7 +171,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (userInfor != null) {
             String icon = userInfor.getTouxiang();
             if (!TextUtils.isEmpty(icon)) {
-                Glide.with(MainActivity.this).load(icon).placeholder(R.drawable.loading).into(imgMyIcon);
+                Glide.with(MainActivity.this).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
+                Glide.with(MainActivity.this).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
+            }else {
+                Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
+                Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
             }
             txtMyName.setText(userInfor.getXingming() + "");
             txtMyClazz.setText(userInfor.getBanji() + "");
@@ -166,7 +185,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             } else {
                 txtMyMotto.setText(motto);
             }
-            txtMyDepartment.setText(userInfor.getXingbie());
+            txtMyDepartment.setText(userInfor.getXibie());
         }
 
     }
@@ -297,6 +316,41 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     isOpon = true;
                 }
                 break;
+            case R.id.img_my_icon:
+                chooseWayDialog = new ChooseWayDialog(MainActivity.this, R.style.MyDialog, new ChooseWayDialog.ChooseWayDialogListener() {
+                    @Override
+                    public void onClick(View view) {
+                        switch (view.getId()) {
+                            case R.id.txt_way1:
+                                //打开系统拍照程序，选择拍照图片
+                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                file = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
+                                if (!file.exists()) {
+                                    try {
+                                        file.createNewFile();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                // 下面这句指定调用相机拍照后的照片存储的路径
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+                                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                    Toast.makeText(MainActivity.this, "拍照的权限申请失败", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                MainActivity.this.startActivityForResult(intent, Constant.REQUEST_CODE_CAMERA);
+                                chooseWayDialog.dismiss();
+                                break;
+                            case R.id.txt_way2:
+                                intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                MainActivity.this.startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
+                                chooseWayDialog.dismiss();
+                                break;
+                        }
+                    }
+                }, MainActivity.this, Constant.CHOOSE_WAY_DIALOG_TYPE_GET_PHOTO);
+                chooseWayDialog.show();
+                break;
             case R.id.txt_my_motto:
                 modifyMyMottoDialog = new ModifyMyMottoDialog(MainActivity.this, R.style.MyDialog, new ModifyMyMottoDialog.ModifyMottoDialogListener() {
                     @Override
@@ -304,11 +358,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         switch (view.getId()) {
                             case R.id.btn_save_modify_motto:
                                 //此处将修改后的motto上传至服务器。
-                                String userid=SharedPreferenceManager.instance(MainActivity.this).getUserInfor().getUserid();
-                                if (TextUtils.isEmpty(userid)){
+                                String userid = SharedPreferenceManager.instance(MainActivity.this).getUserInfor().getUserid();
+                                if (TextUtils.isEmpty(userid)) {
                                     toast("登录失效");
-                                }else {
-                                    updateMyMotto(userid,modifyMyMottoDialog.newMotto);
+                                } else {
+                                    updateMyMotto(userid, modifyMyMottoDialog.newMotto);
                                 }
                                 modifyMyMottoDialog.dismiss();
                                 break;
@@ -402,5 +456,107 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            //获取拍照后返回的图片
+            if (requestCode == Constant.REQUEST_CODE_CAMERA) {
+                //调用系统裁剪工具对图片进行裁剪
+                startPhotoZoom(Uri.fromFile(file));
+            }
+            //从相册获取图片
+            if (requestCode == Constant.REQUEST_CODE_PICTURE) {
+                Uri selectedImage = data.getData();
+                String[] filePathColumns = {MediaStore.Images.Media.DATA};
+                Cursor c = this.getContentResolver().query(selectedImage, filePathColumns, null, null, null);
+                c.moveToFirst();
+                int columnIndex = c.getColumnIndex(filePathColumns[0]);
+                String picturePath = c.getString(columnIndex);
+                File file1 = new File(picturePath);
+                if (file1 != null) {
+                    //调用系统裁剪工具对图片进行裁剪
+                    startPhotoZoom(Uri.fromFile(file1));
+                }
+
+            }
+            if (requestCode == 3) {
+                //获取裁剪后的图片
+                if (data != null) {
+                    Bundle bundle = data.getExtras();
+                    Bitmap bitmap = (Bitmap) bundle.get("data");
+                    String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "myImage";
+                    //创建文件夹
+                    File folder = new File(path);
+                    if (!folder.exists()) {
+                        folder.mkdirs();
+                    }
+                    //创建文件，该文件是以当前时间的时间戳来命名的，所以不可能已存在
+                    String imagePath = path + File.separator + System.currentTimeMillis() + ".jpg";
+                    File imageFile = new File(imagePath);
+                    try {
+                        imageFile.createNewFile();
+                        saveMyBitmap(imagePath, bitmap);
+                        if (imageFile!=null) {
+                                Glide.with(MainActivity.this).load(imagePath).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
+                                Glide.with(MainActivity.this).load(imagePath).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
+                            } else {
+                                Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
+                                Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
+                            }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 裁剪图片方法实现
+     *
+     * @param uri
+     */
+    public void startPhotoZoom(Uri uri) {
+
+        Intent intent = new Intent("com.android.camera.action.CROP");
+        // 下面这个crop=true是设置在开启的Intent中设置显示的VIEW可裁剪
+        intent.putExtra("crop", "true");
+        // aspectX aspectY 是宽高的比例
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        // outputX outputY 是裁剪图片宽高
+        intent.putExtra("outputX", 200);
+        intent.putExtra("outputY", 200);
+        intent.putExtra("return-data", true);
+        intent.setDataAndType(uri, "image/*");
+        intent.putExtra("scale", true);
+        startActivityForResult(intent, 3);
+    }
+
+    /**
+     * 保存裁剪后的图片
+     *
+     * @param path
+     * @param mBitmap
+     * @return
+     */
+    public boolean saveMyBitmap(String path, Bitmap mBitmap) {
+        FileOutputStream fOut = null;
+        try {
+            fOut = new FileOutputStream(new File(path));
+            mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
