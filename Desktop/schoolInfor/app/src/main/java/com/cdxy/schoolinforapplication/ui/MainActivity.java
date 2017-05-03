@@ -66,6 +66,8 @@ import cn.jpush.android.api.TagAliasCallback;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -173,7 +175,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             if (!TextUtils.isEmpty(icon)) {
                 Glide.with(MainActivity.this).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
                 Glide.with(MainActivity.this).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
-            }else {
+            } else {
                 Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
                 Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
             }
@@ -499,13 +501,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     try {
                         imageFile.createNewFile();
                         saveMyBitmap(imagePath, bitmap);
-                        if (imageFile!=null) {
-                                Glide.with(MainActivity.this).load(imagePath).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
-                                Glide.with(MainActivity.this).load(imagePath).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
-                            } else {
-                                Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
-                                Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
-                            }
+                        updateMyIcon(imagePath);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -558,5 +554,41 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private void updateMyIcon(String path) {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("image/png");
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        builder.setType(MultipartBody.FORM);
+        final File file = new File(path);
+        if (file != null) {
+            builder.addFormDataPart("file", file.getName(), MultipartBody.create(mediaType, file));
+        }
+        builder.addFormDataPart("userid",userInfor.getUserid());
+        MultipartBody multipartBody = builder.build();
+        Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_HEAD_PORTRAIT).post(multipartBody).build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Observable.just(file).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<File>() {
+                    @Override
+                    public void call(File file) {
+                        if (file != null) {
+                            Glide.with(MainActivity.this).load(file).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
+                            Glide.with(MainActivity.this).load(file).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
+                        } else {
+                            Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
+                            Glide.with(MainActivity.this).load(R.drawable.students).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
+                        }
+                    }
+                });
+            }
+        });
     }
 }
