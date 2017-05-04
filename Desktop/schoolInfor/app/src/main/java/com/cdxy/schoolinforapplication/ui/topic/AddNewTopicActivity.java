@@ -15,6 +15,7 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,26 +31,47 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.Poi;
+import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.adapter.Text1ListAdapter;
 import com.cdxy.schoolinforapplication.adapter.topic.TopicPhotosAdapter;
+import com.cdxy.schoolinforapplication.model.ReturnEntity;
+import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
+import com.cdxy.schoolinforapplication.model.topic.AddTopicEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ChooseWayDialog;
 import com.cdxy.schoolinforapplication.ui.widget.ScollerGridView;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 import com.cdxy.schoolinforapplication.util.Constant;
+import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class AddNewTopicActivity extends BaseActivity implements View.OnClickListener, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
@@ -82,8 +104,10 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     private Text1ListAdapter addressAdapter;
     private static List<String> addressList = new ArrayList<>();
     private ChooseWayDialog chooseWayDialog;
-    private List<String> paths = new ArrayList<>();
-    private File file;//保存拍照后裁剪前的临时图片，
+    private File file;//保存拍照后裁剪前的临时图片
+    private List<String> topicPhotos = new ArrayList<>();
+    private String topicid;//话题id;
+    private UserInforEntity userInforEntity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +139,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         gridViewPhotos.setOnItemLongClickListener(this);
         addressAdapter = new Text1ListAdapter(AddNewTopicActivity.this, addressList);
         listviewAddress.setAdapter(addressAdapter);
+        userInforEntity = SharedPreferenceManager.instance(AddNewTopicActivity.this).getUserInfor();
 
     }
 
@@ -137,6 +162,15 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                         toast("定位失败，没有获取到位置信息");
                     }
                 }
+                break;
+            case R.id.btn_right:
+                topicid = String.valueOf(UUID.randomUUID());
+                if (topicPhotos.size() != 0) {
+                    updateTopicPhotos();
+                } else {
+                    addTopic();
+                }
+
                 break;
 
         }
@@ -164,15 +198,17 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                 c.close();*/
                 ArrayList<String> photos = data.getStringArrayListExtra("selectResult");
                 for (int i = photos.size() - 1; i > -1; i--) {
+                    topicPhotos.add(photos.get(i));
                     Bitmap bitmap = BitmapFactory.decodeFile(photos.get(i));
                     list.add(0, bitmap);
                     photos.add(photos.get(i));
                 }
                 adapter.notifyDataSetChanged();
 
-            }if (requestCode==3){
+            }
+            if (requestCode == 3) {
                 //获取裁剪后的图片
-                if (data!=null) {
+                if (data != null) {
                     Bundle bundle = data.getExtras();
                     //获取相机返回的数据，并转换为图片格式
                     Bitmap bitmap = (Bitmap) bundle.get("data");
@@ -188,7 +224,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                     try {
                         imageFile.createNewFile();
                         saveMyBitmap(imagePath, bitmap);
-                        paths.add(imagePath);
+                        topicPhotos.add(imagePath);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -366,6 +402,87 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private void updateTopicPhotos() {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        MediaType mediaType = MediaType.parse("image/png");
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        builder.setType(MultipartBody.FORM);
+        for (int i = 0; i < topicPhotos.size(); i++) {
+            File file = new File(topicPhotos.get(i));
+            if (file != null) {
+                builder.addFormDataPart("file", file.getName(), MultipartBody.create(mediaType, file));
+            }
+        }
+        builder.addFormDataPart("topicid", topicid);
+        MultipartBody multipartBody = builder.build();
+        Request request = new Request.Builder().url(HttpUrl.ADD_TOPIC_PHOTOS).post(multipartBody).build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                addTopic();
+            }
+        });
+
+    }
+
+    private void addTopic() {
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String create_time = format.format(date);
+        String nickName = userInforEntity.getNicheng();
+        String content = edtNewTopic.getText().toString();
+        String authorid = userInforEntity.getUserid();
+        if (TextUtils.isEmpty(authorid)) {
+            toast("登录失效");
+        } else {
+            if (TextUtils.isEmpty(content)) {
+                toast("说点什么吧！");
+                return;
+            } else {
+                AddTopicEntity addTopicEntity = new AddTopicEntity(topicid, authorid, nickName, create_time, content);
+                final Gson gson = new Gson();
+                String topicjson = gson.toJson(addTopicEntity);
+                OkHttpClient okHttpClient = new OkHttpClient();
+                final Request request = new Request.Builder().url(HttpUrl.ADD_TOPIC + "?topicjson=" + topicjson).get().build();
+                okHttpClient.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String result = response.body().string();
+                        Observable.just(result).map(new Func1<String, ReturnEntity>() {
+                            @Override
+                            public ReturnEntity call(String s) {
+                                ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
+                                return returnEntity;
+                            }
+                        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity>() {
+                            @Override
+                            public void call(ReturnEntity returnEntity) {
+
+                                if (returnEntity != null) {
+                                    if (returnEntity.getCode() == 1) {
+                                        toast(returnEntity.getMsg());
+                                        finish();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+            }
         }
     }
 }

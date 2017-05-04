@@ -14,5 +14,8 @@ public class HttpUrl {
     public static final String UPDATE_MY_INFOR="http://120.25.202.192/schoolinfo/userInfor/updateUserInfor";
     public static final String UPDATE_MY_HEAD_PORTRAIT="http://120.25.202.192/schoolinfo/userInfor/updatetouxiang";
     public static final String UPDATE_MY_MOTTO="http://120.25.202.192/schoolinfo/userInfor/updatezuoyouming";
+    public static final String ADD_TOPIC="http://120.25.202.192/schoolinfo/topic/addTopic";
+    public static final String ADD_TOPIC_PHOTOS="http://120.25.202.192/schoolinfo/topic/addPhotos";
+    public static final String All_TOPIC="http://120.25.202.192/schoolinfo/topic/getAllTopic";
 }
 

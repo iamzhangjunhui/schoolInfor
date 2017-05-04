@@ -14,18 +14,34 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.adapter.topic.TopicAdapter;
+import com.cdxy.schoolinforapplication.model.ReturnEntity;
 import com.cdxy.schoolinforapplication.model.topic.CommentContent;
+import com.cdxy.schoolinforapplication.model.topic.ReturnTopicEntity;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
 import com.cdxy.schoolinforapplication.ui.widget.RefreshLayout;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -169,5 +185,54 @@ public class TopicFragment extends BaseFragment {
                 }
             }
         }.execute();
+    }
+
+    private void getAllTopic() {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder().url(HttpUrl.All_TOPIC).get().build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final Gson gson = new Gson();
+                final String result = response.body().string();
+                Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnTopicEntity>>>() {
+                    @Override
+                    public ReturnEntity<List<ReturnTopicEntity>> call(String s) {
+                        ReturnEntity<List<ReturnTopicEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
+                        if (returnEntity != null) {
+                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<ReturnTopicEntity>>() {
+                            }.getType());
+
+                        }
+                        return returnEntity;
+                    }
+                }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnTopicEntity>>>() {
+                    @Override
+                    public void call(ReturnEntity<List<ReturnTopicEntity>> returnTopicEntityReturnEntity) {
+                        if (returnTopicEntityReturnEntity!=null) {
+                            if (returnTopicEntityReturnEntity.getCode() == 1) {
+                                List<ReturnTopicEntity> returnTopicList=returnTopicEntityReturnEntity.getData();
+                                for (ReturnTopicEntity returnTopic:returnTopicList){
+
+                                }
+                            } else {
+                                toast(returnTopicEntityReturnEntity.getMsg());
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getAllTopic();
     }
 }
