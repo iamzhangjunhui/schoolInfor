@@ -27,7 +27,9 @@ import com.cdxy.schoolinforapplication.model.topic.ReturnCommentEntity;
 import com.cdxy.schoolinforapplication.model.topic.ReturnThumb;
 import com.cdxy.schoolinforapplication.model.topic.ThumbEntity;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
+import com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity;
 import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
+import com.cdxy.schoolinforapplication.ui.widget.NotifyDialog;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 import com.cdxy.schoolinforapplication.util.Constant;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
@@ -71,6 +73,7 @@ public class TopicAdapter extends BaseAdapter {
     String myNikename;
     String myUserid;
     List<ReturnCommentEntity> comments;
+    private NotifyDialog notifyDialog;
 
     public TopicAdapter(List<TopicEntity> list, Activity activity, LinearLayout layoutAddComment, EditText edtAddComment, TextView txtSendNewComment) {
         this.list = list;
@@ -116,10 +119,37 @@ public class TopicAdapter extends BaseAdapter {
         }
 
         if (!TextUtils.isEmpty(topicid)) {
-            //获取话题图片
-            getTopicPhoto(topicid);
+//            //获取话题图片
+//            getTopicPhoto(topicid);
+            //获取点赞人
+            getAllThumb(entity);
             //获取评论列表
             getComments(topicid);
+        }
+        //加载图片
+        final List<Object> photos=entity.getPhotos();
+        if (photos!=null){
+            if (photos.size()!=0){
+                viewHolder.framePhotos.setVisibility(View.VISIBLE);
+                topicPhotosAdapter = new TopicPhotosAdapter(activity, photos);
+                viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
+                if (photos.size() > 3) {
+                    viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
+                    viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 4));
+                }
+
+                //点击话题图片放大
+                viewHolder.gridViewPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Intent intent = new Intent(activity, ShowBigPhotosActivity.class);
+                        intent.putExtra("position", i);
+                        intent.putExtra("photos", (Serializable) photos);
+                        intent.putExtra("photosType", Constant.SHOW_BIG_PHOTO_TOPIC_FRAGMENT);
+                        activity.startActivity(intent);
+                    }
+                });
+            }
         }
         //设置评论的适配器
         comments = new ArrayList<>();
@@ -139,7 +169,7 @@ public class TopicAdapter extends BaseAdapter {
             viewHolder.imgDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    deleteMyToppic(entity.getTopicid(),i);
+                    createNotifyDailog(entity.getTopicid(),i);
                 }
             });
         }else {
@@ -214,14 +244,14 @@ public class TopicAdapter extends BaseAdapter {
                 if (!TextUtils.isEmpty(myNikename)&&(!TextUtils.isEmpty(myUserid))) {
                     boolean iHasThumb = entity.isiHasThumb();
                     String topicid = entity.getTopicid();
-                    ThumbEntity thumbEntity = new ThumbEntity(topicid, myUserid, myNikename);
-                    String jsonString = gson.toJson(thumbEntity);
 
                     if (iHasThumb) {
                         //取消点赞
-                        notThumb(jsonString, entity);
+                        notThumb(topicid,myUserid, entity);
                     } else {
                         //点赞
+                        ThumbEntity thumbEntity = new ThumbEntity(topicid, myUserid, myNikename);
+                        String jsonString = gson.toJson(thumbEntity);
                         thumb(jsonString, entity);
                     }
 
@@ -240,10 +270,10 @@ public class TopicAdapter extends BaseAdapter {
         return false;
 
     }
-
-    private void getTopicPhoto(final String topicid) {
+    //获取点赞人列表
+    private void getAllThumb(String topicid, final TopicEntity topicEntity) {
         OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_PHOTOS + "?topicid=" + topicid).build();
+        Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicid).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -252,55 +282,90 @@ public class TopicAdapter extends BaseAdapter {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String result = response.body().string();
-                Log.d("qwqeqewqeq"+topicid,result);
-                Observable.just(result).map(new Func1<String, ReturnEntity<List<Object>>>() {
+                final String result = response.body().string();
+                Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnThumb>>>() {
                     @Override
-                    public ReturnEntity<List<Object>> call(String s) {
-                        ReturnEntity<List<Object>> returnEntity = gson.fromJson(s, ReturnEntity.class);
+                    public ReturnEntity<List<ReturnThumb>> call(String s) {
+                        ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(result, ReturnEntity.class);
                         if (returnEntity != null) {
-                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<Object>>>() {
+                            returnEntity = gson.fromJson(result, new TypeToken<ReturnEntity<List<ReturnThumb>>>() {
                             }.getType());
                         }
                         return returnEntity;
                     }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<Object>>>() {
+                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnThumb>>>() {
                     @Override
-                    public void call(ReturnEntity<List<Object>> listReturnEntity) {
+                    public void call(ReturnEntity<List<ReturnThumb>> listReturnEntity) {
                         if (listReturnEntity != null) {
                             if (listReturnEntity.getCode() == 1) {
-                                final List<Object> photos = listReturnEntity.getData();
-                                if (photos != null) {
-                                    if (photos.size() != 0) {
-                                        viewHolder.framePhotos.setVisibility(View.VISIBLE);
-                                        topicPhotosAdapter = new TopicPhotosAdapter(activity, photos);
-                                        viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
-                                        if (photos.size() > 3) {
-                                            viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
-                                            viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 4));
-                                        }
-                                        viewHolder.gridViewPhotos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                            @Override
-                                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                                Intent intent = new Intent(activity, ShowBigPhotosActivity.class);
-                                                intent.putExtra("position", i);
-                                                intent.putExtra("photos", (Serializable) photos);
-                                                intent.putExtra("photosType", Constant.SHOW_BIG_PHOTO_TOPIC_FRAGMENT);
-                                                activity.startActivity(intent);
-                                            }
-                                        });
-                                    }
+                                List<String> thumbs = new ArrayList<String>();
+                                for (ReturnThumb thumb : listReturnEntity.getData()) {
+                                    thumbs.add(thumb.getUserid());
                                 }
+                                topicEntity.setThumbPersonsNickname(thumbs);
+                                TopicAdapter.this.notifyDataSetChanged();
 
                             } else {
                                 Toast.makeText(activity, listReturnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                             }
+
                         }
                     }
                 });
             }
         });
     }
+//    private void getTopicPhoto(final String topicid) {
+//        OkHttpClient okHttpClient = new OkHttpClient();
+//        Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_PHOTOS + "?topicid=" +"5435").build();
+//        okHttpClient.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                String result = response.body().string();
+//                Log.d("qwqeqewqeq"+topicid,result);
+//                Observable.just(result).map(new Func1<String, ReturnEntity<List<Object>>>() {
+//                    @Override
+//                    public ReturnEntity<List<Object>> call(String s) {
+//                        ReturnEntity<List<Object>> returnEntity = gson.fromJson(s, ReturnEntity.class);
+//                        if (returnEntity != null) {
+//                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<Object>>>() {
+//                            }.getType());
+//                        }
+//                        return returnEntity;
+//                    }
+//                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<Object>>>() {
+//                    @Override
+//                    public void call(ReturnEntity<List<Object>> listReturnEntity) {
+//                        if (listReturnEntity != null) {
+//                            if (listReturnEntity.getCode() == 1) {
+//                                final List<Object> photos = listReturnEntity.getData();
+//                                if (photos != null) {
+//                                    if (photos.size() != 0) {
+//                                        viewHolder.framePhotos.setVisibility(View.VISIBLE);
+//                                        topicPhotosAdapter = new TopicPhotosAdapter(activity, photos);
+//                                        viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
+//                                        if (photos.size() > 3) {
+//                                            viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
+//                                            viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 4));
+//                                        }
+
+//                                    }
+//                                }
+//
+//                            } else {
+//                                Toast.makeText(activity, listReturnEntity.getMsg(), Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//                    }
+//                });
+//            }
+//        });
+//    }
 
     //获取评论列表
     public void getComments(String topicid) {
@@ -354,6 +419,7 @@ public class TopicAdapter extends BaseAdapter {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+
             }
 
             @Override
@@ -411,9 +477,9 @@ public class TopicAdapter extends BaseAdapter {
         });
     }
 
-    private void notThumb(String json, final TopicEntity topicEntity) {
+    private void notThumb(String topicid,String userid, final TopicEntity topicEntity) {
         OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.NOT_THUMB + "?likejson=" + json).get().build();
+        Request request = new Request.Builder().url(HttpUrl.NOT_THUMB + "?topicid=" + topicid+"&&userid="+userid).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -502,8 +568,21 @@ public class TopicAdapter extends BaseAdapter {
             }
         });
     }
-    private void deleteMySendComment(String commentid){
-        OkHttpClient okHttpClient=new OkHttpClient();
-
+    private void createNotifyDailog(final String topicid, final int position) {
+        notifyDialog = new NotifyDialog(activity, R.style.MyDialog, new NotifyDialog.NotifyListener() {
+            @Override
+            public void onClick(View view) {
+                switch (view.getId()) {
+                    case R.id.dialog_ok:
+                        deleteMyToppic(topicid,position);
+                        notifyDialog.dismiss();
+                        break;
+                    case R.id.dialog_cancle:
+                        notifyDialog.dismiss();
+                        break;
+                }
+            }
+        }, activity,"delete_my_topic");
+        notifyDialog.show();
     }
 }

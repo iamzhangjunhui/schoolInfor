@@ -237,7 +237,7 @@ public class MyFriendActivity extends BaseActivity implements View.OnClickListen
                         break;
                 }
             }
-        }, MyFriendActivity.this);
+        }, MyFriendActivity.this,"delete_my_friend");
         notifyDialog.show();
     }
 private void updateName(String userId){

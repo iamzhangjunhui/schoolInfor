@@ -15,6 +15,11 @@ public class ThumbEntity {
         this.nickName = nickName;
     }
 
+    public ThumbEntity(String topicid, String userid) {
+        this.topicid = topicid;
+        this.userid = userid;
+    }
+
     public String getTopicid() {
         return topicid;
     }

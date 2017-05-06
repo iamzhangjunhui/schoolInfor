@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.alibaba.mobileim.IYWLoginService;
 import com.alibaba.mobileim.YWAPI;
@@ -54,6 +55,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     Button btnRegister;
     public static YWIMKit ywimKit;
     public static IYWContactService iywContactService;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     private String loginName;
     private ChooseIdentityTypeDialog chooseIdentityTypeDialog;
     private Gson gson;
@@ -62,6 +65,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
         init();
     }
 
@@ -117,6 +121,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     //苏杭    登陆接口
     public void login(final String userid, final String password) {
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(HttpUrl.LOGIN + "?userid=" + userid + "&&password=" + password).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
@@ -148,13 +153,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                     SharedPreferenceManager.instance(LoginActivity.this).setMyPassword(password);
                                     LoginReturnEntity loginReturnEntity = loginReturnEntityReturnEntity.getData();
                                     aliLogin(loginReturnEntity.getUserid(), loginReturnEntity.getPassword());
-                                     GetUserInfor.getMyInfor(LoginActivity.this,loginReturnEntity.getUserid());
+                                    GetUserInfor.getMyInfor(LoginActivity.this, loginReturnEntity.getUserid());
                                 } else {
                                     toast("登录出现异常");
                                 }
+                                progress.setVisibility(View.GONE);
+
                             }
                         });
+
             }
+
 
         });
     }
@@ -186,10 +195,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
 
     private void autoLogin() {
-        UserInforEntity userInforEntity= SharedPreferenceManager.instance(LoginActivity.this).getUserInfor();
-        if (userInforEntity!=null) {
+        UserInforEntity userInforEntity = SharedPreferenceManager.instance(LoginActivity.this).getUserInfor();
+        if (userInforEntity != null) {
             String userid = userInforEntity.getUserid();
-            String password =SharedPreferenceManager.instance(LoginActivity.this).getMyPassword();
+            String password = SharedPreferenceManager.instance(LoginActivity.this).getMyPassword();
             if (!TextUtils.isEmpty(userid) && (!TextUtils.isEmpty(password))) {
                 ywimKit = YWAPI.getIMKitInstance(userid, SchoolInforManager.appKay);
                 iywContactService = ywimKit.getContactService();

@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.ui.MainActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,11 +31,13 @@ public class NotifyDialog extends Dialog implements View.OnClickListener {
     Button dialogOk;
     private NotifyListener listener;
     private Activity activity;
+    private String type;
 
-    public NotifyDialog(@NonNull Context context, @StyleRes int themeResId, NotifyListener notifyListener, Activity activity) {
+    public NotifyDialog(@NonNull Context context, @StyleRes int themeResId, NotifyListener notifyListener, Activity activity,String type) {
         super(context, themeResId);
         this.listener = notifyListener;
         this.activity=activity;
+        this.type=type;
     }
 
     @Override
@@ -59,5 +62,11 @@ public class NotifyDialog extends Dialog implements View.OnClickListener {
         getWindow().setGravity(Gravity.BOTTOM);
         dialogCancle.setOnClickListener(this);
         dialogOk.setOnClickListener(this);
+        if (type.equals("delete_my_topic")){
+            dialogTitle.setText("删除该话题");
+            dialogOk.setText("是的，删除");
+            dialogCancle.setText("手贱，按错了");
+        }
+
     }
 }

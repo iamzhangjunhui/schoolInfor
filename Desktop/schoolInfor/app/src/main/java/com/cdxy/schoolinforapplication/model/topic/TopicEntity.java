@@ -16,9 +16,17 @@ public class TopicEntity {
     private String create_time;//发起时间
     private String content;//内容
     private List<String> thumbPersonsNickname;//点赞人姓名
-    private List<ReturnCommentEntity> comments;
+    private List<Object> photos;
     private boolean iHasThumb;
     public TopicEntity() {
+    }
+
+    public List<Object> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Object> photos) {
+        this.photos = photos;
     }
 
     public String getTopicid() {
@@ -85,14 +93,6 @@ public class TopicEntity {
         this.iHasThumb = iHasThumb;
     }
 
-    public List<ReturnCommentEntity> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<ReturnCommentEntity> comments) {
-        this.comments = comments;
-    }
-
     @Override
     public String toString() {
         return "TopicEntity{" +
@@ -103,6 +103,7 @@ public class TopicEntity {
                 ", create_time='" + create_time + '\'' +
                 ", content='" + content + '\'' +
                 ", thumbPersonsNickname=" + thumbPersonsNickname +
+                ", photos=" + photos +
                 ", iHasThumb=" + iHasThumb +
                 '}';
     }
