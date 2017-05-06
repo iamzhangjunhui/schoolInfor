@@ -15,18 +15,27 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.SchoolInforManager;
 import com.cdxy.schoolinforapplication.ScreenManager;
+import com.cdxy.schoolinforapplication.model.LoginReturnEntity;
+import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.ChooseInfor.ChooseInforActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
+import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -34,6 +43,7 @@ import okhttp3.Response;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class RegisterActivity extends BaseActivity implements View.OnClickListener {
@@ -73,7 +83,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     @BindView(R.id.activity_register)
     LinearLayout activityRegister;
     private String mRegisterName;
-    private String mLoginPassword;
     private String mDepartment;
     private String mClazz;
     private String mNickName;
@@ -92,9 +101,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
         init();
-        Intent intent=getIntent();
-        mRegisterName=intent.getStringExtra("registerName");
-        mLoginPassword=intent.getStringExtra("registerPassword");
+        Intent intent = getIntent();
+        mRegisterName = intent.getStringExtra("registerName");
     }
 
     @Override
@@ -141,39 +149,43 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;
             case R.id.submit_register:
-                mName=edtRealname.getText().toString();
-                mNickName=edtNickname.getText().toString();
-                mStudentId=edtStudentId.getText().toString();
-                int checkSexId=rgSex.getCheckedRadioButtonId();
-                if (checkSexId==R.id.girl){
-                    mSex="女";
-                }else {
-                    mSex="男";
+                mName = edtRealname.getText().toString();
+                mNickName = edtNickname.getText().toString();
+                mStudentId = edtStudentId.getText().toString();
+                int checkSexId = rgSex.getCheckedRadioButtonId();
+                if (checkSexId == R.id.girl) {
+                    mSex = "女";
+                } else {
+                    mSex = "男";
                 }
-                mBirthday=txtBirthday.getText().toString();
-                mAddress=edtAddress.getText().toString();
-                mHobby=edtHobby.getText().toString();
-               if (TextUtils.isEmpty(mName)){
-                   toast("请输入姓名");
-               return;
-               }
-                if (TextUtils.isEmpty(mNickName)){
+                mBirthday = txtBirthday.getText().toString();
+                mAddress = edtAddress.getText().toString();
+                mHobby = edtHobby.getText().toString();
+                if (TextUtils.isEmpty(mName)) {
+                    toast("请输入姓名");
+                    return;
+                }
+                if (TextUtils.isEmpty(mNickName)) {
                     toast("请输入昵称");
                     return;
                 }
-                if (TextUtils.isEmpty(mDepartment)){
+                if (TextUtils.isEmpty(mDepartment)) {
                     toast("请选择所在系");
                     return;
                 }
-                if (TextUtils.isEmpty(mClazz)){
+                if (TextUtils.isEmpty(mClazz)) {
                     toast("请选择所在班级");
                     return;
                 }
-                if (TextUtils.isEmpty(mStudentId)){
+                if (TextUtils.isEmpty(mStudentId)) {
                     toast("请输入学号");
                     return;
                 }
-                register2(mRegisterName,mLoginPassword,mNickName,mName,mDepartment,mClazz,mStudentId,mSex,mBirthday,mNation,mAddress,mHobby);
+                UserInforEntity userInforEntity = new UserInforEntity(mRegisterName, mNickName, mName, mDepartment, mClazz,
+                        mStudentId, mSex, mBirthday, mNation, mAddress, mHobby);
+                Gson gson = new Gson();
+                String json = gson.toJson(userInforEntity);
+                updateUserInfor(json);
             default:
                 break;
         }
@@ -186,67 +198,42 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             String department = data.getStringExtra("department");
             if (!TextUtils.isEmpty(department)) {
                 txtDepartment.setText(department);
-                mDepartment=department;
+                mDepartment = department;
             }
         }
         if (requestCode == Constant.REQUEST_CODE_CHOOSECLASS && resultCode == Constant.RESULT_CODE_CHOOSECLASS) {
             String clazz = data.getStringExtra("clazz");
             if (!TextUtils.isEmpty(clazz)) {
                 txtClass.setText(clazz);
-                mClazz=clazz;
+                mClazz = clazz;
             }
         }
         if (requestCode == Constant.REQUEST_CODE_CHOOSENATION && resultCode == Constant.RESULT_CODE_CHOOSENATION) {
             String nation = data.getStringExtra("nation");
             if (!TextUtils.isEmpty(nation)) {
                 txtNation.setText(nation);
-                mNation=nation;
+                mNation = nation;
             }
         }
     }
-    //苏杭   注册接口第二布 register2   通过查找之前传输过来的账号密码匹对   然后把其他信息修改进数据库
-    public void register2(final String a, final String b,final String c,final String d,final String e,final String f,final String g,
-                          final String h,final String i,final String j,final String k,final String l){
 
-        Observable.create(new Observable.OnSubscribe<String>() {
+    public void updateUserInfor(String userInforJsonString) {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_INFOR + "?userInfor=" + userInforJsonString).get().build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void call(Subscriber<? super String> subscriber) {
-                OkHttpClient okHttpClient=new OkHttpClient();
-                FormBody formBody=new FormBody.Builder().add("lianxi",a).add("mima",b).add("nicheng",c).add("xingming",d)
-                        .add("xibie",e).add("banji",f).add("xuehao",g).add("xingbie",h).add("shengri",i).add("minzu",j)
-                        .add("jia",k).add("xingqu",l).build();
-                Request request=new Request.Builder().url("http://192.168.191.1:8080/schoolinfor/register2").post(formBody).build();
-                try {
-                    Response response=okHttpClient.newCall(request).execute();
-                    JSONObject jsonObject=new JSONObject(response.body().string());
-                    Log.d("aaaaaaaaaa",jsonObject.getString("result"));
-                    subscriber.onNext(jsonObject.getString("result"));
-                    subscriber.onCompleted();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<String>() {
-            @Override
-            public void onCompleted() {
-
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onResponse(Call call, Response response) throws IOException {
+                ScreenManager.getScreenManager().appExit(RegisterActivity.this);
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                intent.putExtra("mRegisterName",mRegisterName);
+                startActivity(intent);
 
-            }
-
-            @Override
-            public void onNext(String s) {
-                Log.i("ssssss",s);
-                if(s.equals("true")){
-                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    intent.putExtra("loginName", mRegisterName);
-                    startActivity(intent);
-                }
             }
         });
-
     }
 }

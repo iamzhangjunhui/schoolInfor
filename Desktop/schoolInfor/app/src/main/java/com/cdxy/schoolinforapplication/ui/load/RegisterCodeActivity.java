@@ -1,17 +1,12 @@
 package com.cdxy.schoolinforapplication.ui.load;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.HttpUrl;
@@ -109,8 +104,6 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
                 break;
         }
     }
-
-    //苏杭    注册接口第一步 register1  此处只向数据库加入账号和密码  如果返回了false说明账号被注册了需要重新注册下面的onNext中
     public void register1() {
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(HttpUrl.REGISTER + "?userid=" + registerName + "&&password=" + registerPassword).get().build();
@@ -143,23 +136,6 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
                                     }else {
                                         toast(returnEntity.getMsg()+"");
                                     }
-//                                        else if () {
-                                    //该账号已经注册过了
-//                                            new AlertDialog.Builder(RegisterCodeActivity.this).setMessage("该手机号已经注册过，请直接登录").setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                                    Intent intent = new Intent(RegisterCodeActivity.this, LoginActivity.class);
-//                                                    intent.putExtra("loginName", registerName);
-//                                                    startActivity(intent);
-//                                                    dialogInterface.dismiss();
-//                                                }
-//                                            }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                                    dialogInterface.dismiss();
-//                                                }
-//                                            }).create().show();
-//                                        }
                                 } else {
                                     toast("注册失败");
                                 }

@@ -44,6 +44,19 @@ public class UserInforEntity implements Serializable {
         this.zuoyouming = zuoyouming;
     }
 
+    public UserInforEntity(String userid, String nicheng, String xingming, String xibie, String banji, String xuehao, String xingbie, String shengri, String minzu, String jia, String xingqu) {
+        this.userid = userid;
+        this.nicheng = nicheng;
+        this.xingming = xingming;
+        this.xibie = xibie;
+        this.banji = banji;
+        this.xuehao = xuehao;
+        this.xingbie = xingbie;
+        this.shengri = shengri;
+        this.minzu = minzu;
+        this.jia = jia;
+        this.xingqu = xingqu;
+    }
     public String getUserid() {
         return userid;
     }

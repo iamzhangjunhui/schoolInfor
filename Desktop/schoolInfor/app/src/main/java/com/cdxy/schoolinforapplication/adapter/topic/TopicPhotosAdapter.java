@@ -54,6 +54,9 @@ public class TopicPhotosAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) view.getTag();
         }
+        for (Object photo:list){
+            Object o=photo;
+        }
         Object photo = getItem(i);
         if (photo instanceof Integer) {
             if ((int) photo == R.drawable.remind_add_photo) {

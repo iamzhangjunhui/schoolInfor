@@ -69,7 +69,7 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
         txtRight.setVisibility(View.VISIBLE);
         gson = new Gson();
         userId = SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor().getUserid();
-        new GetUserInfor().getMyInfor(MyInformationActivity.this, userId);
+        GetUserInfor.getMyInfor(MyInformationActivity.this, userId);
         userInfor=SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor();
         setData();
     }
@@ -108,7 +108,7 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
     @Override
     protected void onRestart() {
         super.onRestart();
-        new GetUserInfor().getMyInfor(MyInformationActivity.this, userId);
+         GetUserInfor.getMyInfor(MyInformationActivity.this, userId);
         userInfor=SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor();
         setData();
     }

@@ -21,6 +21,7 @@ import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.ChooseInfor.ChooseInforActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
+import com.cdxy.schoolinforapplication.util.GetUserInfor;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 import com.google.gson.Gson;
 
@@ -129,16 +130,14 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
                 } else if (boy.isChecked()) {
                     sex = "男";
                 }
-                userInfor.getUserid();
-                userInfor.getMima();
                 edtRealname.getText().toString();
-                UserInforEntity userInforEntity = new UserInforEntity(userInfor.getUserid(), userInfor.getMima(), edtNickname.getText().toString(), edtRealname.getText().toString(),
+                UserInforEntity userInforEntity = new UserInforEntity(userInfor.getUserid(),edtNickname.getText().toString(), edtRealname.getText().toString(),
                         txtDepartment.getText().toString(), txtClass.getText().toString(), edtStudentId.getText().toString(),
                         sex, txtBirthday.getText().toString(), txtNation.getText().toString(), edtAddress.getText().toString(),
-                        edtHobby.getText().toString(), userInfor.getShenfen(), userInfor.getTouxiang(), userInfor.getZuoyouming());
+                        edtHobby.getText().toString());
                 Gson gson = new Gson();
                 String userInforJson = gson.toJson(userInforEntity);
-                updateUserInfor(userInforJson);
+                updateUserInfor(userInforJson,userInfor.getUserid());
                 break;
             default:
                 break;
@@ -189,7 +188,7 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
         }
     }
 
-    private void updateUserInfor(String userInforJsonString) {
+    public  void updateUserInfor(final String userInforJsonString, final String userid) {
         OkHttpClient okHttpClient = new OkHttpClient();
         final Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_INFOR + "?userInfor=" + userInforJsonString).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
@@ -200,6 +199,7 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                GetUserInfor.getMyInfor(ModifyMyInforActivity.this,userid);
                 finish();
             }
         });

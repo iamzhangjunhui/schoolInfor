@@ -22,6 +22,13 @@ public class SharedPreferenceManager {
     public void setIsAddtag(boolean isAddtag) {
         getEditor().putBoolean("IS_ADD_TAG", isAddtag).commit();
     }
+    public String getMyPassword() {
+        return getSharedPreferences().getString("MY_PASSWORD", null);
+    }
+
+    public void setMyPassword(String password) {
+        getEditor().putString("MY_PASSWORD", password).commit();
+    }
 
     public UserInforEntity getUserInfor() {
         String userInforString=getSharedPreferences().getString("USER_INFOR",null);

@@ -49,6 +49,7 @@ import com.cdxy.schoolinforapplication.ui.widget.ChooseWayDialog;
 import com.cdxy.schoolinforapplication.ui.widget.DragLayout;
 import com.cdxy.schoolinforapplication.ui.widget.ModifyMyMottoDialog;
 import com.cdxy.schoolinforapplication.util.Constant;
+import com.cdxy.schoolinforapplication.util.GetUserInfor;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 
 import java.io.File;
@@ -388,6 +389,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.txt_exit:
+                SharedPreferenceManager.instance(MainActivity.this).setUserInfor("");
+                SharedPreferenceManager.instance(MainActivity.this).setMyPassword("");
                 ScreenManager.getScreenManager().appExit(this);
                 intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
@@ -438,7 +441,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void updateMyMotto(String userid, final String zuoyouming) {
+    private void updateMyMotto(final String userid, final String zuoyouming) {
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_MOTTO + "?userid=" + userid + "&&zuoyouming=" + zuoyouming).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
@@ -449,6 +452,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                GetUserInfor.getMyInfor(MainActivity.this,userid);
                 Observable.just(zuoyouming).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
                     @Override
                     public void call(String s) {
@@ -580,6 +584,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     @Override
                     public void call(File file) {
                         if (file != null) {
+                            GetUserInfor.getMyInfor(MainActivity.this,userInfor.getUserid());
                             Glide.with(MainActivity.this).load(file).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
                             Glide.with(MainActivity.this).load(file).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
                         } else {

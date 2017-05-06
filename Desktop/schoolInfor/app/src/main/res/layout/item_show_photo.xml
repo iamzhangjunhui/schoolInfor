@@ -6,8 +6,7 @@
     android:id="@+id/img_photo"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:scaleType="fitXY"
-    android:src="@drawable/remind_add_photo"/>
+    android:scaleType="fitXY" />
     <ImageView
         android:id="@+id/img_delete_photo"
         android:layout_gravity="right"

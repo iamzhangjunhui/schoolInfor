@@ -10,7 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.model.topic.CommentContent;
+import com.cdxy.schoolinforapplication.model.topic.ReturnCommentEntity;
 
 import java.util.List;
 
@@ -23,9 +23,9 @@ import butterknife.ButterKnife;
 
 public class TopicCommentContentAdapter extends BaseAdapter {
     private Context context;
-    private List<CommentContent> list;
+    private List<ReturnCommentEntity> list;
 
-    public TopicCommentContentAdapter(Context context, List<CommentContent> list) {
+    public TopicCommentContentAdapter(Context context, List<ReturnCommentEntity> list) {
         this.context = context;
         this.list = list;
     }
@@ -55,7 +55,7 @@ public class TopicCommentContentAdapter extends BaseAdapter {
         }else {
             viewHolder= (ViewHolder) view.getTag();
         }
-        CommentContent commentContent= (CommentContent) getItem(i);
+        ReturnCommentEntity commentContent= (ReturnCommentEntity) getItem(i);
         String content=commentContent.getContent();
         if (!TextUtils.isEmpty(content)){
             //显示在屏幕上的发送者名称

@@ -9,32 +9,32 @@ import java.util.List;
  */
 
 public class TopicEntity {
-    private String id;//发起话题人的id
+    private String topicid;//话题id;
+    private String userid;//发起话题人的id
     private Object icon;//头像
     private String nickName;//昵称
     private String create_time;//发起时间
     private String content;//内容
-    private List<Object> photos;//照片
     private List<String> thumbPersonsNickname;//点赞人姓名
-    private List<CommentContent> commentContents;//评论
-
-    public TopicEntity(String id, Object icon, String nickName, String create_time, String content, List<Object> photos, List<String> thumbPersonsNickname, List<CommentContent> commentContents) {
-        this.id = id;
-        this.icon = icon;
-        this.nickName = nickName;
-        this.create_time = create_time;
-        this.content = content;
-        this.photos = photos;
-        this.thumbPersonsNickname = thumbPersonsNickname;
-        this.commentContents = commentContents;
+    private List<ReturnCommentEntity> comments;
+    private boolean iHasThumb;
+    public TopicEntity() {
     }
 
-    public String getId() {
-        return id;
+    public String getTopicid() {
+        return topicid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTopicid(String topicid) {
+        this.topicid = topicid;
+    }
+
+    public String getUserid() {
+        return userid;
+    }
+
+    public void setUserid(String userid) {
+        this.userid = userid;
     }
 
     public Object getIcon() {
@@ -69,18 +69,7 @@ public class TopicEntity {
         this.content = content;
     }
 
-    public List<Object> getPhotos() {
-        return photos;
-    }
-
-    public void setPhotos(List<Object> photos) {
-        this.photos = photos;
-    }
-
     public List<String> getThumbPersonsNickname() {
-        if (thumbPersonsNickname==null){
-            thumbPersonsNickname=new ArrayList<>();
-        }
         return thumbPersonsNickname;
     }
 
@@ -88,28 +77,33 @@ public class TopicEntity {
         this.thumbPersonsNickname = thumbPersonsNickname;
     }
 
-    public List<CommentContent> getCommentContents() {
-        if (commentContents==null){
-            commentContents=new ArrayList<>();
-        }
-        return commentContents;
+    public boolean isiHasThumb() {
+        return iHasThumb;
     }
 
-    public void setCommentContents(List<CommentContent> commentPersons) {
-        this.commentContents = commentPersons;
+    public void setiHasThumb(boolean iHasThumb) {
+        this.iHasThumb = iHasThumb;
+    }
+
+    public List<ReturnCommentEntity> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<ReturnCommentEntity> comments) {
+        this.comments = comments;
     }
 
     @Override
     public String toString() {
         return "TopicEntity{" +
-                "id='" + id + '\'' +
-                ", icon='" + icon + '\'' +
+                "topicid='" + topicid + '\'' +
+                ", userid='" + userid + '\'' +
+                ", icon=" + icon +
                 ", nickName='" + nickName + '\'' +
                 ", create_time='" + create_time + '\'' +
                 ", content='" + content + '\'' +
-                ", photos=" + photos +
                 ", thumbPersonsNickname=" + thumbPersonsNickname +
-                ", commentPersons=" + commentContents +
+                ", iHasThumb=" + iHasThumb +
                 '}';
     }
 }

@@ -70,7 +70,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         ButterKnife.bind(this);
         ScreenManager.getScreenManager().pushActivity(this);
         //如果注册的时候返回说账号已经注册过了，返回登录界面是显示登录名
-        loginName = getIntent().getStringExtra("loginName");
+        loginName = getIntent().getStringExtra("mRegisterName");
         edtLoginName.setText(loginName);
         //如果本地有登录信息就实现自动登录
         autoLogin();
@@ -145,9 +145,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             public void call(ReturnEntity<LoginReturnEntity> loginReturnEntityReturnEntity) {
                                 //如果登陆成功
                                 if (loginReturnEntityReturnEntity.getCode() == 1) {
+                                    SharedPreferenceManager.instance(LoginActivity.this).setMyPassword(password);
                                     LoginReturnEntity loginReturnEntity = loginReturnEntityReturnEntity.getData();
                                     aliLogin(loginReturnEntity.getUserid(), loginReturnEntity.getPassword());
-                                    new GetUserInfor().getMyInfor(LoginActivity.this,loginReturnEntity.getUserid());
+                                     GetUserInfor.getMyInfor(LoginActivity.this,loginReturnEntity.getUserid());
                                 } else {
                                     toast("登录出现异常");
                                 }
@@ -188,7 +189,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         UserInforEntity userInforEntity= SharedPreferenceManager.instance(LoginActivity.this).getUserInfor();
         if (userInforEntity!=null) {
             String userid = userInforEntity.getUserid();
-            String password = userInforEntity.getMima();
+            String password =SharedPreferenceManager.instance(LoginActivity.this).getMyPassword();
             if (!TextUtils.isEmpty(userid) && (!TextUtils.isEmpty(password))) {
                 ywimKit = YWAPI.getIMKitInstance(userid, SchoolInforManager.appKay);
                 iywContactService = ywimKit.getContactService();

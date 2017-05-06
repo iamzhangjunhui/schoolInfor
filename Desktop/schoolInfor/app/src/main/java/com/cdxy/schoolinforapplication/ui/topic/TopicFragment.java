@@ -1,11 +1,11 @@
 package com.cdxy.schoolinforapplication.ui.topic;
 
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +18,7 @@ import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.adapter.topic.TopicAdapter;
 import com.cdxy.schoolinforapplication.model.ReturnEntity;
-import com.cdxy.schoolinforapplication.model.topic.CommentContent;
+import com.cdxy.schoolinforapplication.model.topic.ReturnThumb;
 import com.cdxy.schoolinforapplication.model.topic.ReturnTopicEntity;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
@@ -62,6 +62,7 @@ public class TopicFragment extends BaseFragment {
     LinearLayout layoutAddComment;
     private TopicAdapter adapter;
     private List<TopicEntity> list;
+    private Gson gson;
 
     public TopicFragment() {
         // Required empty public constructor
@@ -80,8 +81,6 @@ public class TopicFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         init();
-        getTopics();
-        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -129,67 +128,20 @@ public class TopicFragment extends BaseFragment {
                 }, 2000);
             }
         });
+
+        gson = new Gson();
     }
 
-    //测试数据
-    private void getTopics() {
-        new AsyncTask<Void, Void, List<TopicEntity>>() {
-            @Override
-            protected List<TopicEntity> doInBackground(Void... voids) {
-                List<TopicEntity> topicEntities = new ArrayList<TopicEntity>();
-                //上传的图片
-                List<Object> photos1 = new ArrayList<Object>();
-                photos1.add(R.drawable.school);
-                photos1.add(R.drawable.myinfor_backgroud_photo);
-                photos1.add(R.drawable.students);
-                photos1.add(R.drawable.bottom_tap_message_true);
-                photos1.add(R.drawable.school);
-                photos1.add(R.drawable.bottom_tap_topic_true);
-                //点赞人姓名
-                List<String> thumbPersonsNickname = new ArrayList<String>();
-                thumbPersonsNickname.add("Rain");
-                thumbPersonsNickname.add("Andy");
-                //第一个评论人
-                List<CommentContent> commentContents1 = new ArrayList<CommentContent>();
-                CommentContent commentContent1 = new CommentContent("Rain", "kaylee", "确实很好，一起去打羽毛球吧");
-                CommentContent commentContent2 = new CommentContent("kaylee", "Rain", "好呀，半个小时后楼下见");
-                commentContents1.add(commentContent1);
-                commentContents1.add(commentContent2);
-                //第二个评论人
-                List<CommentContent> commentContents2 = new ArrayList<CommentContent>();
-                CommentContent commentContent3 = new CommentContent("Andy", "kaylee", "我也想打羽毛球了，等一下叫我哦");
-                CommentContent commentContent4 = new CommentContent("kaylee", "Andy", "要得，好久没和你PK了");
-                commentContents2.add(commentContent3);
-                commentContents2.add(commentContent4);
-                List<Object> photos = new ArrayList<>();
-                photos.add(R.drawable.bottom_tap_chat_false);
-                photos.add(R.drawable.bottom_tap_chat_false);
-                photos.add(R.drawable.bottom_tap_chat_false);
-                photos.add(R.drawable.bottom_tap_chat_false);
-                photos.add(R.drawable.bottom_tap_chat_false);
-                TopicEntity topicEntity1 = new TopicEntity("1", R.drawable.students, "kaylee", "2016-12-12", "今天天气好，适合出去玩", photos, thumbPersonsNickname, commentContents1);
-                TopicEntity topicEntity2 = new TopicEntity("2", R.drawable.students, "andy", "2016-12-31", "走去打球", null, null, commentContents2);
-                topicEntities.add(topicEntity1);
-                topicEntities.add(topicEntity2);
-                topicEntities.add(topicEntity2);
-                return topicEntities;
-            }
-
-            @Override
-            protected void onPostExecute(List<TopicEntity> topicEntities) {
-                super.onPostExecute(topicEntities);
-                if (topicEntities != null) {
-                    list.addAll(topicEntities);
-                    adapter.notifyDataSetChanged();
-                    layoutProgress.setVisibility(View.GONE);
-                }
-            }
-        }.execute();
+    @Override
+    public void onResume() {
+        super.onResume();
+        getAllTopic();
     }
 
     private void getAllTopic() {
+        list.clear();
         OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.All_TOPIC).get().build();
+        Request request = new Request.Builder().url(HttpUrl.All_TOPICS).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -198,14 +150,13 @@ public class TopicFragment extends BaseFragment {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                final Gson gson = new Gson();
                 final String result = response.body().string();
                 Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnTopicEntity>>>() {
                     @Override
                     public ReturnEntity<List<ReturnTopicEntity>> call(String s) {
                         ReturnEntity<List<ReturnTopicEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
                         if (returnEntity != null) {
-                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<ReturnTopicEntity>>() {
+                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnTopicEntity>>>() {
                             }.getType());
 
                         }
@@ -214,12 +165,25 @@ public class TopicFragment extends BaseFragment {
                 }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnTopicEntity>>>() {
                     @Override
                     public void call(ReturnEntity<List<ReturnTopicEntity>> returnTopicEntityReturnEntity) {
-                        if (returnTopicEntityReturnEntity!=null) {
+                        if (returnTopicEntityReturnEntity != null) {
                             if (returnTopicEntityReturnEntity.getCode() == 1) {
-                                List<ReturnTopicEntity> returnTopicList=returnTopicEntityReturnEntity.getData();
-                                for (ReturnTopicEntity returnTopic:returnTopicList){
+                                List<ReturnTopicEntity> returnTopicList = returnTopicEntityReturnEntity.getData();
+                                for (ReturnTopicEntity returnTopic : returnTopicList) {
+                                    String topicid = returnTopic.getTopicid();
+                                    String userid = returnTopic.getAuthorid();
+                                    if ((!TextUtils.isEmpty(topicid))&&(!TextUtils.isEmpty(userid))) {
+                                        TopicEntity topicEntity = new TopicEntity();
+                                        topicEntity.setContent(returnTopic.getContent());
+                                        topicEntity.setCreate_time(returnTopic.getCreateTime());
+                                        topicEntity.setIcon(returnTopic.getIcon());
+                                        topicEntity.setNickName(returnTopic.getNickName());
+                                        topicEntity.setUserid(userid);
+                                        topicEntity.setTopicid(topicid);
+                                        getAllThumb(topicid, topicEntity);
+                                    }
 
                                 }
+
                             } else {
                                 toast(returnTopicEntityReturnEntity.getMsg());
                             }
@@ -230,9 +194,51 @@ public class TopicFragment extends BaseFragment {
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        getAllTopic();
+    //获取点赞人列表
+    private void getAllThumb(String topicid, final TopicEntity topicEntity) {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicid).get().build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String result = response.body().string();
+                Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnThumb>>>() {
+                    @Override
+                    public ReturnEntity<List<ReturnThumb>> call(String s) {
+                        ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(result, ReturnEntity.class);
+                        if (returnEntity != null) {
+                            returnEntity = gson.fromJson(result, new TypeToken<ReturnEntity<List<ReturnThumb>>>() {
+                            }.getType());
+                        }
+                        return returnEntity;
+                    }
+                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnThumb>>>() {
+                    @Override
+                    public void call(ReturnEntity<List<ReturnThumb>> listReturnEntity) {
+                        if (listReturnEntity != null) {
+                            if (listReturnEntity.getCode() == 1) {
+                                List<String> thumbs = new ArrayList<String>();
+                                for (ReturnThumb thumb : listReturnEntity.getData()) {
+                                    thumbs.add(thumb.getUserid());
+                                }
+                                topicEntity.setThumbPersonsNickname(thumbs);
+                                list.add(topicEntity);
+                                adapter.notifyDataSetChanged();
+
+                            } else {
+                                toast(listReturnEntity.getMsg());
+                            }
+
+                        }
+                    }
+                });
+            }
+        });
     }
+
 }

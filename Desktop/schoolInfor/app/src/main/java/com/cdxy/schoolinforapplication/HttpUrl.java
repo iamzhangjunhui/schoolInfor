@@ -16,6 +16,14 @@ public class HttpUrl {
     public static final String UPDATE_MY_MOTTO="http://120.25.202.192/schoolinfo/userInfor/updatezuoyouming";
     public static final String ADD_TOPIC="http://120.25.202.192/schoolinfo/topic/addTopic";
     public static final String ADD_TOPIC_PHOTOS="http://120.25.202.192/schoolinfo/topic/addPhotos";
-    public static final String All_TOPIC="http://120.25.202.192/schoolinfo/topic/getAllTopic";
+    public static final String All_TOPICS="http://120.25.202.192/schoolinfo/topic/getAllTopic";
+    public static final String All_TOPIC_THUMBS="http://120.25.202.192/schoolinfo/like/getLike";
+    public static final String ALL_TOPIC_PHOTOS="http://120.25.202.192/schoolinfo/topic/getPhotos";
+    public static final String ALL_TOPIC_COMMENTS="http://120.25.202.192/schoolinfo/comment/getAllComment";
+    public static final String THUMB="http://120.25.202.192/schoolinfo/like/addLike";
+    public static final String NOT_THUMB="http://120.25.202.192/schoolinfo/like/removeLike";
+    public static final String SEND_COMMENT="http://120.25.202.192/schoolinfo/comment/addComment";
+    public static final String UPDATE_PASSWORD="http://120.25.202.192/schoolinfo/rest/changePassword";
+    public static final String DELETE_MY_TOPIC="http://120.25.202.192/schoolinfo/topic/delTopic";
 }
 
