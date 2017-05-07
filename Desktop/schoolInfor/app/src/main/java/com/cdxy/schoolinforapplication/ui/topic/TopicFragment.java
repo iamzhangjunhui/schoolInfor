@@ -1,7 +1,6 @@
 package com.cdxy.schoolinforapplication.ui.topic;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,29 +10,25 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.adapter.topic.TopicAdapter;
-import com.cdxy.schoolinforapplication.adapter.topic.TopicPhotosAdapter;
 import com.cdxy.schoolinforapplication.model.ReturnEntity;
-import com.cdxy.schoolinforapplication.model.topic.ReturnThumb;
 import com.cdxy.schoolinforapplication.model.topic.ReturnTopicEntity;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
+import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
 import com.cdxy.schoolinforapplication.ui.widget.RefreshLayout;
-import com.cdxy.schoolinforapplication.util.Constant;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +62,8 @@ public class TopicFragment extends BaseFragment {
     TextView txtSendNewComment;
     @BindView(R.id.layout_add_comment)
     LinearLayout layoutAddComment;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     private TopicAdapter adapter;
     private List<TopicEntity> list;
     private Gson gson;
@@ -88,6 +85,7 @@ public class TopicFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         init();
+        getAllTopic();
     }
 
     @Override
@@ -109,7 +107,7 @@ public class TopicFragment extends BaseFragment {
          * 在setAdapter之前要判断该是否存在headView或footerView，如果存在就创建并传HeaderViewListAdapter，否则传adapter
          */
         refreshLayout.setLoading(false);
-        adapter = new TopicAdapter(list, getActivity(), layoutAddComment, edtAddComment, txtSendNewComment);
+        adapter = new TopicAdapter(list, getActivity(), layoutAddComment, edtAddComment, txtSendNewComment,progress);
         listTopic.setAdapter(adapter);
         //设置下拉刷新时的颜色值，颜色需要定义在xml中
         refreshLayout.setColorSchemeColors(R.color.top_color, R.color.colorAccent, R.color.text_red_color, R.color.txt_departent_class_color);
@@ -142,17 +140,29 @@ public class TopicFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        getAllTopic();
+        if (MainActivity.finish_type != null) {
+            if (MainActivity.finish_type.equals("add_topic")) {
+                getAllTopic();
+            }
+        }
     }
 
     private void getAllTopic() {
         list.clear();
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(HttpUrl.All_TOPICS).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("获取会话列表失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        toast(s);
+                    }
+                });
             }
 
             @Override
@@ -178,7 +188,7 @@ public class TopicFragment extends BaseFragment {
                                 for (ReturnTopicEntity returnTopic : returnTopicList) {
                                     String topicid = returnTopic.getTopicid();
                                     String userid = returnTopic.getAuthorid();
-                                    if ((!TextUtils.isEmpty(topicid))&&(!TextUtils.isEmpty(userid))) {
+                                    if ((!TextUtils.isEmpty(topicid)) && (!TextUtils.isEmpty(userid))) {
                                         TopicEntity topicEntity = new TopicEntity();
                                         topicEntity.setContent(returnTopic.getContent());
                                         topicEntity.setCreate_time(returnTopic.getCreateTime());
@@ -195,25 +205,34 @@ public class TopicFragment extends BaseFragment {
                             } else {
                                 toast(returnTopicEntityReturnEntity.getMsg());
                             }
+                            progress.setVisibility(View.GONE);
                         }
                     }
                 });
             }
         });
     }
+
     private void getTopicPhoto(final String topicid, final TopicEntity topicEntity) {
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_PHOTOS + "?topicid=" +topicid).build();
+        Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_PHOTOS + "?topicid=" + topicid).build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("获取话题列表失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        toast(s);
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String result = response.body().string();
-                Log.d("qwqeqewqeq"+topicid,result);
                 Observable.just(result).map(new Func1<String, ReturnEntity<List<Object>>>() {
                     @Override
                     public ReturnEntity<List<Object>> call(String s) {
@@ -242,10 +261,16 @@ public class TopicFragment extends BaseFragment {
                         }
                         list.add(topicEntity);
                         adapter.notifyDataSetChanged();
+                        progress.setVisibility(View.GONE);
                     }
                 });
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
 //    //获取点赞人列表

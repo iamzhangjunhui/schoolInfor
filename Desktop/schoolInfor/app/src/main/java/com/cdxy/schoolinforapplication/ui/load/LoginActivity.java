@@ -128,6 +128,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("登录异常，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        toast(s);
+                    }
+                });
             }
 
             @Override
@@ -157,7 +164,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 } else {
                                     toast("登录出现异常");
                                 }
-                                progress.setVisibility(View.GONE);
 
                             }
                         });
@@ -177,13 +183,25 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         loginService.login(param, new IWxCallback() {
             @Override
             public void onSuccess(Object... objects) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
+                Observable.just("").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
             }
 
             @Override
             public void onError(int i, String s) {
-
+                Observable.just(s).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                       toast(s);
+                    }
+                });
             }
 
             @Override

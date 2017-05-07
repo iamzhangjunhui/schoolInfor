@@ -140,7 +140,7 @@ public class ChatFragment extends BaseFragment {
         LoginActivity.iywContactService.addContactOperateNotifyListener(mContactOperateNotifyListener);
     }
 
-    private void addFriend(String target) {
+    private  void addFriend(String target) {
         IWxCallback callback = new IWxCallback() {
 
             @Override

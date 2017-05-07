@@ -1,8 +1,6 @@
 package com.cdxy.schoolinforapplication.ui.topic;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,18 +9,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,6 +92,8 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     ScrollListView listviewAddress;
     @BindView(R.id.img_indicator)
     ImageView imgIndicator;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     private List<Object> list;
     private TopicPhotosAdapter adapter;
     private String newTopic;
@@ -406,6 +405,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void updateTopicPhotos() {
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = new OkHttpClient();
         MediaType mediaType = MediaType.parse("image/png");
         MultipartBody.Builder builder = new MultipartBody.Builder();
@@ -422,6 +422,13 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Observable.just("上传话题图片失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        toast(s);
+                    }
+                });
                 e.printStackTrace();
             }
 
@@ -434,6 +441,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void addTopic() {
+        progress.setVisibility(View.VISIBLE);
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         String create_time = format.format(date);
@@ -456,6 +464,13 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                     @Override
                     public void onFailure(Call call, IOException e) {
                         e.printStackTrace();
+                        Observable.just("创建话题失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                            @Override
+                            public void call(String s) {
+                                progress.setVisibility(View.GONE);
+                                toast(s);
+                            }
+                        });
                     }
 
                     @Override
@@ -474,9 +489,13 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                                 if (returnEntity != null) {
                                     if (returnEntity.getCode() == 1) {
                                         toast(returnEntity.getMsg());
+                                        Intent intent = new Intent();
+                                        intent.putExtra("finish_type", "add_topic");
+                                        setResult(RESULT_OK, intent);
                                         finish();
                                     }
                                 }
+                                progress.setVisibility(View.GONE);
                             }
                         });
                     }

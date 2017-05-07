@@ -4,12 +4,13 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -22,7 +23,6 @@ import com.cdxy.schoolinforapplication.ui.ChooseInfor.ChooseInforActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
 import com.cdxy.schoolinforapplication.util.GetUserInfor;
-import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -35,6 +35,9 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 public class ModifyMyInforActivity extends BaseActivity implements View.OnClickListener {
 
@@ -68,6 +71,10 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
     EditText edtHobby;
     @BindView(R.id.submit_register)
     Button submitRegister;
+    @BindView(R.id.activity_register)
+    LinearLayout activityRegister;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     private UserInforEntity userInfor;
 
     @Override
@@ -82,7 +89,7 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
     @Override
     public void init() {
         txtTitle.setText("修改我的个人信息");
-        userInfor= (UserInforEntity) getIntent().getSerializableExtra("userInfor");
+        userInfor = (UserInforEntity) getIntent().getSerializableExtra("userInfor");
         setData();
     }
 
@@ -131,13 +138,13 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
                     sex = "男";
                 }
                 edtRealname.getText().toString();
-                UserInforEntity userInforEntity = new UserInforEntity(userInfor.getUserid(),edtNickname.getText().toString(), edtRealname.getText().toString(),
+                UserInforEntity userInforEntity = new UserInforEntity(userInfor.getUserid(), edtNickname.getText().toString(), edtRealname.getText().toString(),
                         txtDepartment.getText().toString(), txtClass.getText().toString(), edtStudentId.getText().toString(),
                         sex, txtBirthday.getText().toString(), txtNation.getText().toString(), edtAddress.getText().toString(),
                         edtHobby.getText().toString());
                 Gson gson = new Gson();
                 String userInforJson = gson.toJson(userInforEntity);
-                updateUserInfor(userInforJson,userInfor.getUserid());
+                updateUserInfor(userInforJson, userInfor.getUserid());
                 break;
             default:
                 break;
@@ -175,9 +182,9 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
                 txtDepartment.setText(userInfor.getXibie() + "");
                 txtClass.setText(userInfor.getBanji() + "");
                 edtStudentId.setText(userInfor.getXuehao() + "");
-                if ((userInfor.getXingbie()+"").equals("女")) {
+                if ((userInfor.getXingbie() + "").equals("女")) {
                     rgSex.check(R.id.girl);
-                } else if ((userInfor.getXingbie()+"").equals("男")){
+                } else if ((userInfor.getXingbie() + "").equals("男")) {
                     rgSex.check(R.id.boy);
                 }
                 txtBirthday.setText(userInfor.getShengri() + "");
@@ -188,19 +195,34 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
         }
     }
 
-    public  void updateUserInfor(final String userInforJsonString, final String userid) {
+    public void updateUserInfor(final String userInforJsonString, final String userid) {
+       progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = new OkHttpClient();
         final Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_INFOR + "?userInfor=" + userInforJsonString).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("修改个人信息失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        toast(s);
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                GetUserInfor.getMyInfor(ModifyMyInforActivity.this,userid);
-                finish();
+                Observable.just("").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        GetUserInfor.getMyInfor(ModifyMyInforActivity.this, userid);
+                        finish();
+                    }
+                });
+
             }
         });
     }

@@ -14,12 +14,15 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.mobileim.channel.event.IWxCallback;
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.SchoolInforManager;
 import com.cdxy.schoolinforapplication.model.ReturnEntity;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.model.topic.CommentEntity;
@@ -27,8 +30,11 @@ import com.cdxy.schoolinforapplication.model.topic.ReturnCommentEntity;
 import com.cdxy.schoolinforapplication.model.topic.ReturnThumb;
 import com.cdxy.schoolinforapplication.model.topic.ThumbEntity;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
+import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity;
+import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
 import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
+import com.cdxy.schoolinforapplication.ui.widget.EdtDialog;
 import com.cdxy.schoolinforapplication.ui.widget.NotifyDialog;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 import com.cdxy.schoolinforapplication.util.Constant;
@@ -74,13 +80,17 @@ public class TopicAdapter extends BaseAdapter {
     String myUserid;
     List<ReturnCommentEntity> comments;
     private NotifyDialog notifyDialog;
+    private EdtDialog edtDialog;
+    private ProgressBar progress;
 
-    public TopicAdapter(List<TopicEntity> list, Activity activity, LinearLayout layoutAddComment, EditText edtAddComment, TextView txtSendNewComment) {
+
+    public TopicAdapter(List<TopicEntity> list, Activity activity, LinearLayout layoutAddComment, EditText edtAddComment, TextView txtSendNewComment, ProgressBar progress) {
         this.list = list;
         this.activity = activity;
         this.layoutAddComment = layoutAddComment;
         this.edtAddComment = edtAddComment;
         this.txtSendNewComment = txtSendNewComment;
+        this.progress=progress;
     }
 
     @Override
@@ -101,10 +111,10 @@ public class TopicAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
 //        if (view == null) {
-            view = LayoutInflater.from(activity).inflate(R.layout.item_topic, null);
-            viewHolder = new ViewHolder(view);
-            viewHolder.layout_divider = (LinearLayout) view.findViewById(R.id.layout_divider);
-            view.setTag(viewHolder);
+        view = LayoutInflater.from(activity).inflate(R.layout.item_topic, null);
+        viewHolder = new ViewHolder(view);
+        viewHolder.layout_divider = (LinearLayout) view.findViewById(R.id.layout_divider);
+        view.setTag(viewHolder);
 //        } else {
 //            viewHolder = (ViewHolder) view.getTag();
 //        }
@@ -115,7 +125,7 @@ public class TopicAdapter extends BaseAdapter {
         userInfor = SharedPreferenceManager.instance(activity).getUserInfor();
         if (userInfor != null) {
             myNikename = userInfor.getNicheng();
-            myUserid=userInfor.getUserid();
+            myUserid = userInfor.getUserid();
         }
 
         if (!TextUtils.isEmpty(topicid)) {
@@ -127,13 +137,13 @@ public class TopicAdapter extends BaseAdapter {
             getComments(topicid);
         }
         //加载图片
-        final List<Object> photos=entity.getPhotos();
-        if (photos!=null){
-            if (photos.size()!=0){
+        final List<Object> photos = entity.getPhotos();
+        if (photos != null) {
+            if (photos.size() != 0) {
                 viewHolder.framePhotos.setVisibility(View.VISIBLE);
                 topicPhotosAdapter = new TopicPhotosAdapter(activity, photos);
                 viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
-                if (photos.size() > 3) {
+                if (photos.size() > 4) {
                     viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
                     viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 4));
                 }
@@ -162,18 +172,21 @@ public class TopicAdapter extends BaseAdapter {
                 return false;
             }
         });
-
-        //判断该话题是否是本人发的，如果是的话就可以删除
-        if (entity.getUserid().equals(userInfor.getUserid())) {
-            viewHolder.imgDelete.setVisibility(View.VISIBLE);
-            viewHolder.imgDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    createNotifyDailog(entity.getTopicid(),i);
+        if (userInfor != null) {
+            if (!TextUtils.isEmpty(userInfor.getUserid())) {
+                //判断该话题是否是本人发的，如果是的话就可以删除
+                if (entity.getUserid().equals(userInfor.getUserid())) {
+                    viewHolder.imgDelete.setVisibility(View.VISIBLE);
+                    viewHolder.imgDelete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            createNotifyDailog(entity.getTopicid(), i);
+                        }
+                    });
+                } else {
+                    viewHolder.imgDelete.setVisibility(View.GONE);
                 }
-            });
-        }else {
-            viewHolder.imgDelete.setVisibility(View.GONE);
+            }
         }
 
         if (!TextUtils.isEmpty(nickName)) {
@@ -184,14 +197,33 @@ public class TopicAdapter extends BaseAdapter {
             viewHolder.txtTopicCreateTime.setText(createTime);
         }
         Object icon = entity.getIcon();
-        if (icon != null) {
-            //这儿的头像类型要分几种（int（drawable），网络图片）
+        if (icon!=null) {
             Glide.with(activity).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(activity)).into(viewHolder.imgTopicIcon);
+        } else {
+            Glide.with(activity).load(R.drawable.icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(activity)).into(viewHolder.imgTopicIcon);
         }
-        String topicContent = entity.getContent();
-        if (!TextUtils.isEmpty(topicContent)) {
-            viewHolder.txtTopicContent.setText(topicContent);
-        }
+        viewHolder.imgTopicIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!entity.getUserid().equals(myUserid)){
+                    edtDialog = new EdtDialog(activity, R.style.MyDialog, new EdtDialog.AddFriendListener() {
+                        @Override
+                        public void onClick(View view) {
+                            switch (view.getId()) {
+                                case R.id.btn_sure:
+                                    addFriend(entity.getUserid());
+                                    edtDialog.dismiss();
+                                    break;
+                                case R.id.btn_cancel:
+                                    edtDialog.dismiss();
+                                    break;
+                            }
+                        }
+                    }, activity, Constant.EDTDIALOG_TYPE_ADD_FRIEND);
+                    edtDialog.show();
+                }
+            }
+        });
         //点赞人姓名集合
         final List<String> thumbPersonsName = entity.getThumbPersonsNickname();
         if (thumbPersonsName != null) {
@@ -204,7 +236,11 @@ public class TopicAdapter extends BaseAdapter {
                     if (j == 0) {
                         thumbPersonsNameString = thumbPersonsName.get(j);
                     } else {
-                        thumbPersonsNameString = thumbPersonsNameString + "," + thumbPersonsName.get(j);
+                        if (!TextUtils.isEmpty(thumbPersonsName.get(j))){
+                            if (!thumbPersonsName.get(j).equals("null"))
+                                thumbPersonsNameString = thumbPersonsNameString + "," + thumbPersonsName.get(j);
+                        }
+
                     }
                 }
                 thumbPersonsNameString = thumbPersonsNameString + " " + thumbNumber + "人为你点赞";
@@ -241,13 +277,13 @@ public class TopicAdapter extends BaseAdapter {
         viewHolder.imgThumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!TextUtils.isEmpty(myNikename)&&(!TextUtils.isEmpty(myUserid))) {
+                if (!TextUtils.isEmpty(myNikename) && (!TextUtils.isEmpty(myUserid))) {
                     boolean iHasThumb = entity.isiHasThumb();
                     String topicid = entity.getTopicid();
 
                     if (iHasThumb) {
                         //取消点赞
-                        notThumb(topicid,myUserid, entity);
+                        notThumb(topicid, myUserid, entity);
                     } else {
                         //点赞
                         ThumbEntity thumbEntity = new ThumbEntity(topicid, myUserid, myNikename);
@@ -256,8 +292,8 @@ public class TopicAdapter extends BaseAdapter {
                     }
 
 
-                }else {
-                    Toast.makeText(activity,"你还没设置昵称，快去设置吧",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(activity, "你还没设置昵称，快去设置吧", Toast.LENGTH_SHORT).show();
                 }
                 TopicAdapter.this.notifyDataSetChanged();
             }
@@ -270,111 +306,23 @@ public class TopicAdapter extends BaseAdapter {
         return false;
 
     }
-    //获取点赞人列表
-    private void getAllThumb(String topicid, final TopicEntity topicEntity) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicid).get().build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String result = response.body().string();
-                Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnThumb>>>() {
-                    @Override
-                    public ReturnEntity<List<ReturnThumb>> call(String s) {
-                        ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(result, ReturnEntity.class);
-                        if (returnEntity != null) {
-                            returnEntity = gson.fromJson(result, new TypeToken<ReturnEntity<List<ReturnThumb>>>() {
-                            }.getType());
-                        }
-                        return returnEntity;
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnThumb>>>() {
-                    @Override
-                    public void call(ReturnEntity<List<ReturnThumb>> listReturnEntity) {
-                        if (listReturnEntity != null) {
-                            if (listReturnEntity.getCode() == 1) {
-                                List<String> thumbs = new ArrayList<String>();
-                                for (ReturnThumb thumb : listReturnEntity.getData()) {
-                                    thumbs.add(thumb.getUserid());
-                                }
-                                topicEntity.setThumbPersonsNickname(thumbs);
-                                TopicAdapter.this.notifyDataSetChanged();
-
-                            } else {
-                                Toast.makeText(activity, listReturnEntity.getMsg(), Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
-                    }
-                });
-            }
-        });
-    }
-//    private void getTopicPhoto(final String topicid) {
-//        OkHttpClient okHttpClient = new OkHttpClient();
-//        Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_PHOTOS + "?topicid=" +"5435").build();
-//        okHttpClient.newCall(request).enqueue(new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                String result = response.body().string();
-//                Log.d("qwqeqewqeq"+topicid,result);
-//                Observable.just(result).map(new Func1<String, ReturnEntity<List<Object>>>() {
-//                    @Override
-//                    public ReturnEntity<List<Object>> call(String s) {
-//                        ReturnEntity<List<Object>> returnEntity = gson.fromJson(s, ReturnEntity.class);
-//                        if (returnEntity != null) {
-//                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<Object>>>() {
-//                            }.getType());
-//                        }
-//                        return returnEntity;
-//                    }
-//                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<Object>>>() {
-//                    @Override
-//                    public void call(ReturnEntity<List<Object>> listReturnEntity) {
-//                        if (listReturnEntity != null) {
-//                            if (listReturnEntity.getCode() == 1) {
-//                                final List<Object> photos = listReturnEntity.getData();
-//                                if (photos != null) {
-//                                    if (photos.size() != 0) {
-//                                        viewHolder.framePhotos.setVisibility(View.VISIBLE);
-//                                        topicPhotosAdapter = new TopicPhotosAdapter(activity, photos);
-//                                        viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
-//                                        if (photos.size() > 3) {
-//                                            viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
-//                                            viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 4));
-//                                        }
-
-//                                    }
-//                                }
-//
-//                            } else {
-//                                Toast.makeText(activity, listReturnEntity.getMsg(), Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                    }
-//                });
-//            }
-//        });
-//    }
 
     //获取评论列表
     public void getComments(String topicid) {
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okhttpclient = new OkHttpClient();
         Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_COMMENTS + "?topicid=" + topicid).get().build();
         okhttpclient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("获取评论失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        Toast.makeText(activity,s,Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
@@ -405,6 +353,7 @@ public class TopicAdapter extends BaseAdapter {
                                 Toast.makeText(activity, listReturnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                             }
                         }
+                        progress.setVisibility(View.GONE);
                     }
                 });
             }
@@ -413,32 +362,56 @@ public class TopicAdapter extends BaseAdapter {
     }
 
     private void thumb(String json, final TopicEntity topicEntity) {
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.THUMB + "?likejson=" + json).get().build();
+        final Request request = new Request.Builder().url(HttpUrl.THUMB + "?likejson=" + json).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("点赞失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        Toast.makeText(activity,s,Toast.LENGTH_SHORT).show();
+                    }
+                });
 
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String result=response.body().string();
-                getAllThumb(topicEntity);
-                topicEntity.setiHasThumb(true);
+                String result = response.body().string();
+
+                Observable.just(result).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        getAllThumb(topicEntity);
+                        topicEntity.setiHasThumb(true);
+                    }
+                });
             }
         });
     }
 
     //获取点赞人列表
     private void getAllThumb(final TopicEntity topicEntity) {
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicEntity.getTopicid()).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("获取点赞列表失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        Toast.makeText(activity,s,Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
 
             @Override
@@ -471,44 +444,74 @@ public class TopicAdapter extends BaseAdapter {
                             }
 
                         }
+                        progress.setVisibility(View.GONE);
                     }
                 });
             }
         });
     }
 
-    private void notThumb(String topicid,String userid, final TopicEntity topicEntity) {
+    private void notThumb(String topicid, String userid, final TopicEntity topicEntity) {
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.NOT_THUMB + "?topicid=" + topicid+"&&userid="+userid).get().build();
+        Request request = new Request.Builder().url(HttpUrl.NOT_THUMB + "?topicid=" + topicid + "&&userid=" + userid).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("取消点赞失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        Toast.makeText(activity,s,Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String result=response.body().string();
-                getAllThumb(topicEntity);
-                topicEntity.setiHasThumb(false);
+                String result = response.body().string();
+                Observable.just(result).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        getAllThumb(topicEntity);
+                        topicEntity.setiHasThumb(false);
+                    }
+                });
 
             }
         });
     }
 
     private void sendComment(String commentjson, final String topicid) {
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okhttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(HttpUrl.SEND_COMMENT + "?commentjson=" + commentjson).get().build();
         okhttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("评论失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        Toast.makeText(activity,s,Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String result=response.body().string();
-                getComments(topicid);
+                String result = response.body().string();
+                Observable.just(result).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        getComments(topicid);
+                    }
+                });
             }
         });
     }
@@ -547,34 +550,44 @@ public class TopicAdapter extends BaseAdapter {
     }
 
     private void deleteMyToppic(String topicid, final int position) {
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(HttpUrl.DELETE_MY_TOPIC + "?topicid=" + topicid).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("删除话题失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        Toast.makeText(activity,s,Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String result=response.body().string();
+                String result = response.body().string();
                 Observable.just(result).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
                     @Override
                     public void call(String s) {
                         list.remove(position);
                         TopicAdapter.this.notifyDataSetChanged();
+                        progress.setVisibility(View.GONE);
                     }
                 });
             }
         });
     }
+
     private void createNotifyDailog(final String topicid, final int position) {
         notifyDialog = new NotifyDialog(activity, R.style.MyDialog, new NotifyDialog.NotifyListener() {
             @Override
             public void onClick(View view) {
                 switch (view.getId()) {
                     case R.id.dialog_ok:
-                        deleteMyToppic(topicid,position);
+                        deleteMyToppic(topicid, position);
                         notifyDialog.dismiss();
                         break;
                     case R.id.dialog_cancle:
@@ -582,7 +595,28 @@ public class TopicAdapter extends BaseAdapter {
                         break;
                 }
             }
-        }, activity,"delete_my_topic");
+        }, activity, "delete_my_topic");
         notifyDialog.show();
+    }
+    private  void addFriend(String target) {
+        IWxCallback callback = new IWxCallback() {
+
+            @Override
+            public void onSuccess(Object... result) {
+                Toast.makeText(activity, "添加好友成功", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onProgress(int progress) {
+
+            }
+
+            @Override
+            public void onError(int code, String info) {
+
+            }
+        };
+        LoginActivity.iywContactService.ackAddContact(target, SchoolInforManager.appKay, true, edtDialog.content, callback);
+
     }
 }
