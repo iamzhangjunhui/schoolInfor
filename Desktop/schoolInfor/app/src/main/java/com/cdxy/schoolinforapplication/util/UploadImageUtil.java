@@ -19,7 +19,7 @@ import okhttp3.Response;
 
 public class UploadImageUtil {
     public void uploadImage(List<String> paths) {
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient =  HttpUtil.getClient();
         MediaType mediaType = MediaType.parse("image/png");
         MultipartBody.Builder builder = new MultipartBody.Builder();
         builder.setType(MultipartBody.FORM);

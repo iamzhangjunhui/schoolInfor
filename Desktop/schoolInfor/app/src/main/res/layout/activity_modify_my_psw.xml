@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_modify_my_psw"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.cdxy.schoolinforapplication.ui.my.ModifyMyPswActivity">
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.cdxy.schoolinforapplication.ui.my.ModifyMyPswActivity">
-
+    android:id="@+id/activity_modify_my_psw">
     <include layout="@layout/view_title_my" />
 
     <LinearLayout
@@ -96,3 +98,10 @@
             android:textSize="@dimen/text_size" />
     </LinearLayout>
 </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+</FrameLayout>

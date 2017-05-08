@@ -4,30 +4,26 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
-import com.cdxy.schoolinforapplication.SchoolInforManager;
 import com.cdxy.schoolinforapplication.ScreenManager;
-import com.cdxy.schoolinforapplication.model.LoginReturnEntity;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.ChooseInfor.ChooseInforActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.util.Constant;
-import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
+import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.google.gson.Gson;
-
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -36,15 +32,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 public class RegisterActivity extends BaseActivity implements View.OnClickListener {
 
@@ -82,6 +75,8 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     EditText edtNickname;
     @BindView(R.id.activity_register)
     LinearLayout activityRegister;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     private String mRegisterName;
     private String mDepartment;
     private String mClazz;
@@ -218,20 +213,34 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     }
 
     public void updateUserInfor(String userInforJsonString) {
-        OkHttpClient okHttpClient = new OkHttpClient();
+        progress.setVisibility(View.VISIBLE);
+        OkHttpClient okHttpClient = HttpUtil.getClient();
         final Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_INFOR + "?userInfor=" + userInforJsonString).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Observable.just("注册失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        toast(s);
+                    }
+                });
                 e.printStackTrace();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                ScreenManager.getScreenManager().appExit(RegisterActivity.this);
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                intent.putExtra("mRegisterName",mRegisterName);
-                startActivity(intent);
+                Observable.just(response.body().string()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        ScreenManager.getScreenManager().appExit(RegisterActivity.this);
+                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        intent.putExtra("mRegisterName", mRegisterName);
+                        startActivity(intent);
+                    }
+                });
 
             }
         });

@@ -144,8 +144,8 @@ public class MessageListActivity extends BaseActivity implements View.OnClickLis
             @Override
             protected List<MessageEntity> doInBackground(Void... voids) {
                 //测试数据
-                MessageEntity entity1 = new MessageEntity(1, "菊花姐姐", "2016-12-25", "计算机系", "", "期末考试教室变化", "二教205的考生请到206考试");
-                MessageEntity entity2 = new MessageEntity(0, "菊花姐姐", "2016-12-29", "计算机系", "", "菊花姐姐要办考研班了", "有想要报名的尽快来报名");
+                MessageEntity entity1 = new MessageEntity(1, "杨老师", "2016-12-25", "计算机系", "", "期末考试教室变化", "二教205的考生请到206考试");
+                MessageEntity entity2 = new MessageEntity(0, "杨老师", "2016-12-29", "计算机系", "", "杨老师要办考研班了", "有想要报名的尽快来报名");
                 List<MessageEntity> entityList = new ArrayList<>();
                 entityList.add(entity1);
                 entityList.add(entity2);

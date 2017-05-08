@@ -14,12 +14,15 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.mobileim.channel.event.IWxCallback;
 import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
+import com.cdxy.schoolinforapplication.SchoolInforManager;
 import com.cdxy.schoolinforapplication.model.ReturnEntity;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.model.topic.CommentEntity;
@@ -27,11 +30,16 @@ import com.cdxy.schoolinforapplication.model.topic.ReturnCommentEntity;
 import com.cdxy.schoolinforapplication.model.topic.ReturnThumb;
 import com.cdxy.schoolinforapplication.model.topic.ThumbEntity;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
+import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity;
+import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
 import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
+import com.cdxy.schoolinforapplication.ui.topic.TopicFragment;
+import com.cdxy.schoolinforapplication.ui.widget.EdtDialog;
 import com.cdxy.schoolinforapplication.ui.widget.NotifyDialog;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 import com.cdxy.schoolinforapplication.util.Constant;
+import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -50,6 +58,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
+import rx.Observable.OnSubscribe;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -63,7 +73,6 @@ public class TopicAdapter extends BaseAdapter {
     private List<TopicEntity> list;
     private Activity activity;
     private TopicPhotosAdapter topicPhotosAdapter;
-    private TopicCommentContentAdapter topicCommentContentAdapter;
     private LinearLayout layoutAddComment;
     private EditText edtAddComment;
     private TextView txtSendNewComment;
@@ -72,8 +81,9 @@ public class TopicAdapter extends BaseAdapter {
     UserInforEntity userInfor;
     String myNikename;
     String myUserid;
-    List<ReturnCommentEntity> comments;
     private NotifyDialog notifyDialog;
+    private EdtDialog edtDialog;
+
 
     public TopicAdapter(List<TopicEntity> list, Activity activity, LinearLayout layoutAddComment, EditText edtAddComment, TextView txtSendNewComment) {
         this.list = list;
@@ -115,25 +125,29 @@ public class TopicAdapter extends BaseAdapter {
         userInfor = SharedPreferenceManager.instance(activity).getUserInfor();
         if (userInfor != null) {
             myNikename = userInfor.getNicheng();
-            myUserid=userInfor.getUserid();
+            myUserid = userInfor.getUserid();
         }
 
         if (!TextUtils.isEmpty(topicid)) {
-//            //获取话题图片
-//            getTopicPhoto(topicid);
-            //获取点赞人
+//            //获取点赞人
             getAllThumb(entity);
-            //获取评论列表
+//            //获取评论列表
             getComments(topicid);
         }
+        //显示话题内容
+        String content = entity.getContent();
+        if (!TextUtils.isEmpty(content)) {
+            viewHolder.txtTopicContent.setText(content);
+        }
+
         //加载图片
-        final List<Object> photos=entity.getPhotos();
-        if (photos!=null){
-            if (photos.size()!=0){
+        final List<Object> photos = entity.getPhotos();
+        if (photos != null) {
+            if (photos.size() != 0) {
                 viewHolder.framePhotos.setVisibility(View.VISIBLE);
                 topicPhotosAdapter = new TopicPhotosAdapter(activity, photos);
                 viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
-                if (photos.size() > 3) {
+                if (photos.size() > 4) {
                     viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
                     viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 4));
                 }
@@ -151,10 +165,6 @@ public class TopicAdapter extends BaseAdapter {
                 });
             }
         }
-        //设置评论的适配器
-        comments = new ArrayList<>();
-        topicCommentContentAdapter = new TopicCommentContentAdapter(activity, comments);
-        viewHolder.scrollComments.setAdapter(topicCommentContentAdapter);
         //长按一条自己发送的评论实现删除
         viewHolder.scrollComments.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -162,18 +172,21 @@ public class TopicAdapter extends BaseAdapter {
                 return false;
             }
         });
-
-        //判断该话题是否是本人发的，如果是的话就可以删除
-        if (entity.getUserid().equals(userInfor.getUserid())) {
-            viewHolder.imgDelete.setVisibility(View.VISIBLE);
-            viewHolder.imgDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    createNotifyDailog(entity.getTopicid(),i);
+        if (userInfor != null) {
+            if (!TextUtils.isEmpty(userInfor.getUserid())) {
+                //判断该话题是否是本人发的，如果是的话就可以删除
+                if (entity.getUserid().equals(userInfor.getUserid())) {
+                    viewHolder.imgDelete.setVisibility(View.VISIBLE);
+                    viewHolder.imgDelete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            createNotifyDailog(entity.getTopicid(), i);
+                        }
+                    });
+                } else {
+                    viewHolder.imgDelete.setVisibility(View.GONE);
                 }
-            });
-        }else {
-            viewHolder.imgDelete.setVisibility(View.GONE);
+            }
         }
 
         if (!TextUtils.isEmpty(nickName)) {
@@ -185,26 +198,48 @@ public class TopicAdapter extends BaseAdapter {
         }
         Object icon = entity.getIcon();
         if (icon != null) {
-            //这儿的头像类型要分几种（int（drawable），网络图片）
             Glide.with(activity).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(activity)).into(viewHolder.imgTopicIcon);
+        } else {
+            Glide.with(activity).load(R.drawable.icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(activity)).into(viewHolder.imgTopicIcon);
         }
-        String topicContent = entity.getContent();
-        if (!TextUtils.isEmpty(topicContent)) {
-            viewHolder.txtTopicContent.setText(topicContent);
-        }
+        viewHolder.imgTopicIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!entity.getUserid().equals(myUserid)) {
+                    edtDialog = new EdtDialog(activity, R.style.MyDialog, new EdtDialog.AddFriendListener() {
+                        @Override
+                        public void onClick(View view) {
+                            switch (view.getId()) {
+                                case R.id.btn_sure:
+                                    addFriend(entity.getUserid());
+                                    edtDialog.dismiss();
+                                    break;
+                                case R.id.btn_cancel:
+                                    edtDialog.dismiss();
+                                    break;
+                            }
+                        }
+                    }, activity, Constant.EDTDIALOG_TYPE_ADD_FRIEND);
+                    edtDialog.show();
+                }
+            }
+        });
         //点赞人姓名集合
         final List<String> thumbPersonsName = entity.getThumbPersonsNickname();
         if (thumbPersonsName != null) {
-            int thumbNumber = thumbPersonsName.size();
+            int thumbNumber = thumbPersonsName.size() - 1;
             if (thumbNumber > 0) {
                 viewHolder.layout_divider.setVisibility(View.VISIBLE);
                 viewHolder.txtThumbPersonsNickname.setVisibility(View.VISIBLE);
                 String thumbPersonsNameString = "";
-                for (int j = 0; j < thumbPersonsName.size(); j++) {
-                    if (j == 0) {
+                for (int j = 1; j < thumbPersonsName.size(); j++) {
+                    if (j == 1) {
                         thumbPersonsNameString = thumbPersonsName.get(j);
                     } else {
-                        thumbPersonsNameString = thumbPersonsNameString + "," + thumbPersonsName.get(j);
+                        if (!TextUtils.isEmpty(thumbPersonsName.get(j))) {
+                            thumbPersonsNameString = thumbPersonsNameString + "," + thumbPersonsName.get(j);
+                        }
+
                     }
                 }
                 thumbPersonsNameString = thumbPersonsNameString + " " + thumbNumber + "人为你点赞";
@@ -241,13 +276,13 @@ public class TopicAdapter extends BaseAdapter {
         viewHolder.imgThumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!TextUtils.isEmpty(myNikename)&&(!TextUtils.isEmpty(myUserid))) {
+                if (!TextUtils.isEmpty(myNikename) && (!TextUtils.isEmpty(myUserid))) {
                     boolean iHasThumb = entity.isiHasThumb();
                     String topicid = entity.getTopicid();
 
                     if (iHasThumb) {
                         //取消点赞
-                        notThumb(topicid,myUserid, entity);
+                        notThumb(topicid, myUserid, entity);
                     } else {
                         //点赞
                         ThumbEntity thumbEntity = new ThumbEntity(topicid, myUserid, myNikename);
@@ -256,8 +291,8 @@ public class TopicAdapter extends BaseAdapter {
                     }
 
 
-                }else {
-                    Toast.makeText(activity,"你还没设置昵称，快去设置吧",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(activity, "你还没设置昵称，快去设置吧", Toast.LENGTH_SHORT).show();
                 }
                 TopicAdapter.this.notifyDataSetChanged();
             }
@@ -270,245 +305,171 @@ public class TopicAdapter extends BaseAdapter {
         return false;
 
     }
-    //获取点赞人列表
-    private void getAllThumb(String topicid, final TopicEntity topicEntity) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicid).get().build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String result = response.body().string();
-                Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnThumb>>>() {
-                    @Override
-                    public ReturnEntity<List<ReturnThumb>> call(String s) {
-                        ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(result, ReturnEntity.class);
-                        if (returnEntity != null) {
-                            returnEntity = gson.fromJson(result, new TypeToken<ReturnEntity<List<ReturnThumb>>>() {
-                            }.getType());
-                        }
-                        return returnEntity;
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnThumb>>>() {
-                    @Override
-                    public void call(ReturnEntity<List<ReturnThumb>> listReturnEntity) {
-                        if (listReturnEntity != null) {
-                            if (listReturnEntity.getCode() == 1) {
-                                List<String> thumbs = new ArrayList<String>();
-                                for (ReturnThumb thumb : listReturnEntity.getData()) {
-                                    thumbs.add(thumb.getUserid());
-                                }
-                                topicEntity.setThumbPersonsNickname(thumbs);
-                                TopicAdapter.this.notifyDataSetChanged();
-
-                            } else {
-                                Toast.makeText(activity, listReturnEntity.getMsg(), Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
-                    }
-                });
-            }
-        });
-    }
-//    private void getTopicPhoto(final String topicid) {
-//        OkHttpClient okHttpClient = new OkHttpClient();
-//        Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_PHOTOS + "?topicid=" +"5435").build();
-//        okHttpClient.newCall(request).enqueue(new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                String result = response.body().string();
-//                Log.d("qwqeqewqeq"+topicid,result);
-//                Observable.just(result).map(new Func1<String, ReturnEntity<List<Object>>>() {
-//                    @Override
-//                    public ReturnEntity<List<Object>> call(String s) {
-//                        ReturnEntity<List<Object>> returnEntity = gson.fromJson(s, ReturnEntity.class);
-//                        if (returnEntity != null) {
-//                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<Object>>>() {
-//                            }.getType());
-//                        }
-//                        return returnEntity;
-//                    }
-//                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<Object>>>() {
-//                    @Override
-//                    public void call(ReturnEntity<List<Object>> listReturnEntity) {
-//                        if (listReturnEntity != null) {
-//                            if (listReturnEntity.getCode() == 1) {
-//                                final List<Object> photos = listReturnEntity.getData();
-//                                if (photos != null) {
-//                                    if (photos.size() != 0) {
-//                                        viewHolder.framePhotos.setVisibility(View.VISIBLE);
-//                                        topicPhotosAdapter = new TopicPhotosAdapter(activity, photos);
-//                                        viewHolder.gridViewPhotos.setAdapter(topicPhotosAdapter);
-//                                        if (photos.size() > 3) {
-//                                            viewHolder.txtMorePhotoNumber.setVisibility(View.VISIBLE);
-//                                            viewHolder.txtMorePhotoNumber.setText("+" + (photos.size() - 4));
-//                                        }
-
-//                                    }
-//                                }
-//
-//                            } else {
-//                                Toast.makeText(activity, listReturnEntity.getMsg(), Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                    }
-//                });
-//            }
-//        });
-//    }
 
     //获取评论列表
-    public void getComments(String topicid) {
-        OkHttpClient okhttpclient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_COMMENTS + "?topicid=" + topicid).get().build();
-        okhttpclient.newCall(request).enqueue(new Callback() {
+    public void getComments(final String topicid) {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okhttpclient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_COMMENTS + "?topicid=" + topicid).get().build();
+                try {
+                    Response response = okhttpclient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result = response.body().string();
-                Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnCommentEntity>>>() {
-                    @Override
-                    public ReturnEntity<List<ReturnCommentEntity>> call(String s) {
-                        ReturnEntity<List<ReturnCommentEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
-                        if (returnEntity != null) {
-                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnCommentEntity>>>() {
-                            }.getType());
-                        }
-                        return returnEntity;
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnCommentEntity>>>() {
-                    @Override
-                    public void call(ReturnEntity<List<ReturnCommentEntity>> listReturnEntity) {
-                        if (listReturnEntity != null) {
-                            if (listReturnEntity.getCode() == 1) {
-                                comments = listReturnEntity.getData();
-                                if (comments != null) {
-                                    if (comments.size() != 0) {
-                                        topicCommentContentAdapter.notifyDataSetChanged();
-                                    }
-                                }
-                            } else {
-                                Toast.makeText(activity, listReturnEntity.getMsg(), Toast.LENGTH_SHORT).show();
+            public void call(String s) {
+                ReturnEntity<List<ReturnCommentEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity != null) {
+                    returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnCommentEntity>>>() {
+                    }.getType());
+                    if (returnEntity.getCode() == 1) {
+                        List<ReturnCommentEntity> comments = returnEntity.getData();
+                        if (comments != null) {
+                            if (comments.size() != 0) {
+                                //设置评论的适配器
+                                TopicCommentContentAdapter topicCommentContentAdapter = new TopicCommentContentAdapter(activity, comments);
+                                viewHolder.scrollComments.setAdapter(topicCommentContentAdapter);
+//                                TopicAdapter.this.notifyDataSetChanged();
                             }
                         }
+                    } else {
+                        Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                     }
-                });
+                }
+
+
             }
         });
-
     }
 
-    private void thumb(String json, final TopicEntity topicEntity) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.THUMB + "?likejson=" + json).get().build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
+    private void thumb(final String json, final TopicEntity topicEntity) {
+        Observable.create(new OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okHttpClient = HttpUtil.getClient();
+                final Request request = new Request.Builder().url(HttpUrl.THUMB + "?likejson=" + json).get().build();
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result=response.body().string();
-                getAllThumb(topicEntity);
-                topicEntity.setiHasThumb(true);
+            public void call(String s) {
+                ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity != null) {
+                    if (returnEntity.getCode() == 1) {
+//                        getAllThumb(topicEntity);
+                        topicEntity.setiHasThumb(true);
+                    } else {
+                        Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
             }
         });
     }
 
     //获取点赞人列表
     private void getAllThumb(final TopicEntity topicEntity) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicEntity.getTopicid()).get().build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        Observable.create(new OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okHttpClient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicEntity.getTopicid()).get().build();
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String result = response.body().string();
-                Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnThumb>>>() {
-                    @Override
-                    public ReturnEntity<List<ReturnThumb>> call(String s) {
-                        ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(result, ReturnEntity.class);
-                        if (returnEntity != null) {
-                            returnEntity = gson.fromJson(result, new TypeToken<ReturnEntity<List<ReturnThumb>>>() {
-                            }.getType());
+            public void call(String s) {
+                ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity != null) {
+                    returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnThumb>>>() {
+                    }.getType());
+                    if (returnEntity.getCode() == 1) {
+                        List<String> thumbs = new ArrayList<String>();
+                        for (ReturnThumb thumb : returnEntity.getData()) {
+                            thumbs.add(thumb.getUserid());
                         }
-                        return returnEntity;
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnThumb>>>() {
-                    @Override
-                    public void call(ReturnEntity<List<ReturnThumb>> listReturnEntity) {
-                        if (listReturnEntity != null) {
-                            if (listReturnEntity.getCode() == 1) {
-                                List<String> thumbs = new ArrayList<String>();
-                                for (ReturnThumb thumb : listReturnEntity.getData()) {
-                                    thumbs.add(thumb.getUserid());
-                                }
-                                topicEntity.setThumbPersonsNickname(thumbs);
-                                TopicAdapter.this.notifyDataSetChanged();
+                        topicEntity.setThumbPersonsNickname(thumbs);
+//                        TopicAdapter.this.notifyDataSetChanged();
 
-                            } else {
-                                Toast.makeText(activity, listReturnEntity.getMsg(), Toast.LENGTH_SHORT).show();
-                            }
-
-                        }
+                    } else {
+                        Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                     }
-                });
+
+                }
             }
         });
     }
 
-    private void notThumb(String topicid,String userid, final TopicEntity topicEntity) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.NOT_THUMB + "?topicid=" + topicid+"&&userid="+userid).get().build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
+    private void notThumb(final String topicid, final String userid, final TopicEntity topicEntity) {
+        Observable.create(new OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okHttpClient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.NOT_THUMB + "?topicid=" + topicid + "&&userid=" + userid).get().build();
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result=response.body().string();
-                getAllThumb(topicEntity);
-                topicEntity.setiHasThumb(false);
+            public void call(String s) {
+                ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity != null) {
+                    if (returnEntity.getCode() == 1) {
+//                        getAllThumb(topicEntity);
+                        topicEntity.setiHasThumb(false);
+                    } else {
+                        Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
 
             }
         });
+
     }
 
-    private void sendComment(String commentjson, final String topicid) {
-        OkHttpClient okhttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.SEND_COMMENT + "?commentjson=" + commentjson).get().build();
-        okhttpClient.newCall(request).enqueue(new Callback() {
+    private void sendComment(final String commentjson, final String topicid) {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okhttpClient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.SEND_COMMENT + "?commentjson=" + commentjson).get().build();
+                try {
+                    Response response = okhttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result=response.body().string();
-                getComments(topicid);
+            public void call(String s) {
+                ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity.getCode() == 1) {
+                    getComments(topicid);
+                } else {
+                    Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
     }
@@ -546,35 +507,40 @@ public class TopicAdapter extends BaseAdapter {
         }
     }
 
-    private void deleteMyToppic(String topicid, final int position) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.DELETE_MY_TOPIC + "?topicid=" + topicid).get().build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
+    private void deleteMyToppic(final String topicid, final int position) {
+        Observable.create(new OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okHttpClient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.DELETE_MY_TOPIC + "?topicid=" + topicid).get().build();
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result=response.body().string();
-                Observable.just(result).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        list.remove(position);
-                        TopicAdapter.this.notifyDataSetChanged();
-                    }
-                });
+            public void call(String s) {
+                ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity.getCode() == 1) {
+                    list.remove(position);
+                    TopicAdapter.this.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
+
     private void createNotifyDailog(final String topicid, final int position) {
         notifyDialog = new NotifyDialog(activity, R.style.MyDialog, new NotifyDialog.NotifyListener() {
             @Override
             public void onClick(View view) {
                 switch (view.getId()) {
                     case R.id.dialog_ok:
-                        deleteMyToppic(topicid,position);
+                        deleteMyToppic(topicid, position);
                         notifyDialog.dismiss();
                         break;
                     case R.id.dialog_cancle:
@@ -582,7 +548,29 @@ public class TopicAdapter extends BaseAdapter {
                         break;
                 }
             }
-        }, activity,"delete_my_topic");
+        }, activity, "delete_my_topic");
         notifyDialog.show();
+    }
+
+    private void addFriend(String target) {
+        IWxCallback callback = new IWxCallback() {
+
+            @Override
+            public void onSuccess(Object... result) {
+                Toast.makeText(activity, "添加好友成功", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onProgress(int progress) {
+
+            }
+
+            @Override
+            public void onError(int code, String info) {
+
+            }
+        };
+        LoginActivity.iywContactService.ackAddContact(target, SchoolInforManager.appKay, true, edtDialog.content, callback);
+
     }
 }

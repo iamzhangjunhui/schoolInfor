@@ -1,8 +1,6 @@
 package com.cdxy.schoolinforapplication.ui.topic;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,18 +9,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +41,7 @@ import com.cdxy.schoolinforapplication.ui.widget.ChooseWayDialog;
 import com.cdxy.schoolinforapplication.ui.widget.ScollerGridView;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
 import com.cdxy.schoolinforapplication.util.Constant;
+import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 import com.google.gson.Gson;
 
@@ -68,6 +66,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -95,6 +94,8 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     ScrollListView listviewAddress;
     @BindView(R.id.img_indicator)
     ImageView imgIndicator;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     private List<Object> list;
     private TopicPhotosAdapter adapter;
     private String newTopic;
@@ -283,9 +284,6 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
                                         chooseWayDialog.dismiss();
                                         break;
                                     case R.id.txt_way2:
-                                        ////打开系统图库程序，选择图片
-//                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                        AddNewTopicActivity.this.startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
                                         //自定义的获取图片的Activity
                                         intent = new Intent(AddNewTopicActivity.this, SelectPhotoActivity.class);
                                         startActivityForResult(intent, Constant.REQUEST_CODE_PICTURE);
@@ -406,27 +404,33 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void updateTopicPhotos() {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("image/png");
-        MultipartBody.Builder builder = new MultipartBody.Builder();
-        builder.setType(MultipartBody.FORM);
-        for (int i = 0; i < topicPhotos.size(); i++) {
-            File file = new File(topicPhotos.get(i));
-            if (file != null) {
-                builder.addFormDataPart("file", file.getName(), MultipartBody.create(mediaType, file));
-            }
-        }
-        builder.addFormDataPart("topicid", topicid);
-        MultipartBody multipartBody = builder.build();
-        Request request = new Request.Builder().url(HttpUrl.ADD_TOPIC_PHOTOS).post(multipartBody).build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        progress.setVisibility(View.VISIBLE);
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okHttpClient = HttpUtil.getClient();
+                MediaType mediaType = MediaType.parse("image/png");
+                MultipartBody.Builder builder = new MultipartBody.Builder();
+                builder.setType(MultipartBody.FORM);
+                for (int i = 0; i < topicPhotos.size(); i++) {
+                    File file = new File(topicPhotos.get(i));
+                    if (file != null) {
+                        builder.addFormDataPart("file", file.getName(), MultipartBody.create(mediaType, file));
+                    }
+                }
+                builder.addFormDataPart("topicid", topicid);
+                MultipartBody multipartBody = builder.build();
+                Request request = new Request.Builder().url(HttpUrl.ADD_TOPIC_PHOTOS).post(multipartBody).build();
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void call(String s) {
                 addTopic();
             }
         });
@@ -434,6 +438,7 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void addTopic() {
+        progress.setVisibility(View.VISIBLE);
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         String create_time = format.format(date);
@@ -449,40 +454,36 @@ public class AddNewTopicActivity extends BaseActivity implements View.OnClickLis
             } else {
                 AddTopicEntity addTopicEntity = new AddTopicEntity(topicid, authorid, nickName, create_time, content);
                 final Gson gson = new Gson();
-                String topicjson = gson.toJson(addTopicEntity);
-                OkHttpClient okHttpClient = new OkHttpClient();
-                final Request request = new Request.Builder().url(HttpUrl.ADD_TOPIC + "?topicjson=" + topicjson).get().build();
-                okHttpClient.newCall(request).enqueue(new Callback() {
+                final String topicjson = gson.toJson(addTopicEntity);
+                Observable.create(new Observable.OnSubscribe<String>() {
                     @Override
-                    public void onFailure(Call call, IOException e) {
-                        e.printStackTrace();
+                    public void call(Subscriber<? super String> subscriber) {
+                        OkHttpClient okHttpClient = HttpUtil.getClient();
+                        final Request request = new Request.Builder().url(HttpUrl.ADD_TOPIC + "?topicjson=" + topicjson).get().build();
+                        try {
+                            Response response = okHttpClient.newCall(request).execute();
+                            subscriber.onNext(response.body().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-
+                }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String result = response.body().string();
-                        Observable.just(result).map(new Func1<String, ReturnEntity>() {
-                            @Override
-                            public ReturnEntity call(String s) {
-                                ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
-                                return returnEntity;
+                    public void call(String s) {
+                        ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
+                        if (returnEntity != null) {
+                            if (returnEntity.getCode() == 1) {
+                                toast(returnEntity.getMsg());
+                                finish();
+                            } else {
+                                toast(returnEntity.getMsg());
                             }
-                        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity>() {
-                            @Override
-                            public void call(ReturnEntity returnEntity) {
-
-                                if (returnEntity != null) {
-                                    if (returnEntity.getCode() == 1) {
-                                        toast(returnEntity.getMsg());
-                                        finish();
-                                    }
-                                }
-                            }
-                        });
+                        }
+                        progress.setVisibility(View.GONE);
                     }
                 });
-
             }
         }
+
     }
 }

@@ -1,10 +1,12 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/diliver_topic"
     tools:context="com.cdxy.schoolinforapplication.ui.topic.TopicFragment">
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/diliver_topic">
     <LinearLayout
         android:id="@+id/layout_progress"
         android:layout_width="match_parent"
@@ -19,17 +21,17 @@
     </LinearLayout>
 
 
-        <com.cdxy.schoolinforapplication.ui.widget.RefreshLayout
-            android:id="@+id/refresh_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <com.cdxy.schoolinforapplication.ui.widget.RefreshLayout
+        android:id="@+id/refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-            <ListView
-                android:id="@+id/list_topic"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:divider="@null" />
-        </com.cdxy.schoolinforapplication.ui.widget.RefreshLayout>
+        <ListView
+            android:id="@+id/list_topic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@null" />
+    </com.cdxy.schoolinforapplication.ui.widget.RefreshLayout>
 
     <LinearLayout
         android:id="@+id/layout_add_comment"
@@ -67,3 +69,11 @@
             android:textSize="@dimen/content_text_size" />
     </LinearLayout>
 </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+</FrameLayout>

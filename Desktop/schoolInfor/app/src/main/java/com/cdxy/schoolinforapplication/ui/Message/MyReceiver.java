@@ -10,6 +10,7 @@ import android.util.Log;
 import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.model.message.ExtraMessageEntity;
 import com.cdxy.schoolinforapplication.model.message.MessageEntity;
+import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -123,7 +124,7 @@ public class MyReceiver extends BroadcastReceiver {
         }
     }
     private void sureReceiveMessage(){
-        OkHttpClient okHttpClient=new OkHttpClient();
+        OkHttpClient okHttpClient= HttpUtil.getClient();
         Request request=new Request.Builder().url(HttpUrl.SURE_RECEIVE_MESSAGE).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override

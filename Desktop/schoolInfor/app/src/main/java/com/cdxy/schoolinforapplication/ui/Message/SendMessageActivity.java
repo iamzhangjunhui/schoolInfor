@@ -27,6 +27,7 @@ import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ScollerExpandableListView;
+import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 import com.google.gson.Gson;
 
@@ -231,7 +232,7 @@ public class SendMessageActivity extends BaseActivity implements View.OnClickLis
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-                OkHttpClient okHttpClient = new OkHttpClient();
+                OkHttpClient okHttpClient = HttpUtil.getClient();
                 SendMessageEntity sendMessageEntity = new SendMessageEntity(title, content, messageTye, sendTo, "kaylee", isSelectAll);
                 Gson gson = new Gson();
                 String json = gson.toJson(sendMessageEntity);
@@ -249,7 +250,7 @@ public class SendMessageActivity extends BaseActivity implements View.OnClickLis
                     e.printStackTrace();
                 }
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<String>() {
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<String>() {
             @Override
             public void onCompleted() {
 

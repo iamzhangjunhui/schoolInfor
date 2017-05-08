@@ -27,7 +27,7 @@ import rx.schedulers.Schedulers;
 public class GetUserInfor {
 
     public static void getMyInfor(final Context context, String userid) {
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = HttpUtil.getClient();
         final Gson gson = new Gson();
         Request request = new Request.Builder().url(HttpUrl.GET_MY_INFOR + "?userid=" + userid).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {

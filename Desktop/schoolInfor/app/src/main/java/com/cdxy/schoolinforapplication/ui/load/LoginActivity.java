@@ -21,15 +21,21 @@ import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.model.LoginReturnEntity;
 import com.cdxy.schoolinforapplication.model.ReturnEntity;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
+import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ChooseIdentityTypeDialog;
 import com.cdxy.schoolinforapplication.util.GetUserInfor;
+import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.io.IOException;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,6 +45,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -122,49 +129,37 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     //苏杭    登陆接口
     public void login(final String userid, final String password) {
         progress.setVisibility(View.VISIBLE);
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.LOGIN + "?userid=" + userid + "&&password=" + password).get().build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okHttpClient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.LOGIN + "?userid=" + userid + "&&password=" + password).get().build();
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result = response.body().string();
-                Observable.just(result).map(new Func1<String, ReturnEntity<LoginReturnEntity>>() {
-                    @Override
-                    public ReturnEntity<LoginReturnEntity> call(String s) {
-                        ReturnEntity<LoginReturnEntity> returnEntity = gson.fromJson(s, ReturnEntity.class);
-                        if (returnEntity != null) {
-                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<LoginReturnEntity>>() {
-                            }.getType());
-                        }
-                        return returnEntity;
+            public void call(String s) {
+                ReturnEntity<LoginReturnEntity> returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity != null) {
+                    returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<LoginReturnEntity>>() {
+                    }.getType());
+                    //如果登陆成功
+                    if (returnEntity.getCode() == 1) {
+                        SharedPreferenceManager.instance(LoginActivity.this).setMyPassword(password);
+                        LoginReturnEntity loginReturnEntity = returnEntity.getData();
+                        aliLogin(loginReturnEntity.getUserid(), loginReturnEntity.getPassword());
+                        GetUserInfor.getMyInfor(LoginActivity.this, loginReturnEntity.getUserid());
+                    } else {
+                        toast("登录出现异常");
                     }
-                }).subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Action1<ReturnEntity<LoginReturnEntity>>() {
-                            @Override
-                            public void call(ReturnEntity<LoginReturnEntity> loginReturnEntityReturnEntity) {
-                                //如果登陆成功
-                                if (loginReturnEntityReturnEntity.getCode() == 1) {
-                                    SharedPreferenceManager.instance(LoginActivity.this).setMyPassword(password);
-                                    LoginReturnEntity loginReturnEntity = loginReturnEntityReturnEntity.getData();
-                                    aliLogin(loginReturnEntity.getUserid(), loginReturnEntity.getPassword());
-                                    GetUserInfor.getMyInfor(LoginActivity.this, loginReturnEntity.getUserid());
-                                } else {
-                                    toast("登录出现异常");
-                                }
-                                progress.setVisibility(View.GONE);
 
-                            }
-                        });
-
+                }
             }
-
-
         });
     }
 
@@ -177,13 +172,25 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         loginService.login(param, new IWxCallback() {
             @Override
             public void onSuccess(Object... objects) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
+                Observable.just("").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
             }
 
             @Override
             public void onError(int i, String s) {
-
+                Observable.just(s).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        toast(s);
+                    }
+                });
             }
 
             @Override
@@ -207,6 +214,4 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             }
         }
     }
-
-
 }

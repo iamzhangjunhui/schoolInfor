@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.HttpUrl;
@@ -13,6 +14,7 @@ import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
+import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 
 import java.io.IOException;
@@ -24,6 +26,9 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 public class ModifyMyPswActivity extends BaseActivity implements View.OnClickListener {
 
@@ -41,6 +46,8 @@ public class ModifyMyPswActivity extends BaseActivity implements View.OnClickLis
     EditText edtSureNewPsw;
     @BindView(R.id.activity_modify_my_psw)
     LinearLayout activityModifyMyPsw;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     private String oldPassword;
     private String userid;
 
@@ -62,7 +69,7 @@ public class ModifyMyPswActivity extends BaseActivity implements View.OnClickLis
         if (userInforEntity != null) {
             userid = userInforEntity.getUserid();
         }
-        oldPassword=SharedPreferenceManager.instance(ModifyMyPswActivity.this).getMyPassword();
+        oldPassword = SharedPreferenceManager.instance(ModifyMyPswActivity.this).getMyPassword();
         edtMyPsw.setText(oldPassword + "");
     }
 
@@ -89,18 +96,32 @@ public class ModifyMyPswActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void modifyPassword(String userid, String oldPassword, final String newPassword) {
-        OkHttpClient okHttpClient = new OkHttpClient();
+       progress.setVisibility(View.VISIBLE);
+        OkHttpClient okHttpClient = HttpUtil.getClient();
         Request request = new Request.Builder().url(HttpUrl.UPDATE_PASSWORD + "?userid=" + userid + "&&oldPassword=" + oldPassword + "&&newPassword=" + oldPassword).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                Observable.just("修改密码失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        toast(s);
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                SharedPreferenceManager.instance(ModifyMyPswActivity.this).setMyPassword(newPassword);
-                finish();
+                Observable.just("").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        SharedPreferenceManager.instance(ModifyMyPswActivity.this).setMyPassword(newPassword);
+                        finish();
+                    }
+                });
             }
         });
     }

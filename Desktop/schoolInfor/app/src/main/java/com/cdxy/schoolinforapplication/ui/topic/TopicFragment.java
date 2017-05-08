@@ -1,7 +1,6 @@
 package com.cdxy.schoolinforapplication.ui.topic;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,29 +10,29 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.adapter.topic.TopicAdapter;
-import com.cdxy.schoolinforapplication.adapter.topic.TopicPhotosAdapter;
 import com.cdxy.schoolinforapplication.model.ReturnEntity;
-import com.cdxy.schoolinforapplication.model.topic.ReturnThumb;
 import com.cdxy.schoolinforapplication.model.topic.ReturnTopicEntity;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
+import com.cdxy.schoolinforapplication.ui.MainActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseFragment;
 import com.cdxy.schoolinforapplication.ui.widget.RefreshLayout;
-import com.cdxy.schoolinforapplication.util.Constant;
+import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +44,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+
+import static java.lang.Thread.sleep;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -67,6 +69,8 @@ public class TopicFragment extends BaseFragment {
     TextView txtSendNewComment;
     @BindView(R.id.layout_add_comment)
     LinearLayout layoutAddComment;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     private TopicAdapter adapter;
     private List<TopicEntity> list;
     private Gson gson;
@@ -88,6 +92,7 @@ public class TopicFragment extends BaseFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         init();
+
     }
 
     @Override
@@ -116,12 +121,15 @@ public class TopicFragment extends BaseFragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshLayout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshLayout.setRefreshing(false);
-                    }
-                }, 2000);
+                try {
+                    getAllTopic();
+                    sleep(2000);
+                    refreshLayout.setRefreshing(false);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+
             }
         });
         refreshLayout.setOnLoadListener(new RefreshLayout.OnLoadListener() {
@@ -140,159 +148,104 @@ public class TopicFragment extends BaseFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         getAllTopic();
     }
-
     private void getAllTopic() {
         list.clear();
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.All_TOPICS).get().build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                try {
+                    OkHttpClient okHttpClient = HttpUtil.getClient();
+                    Request request = new Request.Builder().url(HttpUrl.All_TOPICS).get().build();
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String result = response.body().string();
-                Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnTopicEntity>>>() {
-                    @Override
-                    public ReturnEntity<List<ReturnTopicEntity>> call(String s) {
-                        ReturnEntity<List<ReturnTopicEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
-                        if (returnEntity != null) {
-                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnTopicEntity>>>() {
-                            }.getType());
-
-                        }
-                        return returnEntity;
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnTopicEntity>>>() {
-                    @Override
-                    public void call(ReturnEntity<List<ReturnTopicEntity>> returnTopicEntityReturnEntity) {
-                        if (returnTopicEntityReturnEntity != null) {
-                            if (returnTopicEntityReturnEntity.getCode() == 1) {
-                                List<ReturnTopicEntity> returnTopicList = returnTopicEntityReturnEntity.getData();
-                                for (ReturnTopicEntity returnTopic : returnTopicList) {
-                                    String topicid = returnTopic.getTopicid();
-                                    String userid = returnTopic.getAuthorid();
-                                    if ((!TextUtils.isEmpty(topicid))&&(!TextUtils.isEmpty(userid))) {
-                                        TopicEntity topicEntity = new TopicEntity();
-                                        topicEntity.setContent(returnTopic.getContent());
-                                        topicEntity.setCreate_time(returnTopic.getCreateTime());
-                                        topicEntity.setIcon(returnTopic.getIcon());
-                                        topicEntity.setNickName(returnTopic.getNickName());
-                                        topicEntity.setUserid(userid);
-                                        topicEntity.setTopicid(topicid);
-//                                        getAllThumb(topicid, topicEntity);
-                                        getTopicPhoto(topicid, topicEntity);
-                                    }
-
-                                }
-
-                            } else {
-                                toast(returnTopicEntityReturnEntity.getMsg());
+            public void call(String s) {
+                ReturnEntity<List<ReturnTopicEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity != null) {
+                    returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnTopicEntity>>>() {
+                    }.getType());
+                    if (returnEntity.getCode() == 1) {
+                        List<ReturnTopicEntity> returnTopicList = returnEntity.getData();
+                        for (ReturnTopicEntity returnTopic : returnTopicList) {
+                            String topicid = returnTopic.getTopicid();
+                            String userid = returnTopic.getAuthorid();
+                            if ((!TextUtils.isEmpty(topicid)) && (!TextUtils.isEmpty(userid))) {
+                                TopicEntity topicEntity = new TopicEntity();
+                                topicEntity.setContent(returnTopic.getContent());
+                                topicEntity.setCreate_time(returnTopic.getCreateTime());
+                                topicEntity.setIcon(returnTopic.getIcon());
+                                topicEntity.setNickName(returnTopic.getNickName());
+                                topicEntity.setUserid(userid);
+                                topicEntity.setTopicid(topicid);
+                                getTopicPhoto(topicid, topicEntity);
                             }
+
                         }
+                    } else {
+                        toast(returnEntity.getMsg());
                     }
-                });
+                }
             }
         });
+
     }
+
     private void getTopicPhoto(final String topicid, final TopicEntity topicEntity) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_PHOTOS + "?topicid=" +topicid).build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        progress.setVisibility(View.VISIBLE);
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okHttpClient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_PHOTOS + "?topicid=" + topicid).build();
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
-
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result = response.body().string();
-                Log.d("qwqeqewqeq"+topicid,result);
-                Observable.just(result).map(new Func1<String, ReturnEntity<List<Object>>>() {
-                    @Override
-                    public ReturnEntity<List<Object>> call(String s) {
-                        ReturnEntity<List<Object>> returnEntity = gson.fromJson(s, ReturnEntity.class);
-                        if (returnEntity != null) {
-                            returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<Object>>>() {
-                            }.getType());
-                        }
-                        return returnEntity;
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<Object>>>() {
-                    @Override
-                    public void call(ReturnEntity<List<Object>> listReturnEntity) {
-                        if (listReturnEntity != null) {
-                            if (listReturnEntity.getCode() == 1) {
-                                final List<Object> photos = listReturnEntity.getData();
-                                if (photos != null) {
-                                    if (photos.size() != 0) {
-                                        topicEntity.setPhotos(photos);
-                                    }
-                                }
-
-                            } else {
-                                toast(listReturnEntity.getMsg());
+            public void call(String s) {
+                ReturnEntity<List<Object>> returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity != null) {
+                    returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<Object>>>() {
+                    }.getType());
+                    if (returnEntity.getCode() == 1) {
+                        final List<Object> photos = returnEntity.getData();
+                        if (photos != null) {
+                            if (photos.size() != 0) {
+                                topicEntity.setPhotos(photos);
+                                adapter.notifyDataSetChanged();
                             }
                         }
-                        list.add(topicEntity);
-                        adapter.notifyDataSetChanged();
+
+                    } else {
+                        toast(returnEntity.getMsg());
                     }
-                });
+                }
+                list.add(topicEntity);
+                progress.setVisibility(View.GONE);
+                if (refreshLayout.isRefreshing()) {
+                    refreshLayout.setRefreshing(false);
+                }
             }
         });
     }
 
-//    //获取点赞人列表
-//    private void getAllThumb(String topicid, final TopicEntity topicEntity) {
-//        OkHttpClient okHttpClient = new OkHttpClient();
-//        Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicid).get().build();
-//        okHttpClient.newCall(request).enqueue(new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                final String result = response.body().string();
-//                Observable.just(result).map(new Func1<String, ReturnEntity<List<ReturnThumb>>>() {
-//                    @Override
-//                    public ReturnEntity<List<ReturnThumb>> call(String s) {
-//                        ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(result, ReturnEntity.class);
-//                        if (returnEntity != null) {
-//                            returnEntity = gson.fromJson(result, new TypeToken<ReturnEntity<List<ReturnThumb>>>() {
-//                            }.getType());
-//                        }
-//                        return returnEntity;
-//                    }
-//                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ReturnEntity<List<ReturnThumb>>>() {
-//                    @Override
-//                    public void call(ReturnEntity<List<ReturnThumb>> listReturnEntity) {
-//                        if (listReturnEntity != null) {
-//                            if (listReturnEntity.getCode() == 1) {
-//                                List<String> thumbs = new ArrayList<String>();
-//                                for (ReturnThumb thumb : listReturnEntity.getData()) {
-//                                    thumbs.add(thumb.getUserid());
-//                                }
-//                                topicEntity.setThumbPersonsNickname(thumbs);
-//                                list.add(topicEntity);
-//                                adapter.notifyDataSetChanged();
-//
-//                            } else {
-//                                toast(listReturnEntity.getMsg());
-//                            }
-//
-//                        }
-//                    }
-//                });
-//            }
-//        });
-//    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

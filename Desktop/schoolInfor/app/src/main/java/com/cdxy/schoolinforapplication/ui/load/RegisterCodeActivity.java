@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.cdxy.schoolinforapplication.HttpUrl;
@@ -14,11 +15,8 @@ import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
 import com.cdxy.schoolinforapplication.model.ReturnEntity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
-import com.cdxy.schoolinforapplication.util.Constant;
-import com.cdxy.schoolinforapplication.util.NumberCheckUtil;
+import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.google.gson.Gson;
-
-import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -26,12 +24,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -53,6 +49,8 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
     EditText edtRegisterSurePassword;
     @BindView(R.id.btn_register_next)
     Button btnRegisterNext;
+    @BindView(R.id.progress)
+    ProgressBar progress;
     private String registerName;
     private String registerPassword;
 
@@ -104,12 +102,21 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
                 break;
         }
     }
+
     public void register1() {
-        OkHttpClient okHttpClient = new OkHttpClient();
+        progress.setVisibility(View.VISIBLE);
+        OkHttpClient okHttpClient =  HttpUtil.getClient();
         Request request = new Request.Builder().url(HttpUrl.REGISTER + "?userid=" + registerName + "&&password=" + registerPassword).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Observable.just("添加个人信息失败，请检查一下网络是否连接").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        progress.setVisibility(View.GONE);
+                        toast(s);
+                    }
+                });
                 e.printStackTrace();
             }
 
@@ -122,7 +129,7 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
                         ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
                         return returnEntity;
                     }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Action1<ReturnEntity>() {
                             @Override
                             public void call(ReturnEntity returnEntity) {
@@ -133,14 +140,16 @@ public class RegisterCodeActivity extends BaseActivity implements View.OnClickLi
                                         intent.putExtra("registerName", registerName);
                                         intent.putExtra("registerPassword", registerPassword);
                                         startActivity(intent);
-                                    }else {
-                                        toast(returnEntity.getMsg()+"");
+                                    } else {
+                                        toast(returnEntity.getMsg() + "");
                                     }
                                 } else {
                                     toast("注册失败");
                                 }
+                                progress.setVisibility(View.GONE);
                             }
                         });
+
             }
         });
 
