@@ -17,6 +17,7 @@ public class TopicEntity {
     private String content;//内容
     private List<String> thumbPersonsNickname;//点赞人姓名
     private List<Object> photos;
+    private List<ReturnCommentEntity> comments;
     private boolean iHasThumb;
     public TopicEntity() {
     }
@@ -93,6 +94,14 @@ public class TopicEntity {
         this.iHasThumb = iHasThumb;
     }
 
+    public List<ReturnCommentEntity> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<ReturnCommentEntity> comments) {
+        this.comments = comments;
+    }
+
     @Override
     public String toString() {
         return "TopicEntity{" +
@@ -104,6 +113,7 @@ public class TopicEntity {
                 ", content='" + content + '\'' +
                 ", thumbPersonsNickname=" + thumbPersonsNickname +
                 ", photos=" + photos +
+                ", comments=" + comments +
                 ", iHasThumb=" + iHasThumb +
                 '}';
     }

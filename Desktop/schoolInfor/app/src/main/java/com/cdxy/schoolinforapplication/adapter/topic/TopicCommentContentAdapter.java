@@ -63,7 +63,7 @@ public class TopicCommentContentAdapter extends BaseAdapter {
             String receiverNickName=commentContent.getReceiverNickname();
             //包含发送人和接收者和评价内容的信息
             String commentContentString;
-            if (TextUtils.isEmpty(receiverNickName)) {
+            if (TextUtils.isEmpty(receiverNickName)||receiverNickName.equals(senderNickName)) {
                 commentContentString="<font color='blue'>"+senderNickName+":"+"</font>"+content;
             }else {
                 commentContentString="<font color='blue'>"+senderNickName+"</font>"+" 回复 "+"<font color='blue'>"+receiverNickName+":"+"</font>"+content;

@@ -68,6 +68,10 @@ public class EdtDialog extends Dialog implements View.OnClickListener {
             txtTitle.setText("修改备注为：");
             btnSure.setText("确定");
             btnCancel.setText("取消");
+        }else if (type.equals(Constant.EDTDIALOG_TYPE_WANT_ADD_FRIEND)){
+            txtTitle.setText("想要加我为好友，就说点什么吧！");
+            btnSure.setText("加好友");
+            btnCancel.setText("容我再考虑一下");
         }
     }
 }

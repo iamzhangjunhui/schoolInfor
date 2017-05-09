@@ -16,6 +16,9 @@ import com.cdxy.schoolinforapplication.util.GetUserInfor;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 import com.google.gson.Gson;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -70,8 +73,10 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
         gson = new Gson();
         userId = SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor().getUserid();
         GetUserInfor.getMyInfor(MyInformationActivity.this, userId);
-        userInfor=SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor();
-        setData();
+        userInfor = SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor();
+        if (userInfor != null) {
+            setData(userInfor);
+        }
     }
 
     @Override
@@ -83,13 +88,12 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
             case R.id.txt_right:
                 Intent intent = new Intent(MyInformationActivity.this, ModifyMyInforActivity.class);
                 intent.putExtra("userInfor", userInfor);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
                 break;
         }
     }
 
-    private void setData() {
-        if (userInfor != null) {
+    private void setData(UserInforEntity userInfor) {
             if (!TextUtils.isEmpty(userInfor.getUserid())) {
                 txtNickname.setText(userInfor.getNicheng() + "");
                 txtRealname.setText(userInfor.getXingming() + "");
@@ -102,14 +106,16 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
                 txtAddress.setText(userInfor.getJia() + "");
                 txtHobby.setText(userInfor.getXingqu() + "");
             }
-        }
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-         GetUserInfor.getMyInfor(MyInformationActivity.this, userId);
-        userInfor=SharedPreferenceManager.instance(MyInformationActivity.this).getUserInfor();
-        setData();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK&&requestCode==0) {
+            GetUserInfor.getMyInfor(MyInformationActivity.this, userId);
+            String resultJson = data.getStringExtra("userInforJsonString");
+            UserInforEntity userInforEntity=(new Gson()).fromJson(resultJson,UserInforEntity.class);
+            setData(userInforEntity);
+        }
     }
 }

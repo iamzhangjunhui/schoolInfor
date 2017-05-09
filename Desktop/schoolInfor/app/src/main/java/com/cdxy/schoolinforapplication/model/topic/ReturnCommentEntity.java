@@ -19,6 +19,16 @@ public class ReturnCommentEntity {
     private String receiverNickname;
     private String content;
 
+    public ReturnCommentEntity() {
+    }
+
+    public ReturnCommentEntity(String topicid, String senderNickname, String receiverNickname, String content) {
+        this.topicid = topicid;
+        this.senderNickname = senderNickname;
+        this.receiverNickname = receiverNickname;
+        this.content = content;
+    }
+
     public String getCommentid() {
         return commentid;
     }

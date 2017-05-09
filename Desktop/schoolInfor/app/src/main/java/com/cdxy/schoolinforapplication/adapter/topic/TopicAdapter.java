@@ -3,7 +3,6 @@ package com.cdxy.schoolinforapplication.adapter.topic;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,16 +23,11 @@ import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.SchoolInforManager;
 import com.cdxy.schoolinforapplication.model.ReturnEntity;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
-import com.cdxy.schoolinforapplication.model.topic.CommentEntity;
 import com.cdxy.schoolinforapplication.model.topic.ReturnCommentEntity;
-import com.cdxy.schoolinforapplication.model.topic.ReturnThumb;
 import com.cdxy.schoolinforapplication.model.topic.ThumbEntity;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
-import com.cdxy.schoolinforapplication.ui.MainActivity;
-import com.cdxy.schoolinforapplication.ui.chat.MyFriendActivity;
 import com.cdxy.schoolinforapplication.ui.load.LoginActivity;
 import com.cdxy.schoolinforapplication.ui.topic.ShowBigPhotosActivity;
-import com.cdxy.schoolinforapplication.ui.topic.TopicFragment;
 import com.cdxy.schoolinforapplication.ui.widget.EdtDialog;
 import com.cdxy.schoolinforapplication.ui.widget.NotifyDialog;
 import com.cdxy.schoolinforapplication.ui.widget.ScrollListView;
@@ -42,18 +35,14 @@ import com.cdxy.schoolinforapplication.util.Constant;
 import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -62,7 +51,6 @@ import rx.Observable.OnSubscribe;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -73,6 +61,7 @@ public class TopicAdapter extends BaseAdapter {
     private List<TopicEntity> list;
     private Activity activity;
     private TopicPhotosAdapter topicPhotosAdapter;
+    private TopicCommentContentAdapter commentContentAdapter;
     private LinearLayout layoutAddComment;
     private EditText edtAddComment;
     private TextView txtSendNewComment;
@@ -111,35 +100,57 @@ public class TopicAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
 //        if (view == null) {
-            view = LayoutInflater.from(activity).inflate(R.layout.item_topic, null);
-            viewHolder = new ViewHolder(view);
-            viewHolder.layout_divider = (LinearLayout) view.findViewById(R.id.layout_divider);
-            view.setTag(viewHolder);
+        view = LayoutInflater.from(activity).inflate(R.layout.item_topic, null);
+        viewHolder = new ViewHolder(view);
+        viewHolder.layout_divider = (LinearLayout) view.findViewById(R.id.layout_divider);
+        view.setTag(viewHolder);
 //        } else {
 //            viewHolder = (ViewHolder) view.getTag();
 //        }
+        //话题创建者的昵称、创建时间、话题内容的显示
         final TopicEntity entity = (TopicEntity) getItem(i);
         final String nickName = entity.getNickName();
-        final String topicid = entity.getTopicid();
-
-        userInfor = SharedPreferenceManager.instance(activity).getUserInfor();
-        if (userInfor != null) {
-            myNikename = userInfor.getNicheng();
-            myUserid = userInfor.getUserid();
-        }
-
-        if (!TextUtils.isEmpty(topicid)) {
-//            //获取点赞人
-            getAllThumb(entity);
-//            //获取评论列表
-            getComments(topicid);
-        }
-        //显示话题内容
+        String createTime = entity.getCreate_time();
         String content = entity.getContent();
+        if (!TextUtils.isEmpty(nickName)) {
+            viewHolder.txtTopicNickname.setText(nickName);
+        }
+        if (!TextUtils.isEmpty(createTime)) {
+            viewHolder.txtTopicCreateTime.setText(createTime);
+        }
         if (!TextUtils.isEmpty(content)) {
             viewHolder.txtTopicContent.setText(content);
         }
-
+        //话题创建者头像的显示
+        Object icon = entity.getIcon();
+        if (icon != null) {
+            Glide.with(activity).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(activity)).into(viewHolder.imgTopicIcon);
+        } else {
+            Glide.with(activity).load(R.drawable.icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(activity)).into(viewHolder.imgTopicIcon);
+        }
+        //点击头像发送添加好友请求
+        viewHolder.imgTopicIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!entity.getUserid().equals(myUserid)) {
+                    edtDialog = new EdtDialog(activity, R.style.MyDialog, new EdtDialog.AddFriendListener() {
+                        @Override
+                        public void onClick(View view) {
+                            switch (view.getId()) {
+                                case R.id.btn_sure:
+                                    addFriend(entity.getUserid());
+                                    edtDialog.dismiss();
+                                    break;
+                                case R.id.btn_cancel:
+                                    edtDialog.dismiss();
+                                    break;
+                            }
+                        }
+                    }, activity, Constant.EDTDIALOG_TYPE_WANT_ADD_FRIEND);
+                    edtDialog.show();
+                }
+            }
+        });
         //加载图片
         final List<Object> photos = entity.getPhotos();
         if (photos != null) {
@@ -165,6 +176,19 @@ public class TopicAdapter extends BaseAdapter {
                 });
             }
         }
+        //加载讨论列表
+        List<ReturnCommentEntity> comments = entity.getComments();
+        if(comments!=null){
+            if (comments.size()!=0){
+                commentContentAdapter = new TopicCommentContentAdapter(activity, comments);
+                viewHolder.scrollComments.setAdapter(commentContentAdapter);
+            }else {
+
+            }
+        }else {
+
+
+        }
         //长按一条自己发送的评论实现删除
         viewHolder.scrollComments.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -172,7 +196,11 @@ public class TopicAdapter extends BaseAdapter {
                 return false;
             }
         });
+
+        userInfor = SharedPreferenceManager.instance(activity).getUserInfor();
         if (userInfor != null) {
+            myNikename = userInfor.getNicheng();
+            myUserid = userInfor.getUserid();
             if (!TextUtils.isEmpty(userInfor.getUserid())) {
                 //判断该话题是否是本人发的，如果是的话就可以删除
                 if (entity.getUserid().equals(userInfor.getUserid())) {
@@ -189,41 +217,6 @@ public class TopicAdapter extends BaseAdapter {
             }
         }
 
-        if (!TextUtils.isEmpty(nickName)) {
-            viewHolder.txtTopicNickname.setText(nickName);
-            String createTime = entity.getCreate_time();
-            if (!TextUtils.isEmpty(createTime)) {
-            }
-            viewHolder.txtTopicCreateTime.setText(createTime);
-        }
-        Object icon = entity.getIcon();
-        if (icon != null) {
-            Glide.with(activity).load(icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(activity)).into(viewHolder.imgTopicIcon);
-        } else {
-            Glide.with(activity).load(R.drawable.icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(activity)).into(viewHolder.imgTopicIcon);
-        }
-        viewHolder.imgTopicIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!entity.getUserid().equals(myUserid)) {
-                    edtDialog = new EdtDialog(activity, R.style.MyDialog, new EdtDialog.AddFriendListener() {
-                        @Override
-                        public void onClick(View view) {
-                            switch (view.getId()) {
-                                case R.id.btn_sure:
-                                    addFriend(entity.getUserid());
-                                    edtDialog.dismiss();
-                                    break;
-                                case R.id.btn_cancel:
-                                    edtDialog.dismiss();
-                                    break;
-                            }
-                        }
-                    }, activity, Constant.EDTDIALOG_TYPE_ADD_FRIEND);
-                    edtDialog.show();
-                }
-            }
-        });
         //点赞人姓名集合
         final List<String> thumbPersonsName = entity.getThumbPersonsNickname();
         if (thumbPersonsName != null) {
@@ -245,8 +238,8 @@ public class TopicAdapter extends BaseAdapter {
                 thumbPersonsNameString = thumbPersonsNameString + " " + thumbNumber + "人为你点赞";
                 viewHolder.txtThumbPersonsNickname.setText(thumbPersonsNameString);
             } else {
-                viewHolder.txtThumbPersonsNickname.setVisibility(View.VISIBLE);
-                viewHolder.layout_divider.setVisibility(View.VISIBLE);
+                viewHolder.txtThumbPersonsNickname.setVisibility(View.GONE);
+                viewHolder.layout_divider.setVisibility(View.GONE);
             }
         }
         viewHolder.imgComment.setOnClickListener(new View.OnClickListener() {
@@ -264,10 +257,9 @@ public class TopicAdapter extends BaseAdapter {
                         String topicid = entity.getTopicid();
                         String receiverNickname = entity.getNickName();
                         if (!TextUtils.isEmpty(myNikename) && (!TextUtils.isEmpty(receiverNickname))) {
-                            CommentEntity commentEntity = new CommentEntity(topicid, myNikename, receiverNickname, newCommentcontent);
+                            ReturnCommentEntity commentEntity = new ReturnCommentEntity(topicid, myNikename, receiverNickname, newCommentcontent);
                             String json = gson.toJson(commentEntity);
-                            sendComment(json, topicid);
-                            layoutAddComment.setVisibility(View.GONE);
+                            sendComment(json, entity,commentEntity);
                         }
                     }
                 });
@@ -287,7 +279,7 @@ public class TopicAdapter extends BaseAdapter {
                         //点赞
                         ThumbEntity thumbEntity = new ThumbEntity(topicid, myUserid, myNikename);
                         String jsonString = gson.toJson(thumbEntity);
-                        thumb(jsonString, entity);
+                        thumb(jsonString, entity,i);
                     }
 
 
@@ -306,48 +298,7 @@ public class TopicAdapter extends BaseAdapter {
 
     }
 
-    //获取评论列表
-    public void getComments(final String topicid) {
-        Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                OkHttpClient okhttpclient = HttpUtil.getClient();
-                Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_COMMENTS + "?topicid=" + topicid).get().build();
-                try {
-                    Response response = okhttpclient.newCall(request).execute();
-                    subscriber.onNext(response.body().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                ReturnEntity<List<ReturnCommentEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
-                if (returnEntity != null) {
-                    returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnCommentEntity>>>() {
-                    }.getType());
-                    if (returnEntity.getCode() == 1) {
-                        List<ReturnCommentEntity> comments = returnEntity.getData();
-                        if (comments != null) {
-                            if (comments.size() != 0) {
-                                //设置评论的适配器
-                                TopicCommentContentAdapter topicCommentContentAdapter = new TopicCommentContentAdapter(activity, comments);
-                                viewHolder.scrollComments.setAdapter(topicCommentContentAdapter);
-//                                TopicAdapter.this.notifyDataSetChanged();
-                            }
-                        }
-                    } else {
-                        Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-
-            }
-        });
-    }
-
-    private void thumb(final String json, final TopicEntity topicEntity) {
+    private void thumb(final String json, final TopicEntity topicEntity,int position) {
         Observable.create(new OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
@@ -366,55 +317,23 @@ public class TopicAdapter extends BaseAdapter {
                 ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
                 if (returnEntity != null) {
                     if (returnEntity.getCode() == 1) {
-//                        getAllThumb(topicEntity);
-                        topicEntity.setiHasThumb(true);
-                    } else {
-                        Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
-                    }
-                }
+                        if (topicEntity.isiHasThumb()){
+                            topicEntity.setiHasThumb(false);
+                            topicEntity.getThumbPersonsNickname().remove(myUserid);
+                        }else {
+                            topicEntity.setiHasThumb(true);
+                            topicEntity.getThumbPersonsNickname().add(myUserid);
 
-            }
-        });
-    }
-
-    //获取点赞人列表
-    private void getAllThumb(final TopicEntity topicEntity) {
-        Observable.create(new OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                OkHttpClient okHttpClient = HttpUtil.getClient();
-                Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicEntity.getTopicid()).get().build();
-                try {
-                    Response response = okHttpClient.newCall(request).execute();
-                    subscriber.onNext(response.body().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(s, ReturnEntity.class);
-                if (returnEntity != null) {
-                    returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnThumb>>>() {
-                    }.getType());
-                    if (returnEntity.getCode() == 1) {
-                        List<String> thumbs = new ArrayList<String>();
-                        for (ReturnThumb thumb : returnEntity.getData()) {
-                            thumbs.add(thumb.getUserid());
                         }
-                        topicEntity.setThumbPersonsNickname(thumbs);
-//                        TopicAdapter.this.notifyDataSetChanged();
-
+                        TopicAdapter.this.notifyDataSetChanged();
                     } else {
                         Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                     }
-
                 }
+
             }
         });
     }
-
     private void notThumb(final String topicid, final String userid, final TopicEntity topicEntity) {
         Observable.create(new OnSubscribe<String>() {
             @Override
@@ -434,8 +353,14 @@ public class TopicAdapter extends BaseAdapter {
                 ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
                 if (returnEntity != null) {
                     if (returnEntity.getCode() == 1) {
-//                        getAllThumb(topicEntity);
-                        topicEntity.setiHasThumb(false);
+                        if (topicEntity.isiHasThumb()){
+                            topicEntity.setiHasThumb(false);
+                            topicEntity.getThumbPersonsNickname().remove(myUserid);
+                        }else {
+                            topicEntity.setiHasThumb(true);
+                            topicEntity.getThumbPersonsNickname().add(myUserid);
+                        }
+                        TopicAdapter.this.notifyDataSetChanged();
                     } else {
                         Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                     }
@@ -447,7 +372,7 @@ public class TopicAdapter extends BaseAdapter {
 
     }
 
-    private void sendComment(final String commentjson, final String topicid) {
+    private void sendComment(final String commentjson, final TopicEntity topicEntity, final ReturnCommentEntity commentEntity) {
         Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
@@ -465,11 +390,12 @@ public class TopicAdapter extends BaseAdapter {
             public void call(String s) {
                 ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
                 if (returnEntity.getCode() == 1) {
-                    getComments(topicid);
+                    topicEntity.getComments().add(commentEntity);
+                  TopicAdapter.this.notifyDataSetChanged();
                 } else {
                     Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                 }
-
+                layoutAddComment.setVisibility(View.GONE);
             }
         });
     }
@@ -552,25 +478,32 @@ public class TopicAdapter extends BaseAdapter {
         notifyDialog.show();
     }
 
-    private void addFriend(String target) {
+    private void addFriend(final String target) {
+//
         IWxCallback callback = new IWxCallback() {
 
             @Override
             public void onSuccess(Object... result) {
-                Toast.makeText(activity, "添加好友成功", Toast.LENGTH_SHORT).show();
+                Observable.just("你已经申请添加"+target+"为好友").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        Toast.makeText(activity,s,Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(int i, String s) {
+
             }
 
             @Override
             public void onProgress(int progress) {
 
             }
-
-            @Override
-            public void onError(int code, String info) {
-
-            }
         };
-        LoginActivity.iywContactService.ackAddContact(target, SchoolInforManager.appKay, true, edtDialog.content, callback);
+        LoginActivity.iywContactService.addContact(target, SchoolInforManager.appKay, target, edtDialog.content, callback);
 
     }
+
 }

@@ -8,6 +8,8 @@ import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 
 import okhttp3.Call;

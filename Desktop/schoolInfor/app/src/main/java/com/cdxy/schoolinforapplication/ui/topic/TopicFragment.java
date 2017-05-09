@@ -15,11 +15,15 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.adapter.topic.TopicAdapter;
+import com.cdxy.schoolinforapplication.adapter.topic.TopicCommentContentAdapter;
 import com.cdxy.schoolinforapplication.model.ReturnEntity;
+import com.cdxy.schoolinforapplication.model.topic.ReturnCommentEntity;
+import com.cdxy.schoolinforapplication.model.topic.ReturnThumb;
 import com.cdxy.schoolinforapplication.model.topic.ReturnTopicEntity;
 import com.cdxy.schoolinforapplication.model.topic.TopicEntity;
 import com.cdxy.schoolinforapplication.ui.MainActivity;
@@ -74,6 +78,7 @@ public class TopicFragment extends BaseFragment {
     private TopicAdapter adapter;
     private List<TopicEntity> list;
     private Gson gson;
+    private int topicNummber;
 
     public TopicFragment() {
         // Required empty public constructor
@@ -175,18 +180,19 @@ public class TopicFragment extends BaseFragment {
                     }.getType());
                     if (returnEntity.getCode() == 1) {
                         List<ReturnTopicEntity> returnTopicList = returnEntity.getData();
-                        for (ReturnTopicEntity returnTopic : returnTopicList) {
-                            String topicid = returnTopic.getTopicid();
-                            String userid = returnTopic.getAuthorid();
+                        topicNummber=returnTopicList.size();
+                        for (int j=0;j<topicNummber;j++) {
+                            String topicid = returnTopicList.get(j).getTopicid();
+                            String userid = returnTopicList.get(j).getAuthorid();
                             if ((!TextUtils.isEmpty(topicid)) && (!TextUtils.isEmpty(userid))) {
                                 TopicEntity topicEntity = new TopicEntity();
-                                topicEntity.setContent(returnTopic.getContent());
-                                topicEntity.setCreate_time(returnTopic.getCreateTime());
-                                topicEntity.setIcon(returnTopic.getIcon());
-                                topicEntity.setNickName(returnTopic.getNickName());
+                                topicEntity.setContent(returnTopicList.get(j).getContent());
+                                topicEntity.setCreate_time(returnTopicList.get(j).getCreateTime());
+                                topicEntity.setIcon(returnTopicList.get(j).getIcon());
+                                topicEntity.setNickName(returnTopicList.get(j).getNickName());
                                 topicEntity.setUserid(userid);
                                 topicEntity.setTopicid(topicid);
-                                getTopicPhoto(topicid, topicEntity);
+                                getTopicPhoto(topicid, topicEntity,j);
                             }
 
                         }
@@ -199,7 +205,7 @@ public class TopicFragment extends BaseFragment {
 
     }
 
-    private void getTopicPhoto(final String topicid, final TopicEntity topicEntity) {
+    private void getTopicPhoto(final String topicid, final TopicEntity topicEntity, final int position) {
         progress.setVisibility(View.VISIBLE);
         Observable.create(new Observable.OnSubscribe<String>() {
             @Override
@@ -226,7 +232,6 @@ public class TopicFragment extends BaseFragment {
                         if (photos != null) {
                             if (photos.size() != 0) {
                                 topicEntity.setPhotos(photos);
-                                adapter.notifyDataSetChanged();
                             }
                         }
 
@@ -234,15 +239,93 @@ public class TopicFragment extends BaseFragment {
                         toast(returnEntity.getMsg());
                     }
                 }
-                list.add(topicEntity);
                 progress.setVisibility(View.GONE);
                 if (refreshLayout.isRefreshing()) {
                     refreshLayout.setRefreshing(false);
                 }
+                getComments(topicid,topicEntity,position);
             }
         });
     }
 
+    //获取评论列表
+    public void getComments(final String topicid, final TopicEntity topicEntity, final int position) {
+        Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okhttpclient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.ALL_TOPIC_COMMENTS + "?topicid=" + topicid).get().build();
+                try {
+                    Response response = okhttpclient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                ReturnEntity<List<ReturnCommentEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity != null) {
+                    returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnCommentEntity>>>() {
+                    }.getType());
+                    if (returnEntity.getCode() == 1) {
+                        List<ReturnCommentEntity> comments = returnEntity.getData();
+                        if (comments != null) {
+                            if (comments.size() != 0) {
+                               topicEntity.setComments(comments);
+                            }
+                        }
+                    } else {
+                        Toast.makeText(getContext(), returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+                getAllThumb(topicEntity,position);
+
+
+
+            }
+        });
+    }
+    //获取点赞人列表
+    private void getAllThumb(final TopicEntity topicEntity, final int position) {
+        Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okHttpClient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.All_TOPIC_THUMBS + "?topicid=" + topicEntity.getTopicid()).get().build();
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(s, ReturnEntity.class);
+                if (returnEntity != null) {
+                    returnEntity = gson.fromJson(s, new TypeToken<ReturnEntity<List<ReturnThumb>>>() {
+                    }.getType());
+                    if (returnEntity.getCode() == 1) {
+                        List<String> thumbs = new ArrayList<String>();
+                        for (ReturnThumb thumb : returnEntity.getData()) {
+                            thumbs.add(thumb.getUserid());
+                        }
+                        topicEntity.setThumbPersonsNickname(thumbs);
+                    } else {
+                        Toast.makeText(getContext(), returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+                list.add(topicEntity);
+                if (position==topicNummber-1) {
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
 
     @Override
     public void onDestroy() {

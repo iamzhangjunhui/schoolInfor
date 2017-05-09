@@ -220,6 +220,9 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
                     public void call(String s) {
                         progress.setVisibility(View.GONE);
                         GetUserInfor.getMyInfor(ModifyMyInforActivity.this, userid);
+                        Intent intent=new Intent();
+                        intent.putExtra("userInforJsonString",userInforJsonString);
+                        setResult(RESULT_OK,intent);
                         finish();
                     }
                 });
