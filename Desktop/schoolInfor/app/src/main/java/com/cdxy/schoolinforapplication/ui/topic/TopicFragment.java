@@ -2,6 +2,8 @@ package com.cdxy.schoolinforapplication.ui.topic;
 
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -79,6 +81,19 @@ public class TopicFragment extends BaseFragment {
     private List<TopicEntity> list;
     private Gson gson;
     private int topicNummber;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+                adapter.notifyDataSetChanged();
+                if (refreshLayout.isRefreshing()) {
+                    refreshLayout.setRefreshing(false);
+                }
+                progress.setVisibility(View.GONE);
+            }
+        }
+    };
 
     public TopicFragment() {
         // Required empty public constructor
@@ -126,15 +141,13 @@ public class TopicFragment extends BaseFragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                try {
-                    getAllTopic();
-                    sleep(2000);
-                    refreshLayout.setRefreshing(false);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-
+                progress.setVisibility(View.VISIBLE);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getAllTopic();
+                    }
+                }).start();
             }
         });
         refreshLayout.setOnLoadListener(new RefreshLayout.OnLoadListener() {
@@ -155,8 +168,15 @@ public class TopicFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        getAllTopic();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getAllTopic();
+            }
+        }).start();
+
     }
+
     private void getAllTopic() {
         list.clear();
         Observable.create(new Observable.OnSubscribe<String>() {
@@ -171,7 +191,7 @@ public class TopicFragment extends BaseFragment {
                     e.printStackTrace();
                 }
             }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
+        }).subscribe(new Action1<String>() {
             @Override
             public void call(String s) {
                 ReturnEntity<List<ReturnTopicEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
@@ -180,33 +200,29 @@ public class TopicFragment extends BaseFragment {
                     }.getType());
                     if (returnEntity.getCode() == 1) {
                         List<ReturnTopicEntity> returnTopicList = returnEntity.getData();
-                        topicNummber=returnTopicList.size();
-                        for (int j=0;j<topicNummber;j++) {
+                        topicNummber = returnTopicList.size();
+                        for (int j = 0; j < topicNummber; j++) {
                             String topicid = returnTopicList.get(j).getTopicid();
                             String userid = returnTopicList.get(j).getAuthorid();
                             if ((!TextUtils.isEmpty(topicid)) && (!TextUtils.isEmpty(userid))) {
                                 TopicEntity topicEntity = new TopicEntity();
                                 topicEntity.setContent(returnTopicList.get(j).getContent());
-                                topicEntity.setCreate_time(returnTopicList.get(j).getCreateTime());
+                                topicEntity.setCreate_time(returnTopicList.get(j).getCreatetime());
                                 topicEntity.setIcon(returnTopicList.get(j).getIcon());
                                 topicEntity.setNickName(returnTopicList.get(j).getNickName());
                                 topicEntity.setUserid(userid);
                                 topicEntity.setTopicid(topicid);
-                                getTopicPhoto(topicid, topicEntity,j);
+                                getTopicPhoto(topicid, topicEntity, j);
                             }
 
                         }
-                    } else {
-                        toast(returnEntity.getMsg());
                     }
                 }
             }
         });
-
     }
 
     private void getTopicPhoto(final String topicid, final TopicEntity topicEntity, final int position) {
-        progress.setVisibility(View.VISIBLE);
         Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
@@ -220,7 +236,7 @@ public class TopicFragment extends BaseFragment {
                 }
 
             }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
+        }).subscribe(new Action1<String>() {
             @Override
             public void call(String s) {
                 ReturnEntity<List<Object>> returnEntity = gson.fromJson(s, ReturnEntity.class);
@@ -235,15 +251,12 @@ public class TopicFragment extends BaseFragment {
                             }
                         }
 
-                    } else {
-                        toast(returnEntity.getMsg());
                     }
                 }
-                progress.setVisibility(View.GONE);
-                if (refreshLayout.isRefreshing()) {
-                    refreshLayout.setRefreshing(false);
-                }
-                getComments(topicid,topicEntity,position);
+
+                getComments(topicid, topicEntity, position);
+
+
             }
         });
     }
@@ -262,7 +275,7 @@ public class TopicFragment extends BaseFragment {
                     e.printStackTrace();
                 }
             }
-        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+        }).subscribe(new Action1<String>() {
             @Override
             public void call(String s) {
                 ReturnEntity<List<ReturnCommentEntity>> returnEntity = gson.fromJson(s, ReturnEntity.class);
@@ -273,20 +286,16 @@ public class TopicFragment extends BaseFragment {
                         List<ReturnCommentEntity> comments = returnEntity.getData();
                         if (comments != null) {
                             if (comments.size() != 0) {
-                               topicEntity.setComments(comments);
+                                topicEntity.setComments(comments);
                             }
                         }
-                    } else {
-                        Toast.makeText(getContext(), returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                     }
                 }
-                getAllThumb(topicEntity,position);
-
-
-
+                getAllThumb(topicEntity, position);
             }
         });
     }
+
     //获取点赞人列表
     private void getAllThumb(final TopicEntity topicEntity, final int position) {
         Observable.create(new Observable.OnSubscribe<String>() {
@@ -301,7 +310,7 @@ public class TopicFragment extends BaseFragment {
                     e.printStackTrace();
                 }
             }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
+        }).subscribe(new Action1<String>() {
             @Override
             public void call(String s) {
                 ReturnEntity<List<ReturnThumb>> returnEntity = gson.fromJson(s, ReturnEntity.class);
@@ -314,17 +323,17 @@ public class TopicFragment extends BaseFragment {
                             thumbs.add(thumb.getUserid());
                         }
                         topicEntity.setThumbPersonsNickname(thumbs);
-                    } else {
-                        Toast.makeText(getContext(), returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                     }
 
                 }
                 list.add(topicEntity);
-                if (position==topicNummber-1) {
-                    adapter.notifyDataSetChanged();
+                if (position == topicNummber - 1) {
+                    handler.sendEmptyMessage(1);
                 }
+
             }
         });
+
     }
 
     @Override

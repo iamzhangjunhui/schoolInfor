@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.cdxy.schoolinforapplication.HttpUrl;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.ScreenManager;
+import com.cdxy.schoolinforapplication.model.ReturnEntity;
 import com.cdxy.schoolinforapplication.model.UserInfor.UserInforEntity;
 import com.cdxy.schoolinforapplication.ui.Message.SendMessageActivity;
 import com.cdxy.schoolinforapplication.ui.base.BaseActivity;
@@ -45,6 +46,7 @@ import com.cdxy.schoolinforapplication.util.Constant;
 import com.cdxy.schoolinforapplication.util.GetUserInfor;
 import com.cdxy.schoolinforapplication.util.HttpUtil;
 import com.cdxy.schoolinforapplication.util.SharedPreferenceManager;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -66,8 +68,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
@@ -131,6 +135,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private ChooseWayDialog chooseWayDialog;
     private File file;
     private UserInforEntity userInfor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -265,10 +270,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
             }
         };
-        UserInforEntity userInforEntity=SharedPreferenceManager.instance(MainActivity.this).getUserInfor();
-        if (userInforEntity!=null){
-            String clazz=userInforEntity.getBanji();
-            String xibie=userInforEntity.getXibie();
+        UserInforEntity userInforEntity = SharedPreferenceManager.instance(MainActivity.this).getUserInfor();
+        if (userInforEntity != null) {
+            String clazz = userInforEntity.getBanji();
+            String xibie = userInforEntity.getXibie();
             if (!TextUtils.isEmpty(clazz))
                 tags.add(clazz);
             if (!TextUtils.isEmpty(xibie))
@@ -425,7 +430,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.layout_bottom_message:
                 txtTitle.setText("消息中心");
-//                String identity=SharedPreferenceManager.instance(MainActivity.this).getSharedPreferences().getString(SharedPreferenceManager.IDENTITY,null);
+                //                String identity=SharedPreferenceManager.instance(MainActivity.this).getSharedPreferences().getString(SharedPreferenceManager.IDENTITY,null);
                 String identity = "老师";
                 if (identity.equals("老师")) {
                     btnRight.setText("发送消息");
@@ -446,24 +451,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void updateMyMotto(final String userid, final String zuoyouming) {
-        OkHttpClient okHttpClient = HttpUtil.getClient();
-        Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_MOTTO + "?userid=" + userid + "&&zuoyouming=" + zuoyouming).get().build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+            public void call(Subscriber<? super String> subscriber) {
+                OkHttpClient okHttpClient = HttpUtil.getClient();
+                Request request = new Request.Builder().url(HttpUrl.UPDATE_MY_MOTTO + "?userid=" + userid + "&&zuoyouming=" + zuoyouming).get().build();
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    subscriber.onNext(response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                GetUserInfor.getMyInfor(MainActivity.this, userid);
-                Observable.just(zuoyouming).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        txtMyMotto.setText(zuoyouming);
-                    }
-                });
+            public void call(String s) {
+                ReturnEntity returnEntity = (new Gson()).fromJson(s, ReturnEntity.class);
+                if (returnEntity.getCode() == 1) {
+                    GetUserInfor.getMyInfor(MainActivity.this, userid);
+                    txtMyMotto.setText(zuoyouming);
 
+                }
             }
         });
 

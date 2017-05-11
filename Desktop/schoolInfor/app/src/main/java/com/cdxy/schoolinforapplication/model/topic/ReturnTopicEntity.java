@@ -10,7 +10,7 @@ public class ReturnTopicEntity {
     private String nickName;
     private String content;
     private String icon;//如果没有，使用默认头像
-    private String createTime;
+    private String createtime;
 
     public String getTopicid() {
         return topicid;
@@ -52,12 +52,12 @@ public class ReturnTopicEntity {
         this.icon = icon;
     }
 
-    public String getCreateTime() {
-        return createTime;
+    public String getCreatetime() {
+        return createtime;
     }
 
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
+    public void setCreatetime(String createtime) {
+        this.createtime = createtime;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ReturnTopicEntity {
                 ", nickName='" + nickName + '\'' +
                 ", content='" + content + '\'' +
                 ", icon='" + icon + '\'' +
-                ", createTime='" + createTime + '\'' +
+                ", createtime='" + createtime + '\'' +
                 '}';
     }
 }
