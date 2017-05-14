@@ -36,6 +36,7 @@
                       android:layout_height="match_parent"
                       android:background="@null"
                       android:textSize="@dimen/content_text_size"
+                      android:singleLine="true"
                       android:textColor="@color/text_color"
                       android:hint="@string/hint_register_nickname"
                       android:gravity="center_vertical"/>
@@ -66,6 +67,7 @@
                       android:layout_height="match_parent"
                       android:background="@null"
                       android:textSize="@dimen/content_text_size"
+                      android:singleLine="true"
                       android:textColor="@color/text_color"
                       android:hint="@string/hint_register_realname"
                       android:gravity="center_vertical"/>
@@ -162,6 +164,7 @@
                       android:layout_height="match_parent"
                       android:background="@null"
                       android:textSize="@dimen/content_text_size"
+                      android:singleLine="true"
                       android:textColor="@color/text_color"
                       android:hint="@string/hint_student_id"
                       android:gravity="center_vertical"/>
@@ -288,6 +291,7 @@
                       android:layout_height="match_parent"
                       android:background="@null"
                       android:textSize="@dimen/content_text_size"
+                      android:singleLine="true"
                       android:textColor="@color/text_color"
                       android:hint="@string/hint_address"
                       android:gravity="center_vertical"/>
@@ -311,6 +315,7 @@
                       android:layout_height="match_parent"
                       android:background="@null"
                       android:textSize="@dimen/content_text_size"
+                      android:singleLine="true"
                       android:textColor="@color/text_color"
                       android:hint="@string/hint_hobby"
                       android:gravity="center_vertical"/>

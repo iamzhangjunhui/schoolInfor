@@ -95,16 +95,46 @@ public class MyInformationActivity extends BaseActivity implements View.OnClickL
 
     private void setData(UserInforEntity userInfor) {
             if (!TextUtils.isEmpty(userInfor.getUserid())) {
-                txtNickname.setText(userInfor.getNicheng() + "");
-                txtRealname.setText(userInfor.getXingming() + "");
-                txtDepartment.setText(userInfor.getXibie() + "");
-                txtClass.setText(userInfor.getBanji() + "");
-                txtStudentId.setText(userInfor.getXuehao() + "");
-                txtSex.setText(userInfor.getXingbie() + "");
-                txtBirthday.setText(userInfor.getShengri() + "");
-                txtNation.setText(userInfor.getMinzu() + "");
-                txtAddress.setText(userInfor.getJia() + "");
-                txtHobby.setText(userInfor.getXingqu() + "");
+                String nickName=userInfor.getNicheng();
+                if (!nickName.equals("null")){
+                    txtNickname.setText(nickName);
+                }
+                String name=userInfor.getXingming();
+                if (!name.equals("null")){
+                    txtRealname.setText(name);
+                }
+                String department=userInfor.getXibie();
+                if (!department.equals("null")){
+                    txtDepartment.setText(department);
+                }
+                String clazz=userInfor.getBanji();
+                if (!clazz.equals("null")){
+                    txtClass.setText(clazz);
+                }
+                String studentid=userInfor.getXuehao();
+                if (!studentid.equals("null")){
+                    txtStudentId.setText(studentid);
+                }
+                String sex=userInfor.getXingbie();
+                if (!sex.equals("null")){
+                    txtSex.setText(sex);
+                }
+                String birthday=userInfor.getShengri();
+                if (!birthday.equals("null")){
+                    txtBirthday.setText(birthday);
+                }
+                String nation=userInfor.getMinzu();
+                if (!nation.equals("null")){
+                    txtNation.setText(nation);
+                }
+                String address=userInfor.getJia();
+                if (!address.equals("null")){
+                    txtAddress.setText(address);
+                }
+                String hobby=userInfor.getXingqu();
+                if (!hobby.equals("null")){
+                    txtHobby.setText(hobby);
+                }
             }
     }
 

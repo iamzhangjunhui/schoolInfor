@@ -63,7 +63,7 @@ public class NotifyDialog extends Dialog implements View.OnClickListener {
         dialogCancle.setOnClickListener(this);
         dialogOk.setOnClickListener(this);
         if (type.equals("delete_my_topic")){
-            dialogTitle.setText("删除该话题");
+            dialogTitle.setText("删除该话题吗？");
             dialogOk.setText("是的，删除");
             dialogCancle.setText("手贱，按错了");
         }

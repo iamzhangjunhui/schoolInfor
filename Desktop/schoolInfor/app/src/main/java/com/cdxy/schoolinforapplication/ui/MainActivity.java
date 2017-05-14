@@ -182,15 +182,24 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 Glide.with(MainActivity.this).load(R.drawable.icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgMyIcon);
                 Glide.with(MainActivity.this).load(R.drawable.icon).placeholder(R.drawable.loading).bitmapTransform(new CropCircleTransformation(MainActivity.this)).into(imgIcon);
             }
-            txtMyName.setText(userInfor.getXingming() + "");
-            txtMyClazz.setText(userInfor.getBanji() + "");
+            String name = userInfor.getXingming();
+            if (!TextUtils.equals(name, "null")) {
+                txtMyName.setText(name);
+            }
+            String clazz = userInfor.getBanji();
+            if (!TextUtils.equals(clazz, "null")) {
+                txtMyClazz.setText(clazz);
+            }
             String motto = userInfor.getZuoyouming();
-            if (TextUtils.isEmpty(motto)) {
+            if (TextUtils.equals(motto, "null")||TextUtils.isEmpty(motto)) {
                 txtMyMotto.setText("我的座右铭");
-            } else {
+            }else {
                 txtMyMotto.setText(motto);
             }
-            txtMyDepartment.setText(userInfor.getXibie());
+            String department = userInfor.getXibie();
+            if (!TextUtils.equals(department, "null")) {
+                txtMyDepartment.setText(department);
+            }
         }
 
     }

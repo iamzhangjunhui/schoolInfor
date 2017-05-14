@@ -81,8 +81,19 @@ public class ModifyMyPswActivity extends BaseActivity implements View.OnClickLis
                 break;
             case R.id.txt_right:
                 String newPassword = edtNewPsw.getText().toString();
+                String new2Password = edtSureNewPsw.getText().toString();
                 if (TextUtils.isEmpty(newPassword)) {
                     toast("请设置新密码");
+                    return;
+                }
+                if (TextUtils.isEmpty(new2Password)) {
+                    toast("请再次输入一下新密码");
+                    return;
+                }
+                if (TextUtils.equals(newPassword, new2Password)) {
+                toast("你设置的新密码与旧密码一样，请重新设置");
+                    edtNewPsw.setText("");
+                    edtSureNewPsw.setText("");
                     return;
                 }
                 if ((!TextUtils.isEmpty(oldPassword)) && (!TextUtils.isEmpty(userid))) {
@@ -96,7 +107,7 @@ public class ModifyMyPswActivity extends BaseActivity implements View.OnClickLis
     }
 
     private void modifyPassword(String userid, String oldPassword, final String newPassword) {
-       progress.setVisibility(View.VISIBLE);
+        progress.setVisibility(View.VISIBLE);
         OkHttpClient okHttpClient = HttpUtil.getClient();
         Request request = new Request.Builder().url(HttpUrl.UPDATE_PASSWORD + "?userid=" + userid + "&&oldPassword=" + oldPassword + "&&newPassword=" + oldPassword).get().build();
         okHttpClient.newCall(request).enqueue(new Callback() {

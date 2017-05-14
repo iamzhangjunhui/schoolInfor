@@ -138,7 +138,14 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
                 } else if (boy.isChecked()) {
                     sex = "男";
                 }
-                edtRealname.getText().toString();
+                String oldDepartment=userInfor.getXibie();
+                String nowDepartment=txtDepartment.getText().toString();
+                String oldClazz=userInfor.getBanji();
+                String nowClazz=txtClass.getText().toString();
+                if ((!TextUtils.equals(oldDepartment,nowDepartment))&&TextUtils.equals(oldClazz,nowClazz)){
+                    toast("你修改了系，请将班级也修改一下");
+                    return;
+                }
                 UserInforEntity userInforEntity = new UserInforEntity(userInfor.getUserid(), edtNickname.getText().toString(), edtRealname.getText().toString(),
                         txtDepartment.getText().toString(), txtClass.getText().toString(), edtStudentId.getText().toString(),
                         sex, txtBirthday.getText().toString(), txtNation.getText().toString(), edtAddress.getText().toString(),
@@ -178,20 +185,48 @@ public class ModifyMyInforActivity extends BaseActivity implements View.OnClickL
     private void setData() {
         if (userInfor != null) {
             if (!TextUtils.isEmpty(userInfor.getUserid())) {
-                edtNickname.setText(userInfor.getNicheng() + "");
-                edtRealname.setText(userInfor.getXingming() + "");
-                txtDepartment.setText(userInfor.getXibie() + "");
-                txtClass.setText(userInfor.getBanji() + "");
-                edtStudentId.setText(userInfor.getXuehao() + "");
-                if ((userInfor.getXingbie() + "").equals("女")) {
+                String nickName=userInfor.getNicheng();
+                if (!nickName.equals("null")){
+                    edtNickname.setText(nickName);
+                }
+                String name=userInfor.getXingming();
+                if (!name.equals("null")){
+                    edtRealname.setText(name);
+                }
+                String department=userInfor.getXibie();
+                if (!department.equals("null")){
+                    txtDepartment.setText(department);
+                }
+                String clazz=userInfor.getBanji();
+                if (!clazz.equals("null")){
+                    txtClass.setText(clazz);
+                }
+                String studentid=userInfor.getXuehao();
+                if (!studentid.equals("null")){
+                    edtRealname.setText(studentid);
+                }
+                String birthday=userInfor.getShengri();
+                if (!birthday.equals("null")){
+                    txtBirthday.setText(birthday);
+                }
+                String nation=userInfor.getMinzu();
+                if (!nation.equals("null")){
+                    txtNation.setText(nation);
+                }
+                String address=userInfor.getJia();
+                if (!address.equals("null")){
+                    edtAddress.setText(address);
+                }
+                String hobby=userInfor.getXingqu();
+                if (!hobby.equals("null")){
+                    edtHobby.setText(hobby);
+                }
+                String sex=userInfor.getXingbie();
+                if (sex.equals("女")) {
                     rgSex.check(R.id.girl);
-                } else if ((userInfor.getXingbie() + "").equals("男")) {
+                } else if (sex.equals("男")) {
                     rgSex.check(R.id.boy);
                 }
-                txtBirthday.setText(userInfor.getShengri() + "");
-                txtNation.setText(userInfor.getMinzu() + "");
-                edtAddress.setText(userInfor.getJia() + "");
-                edtHobby.setText(userInfor.getXingqu() + "");
             }
         }
     }

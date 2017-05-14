@@ -178,16 +178,11 @@ public class TopicAdapter extends BaseAdapter {
         }
         //加载讨论列表
         List<ReturnCommentEntity> comments = entity.getComments();
-        if(comments!=null){
-            if (comments.size()!=0){
+        if (comments != null) {
+            if (comments.size() > 0) {
                 commentContentAdapter = new TopicCommentContentAdapter(activity, comments);
                 viewHolder.scrollComments.setAdapter(commentContentAdapter);
-            }else {
-
             }
-        }else {
-
-
         }
         //长按一条自己发送的评论实现删除
         viewHolder.scrollComments.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -259,7 +254,7 @@ public class TopicAdapter extends BaseAdapter {
                         if (!TextUtils.isEmpty(myNikename) && (!TextUtils.isEmpty(receiverNickname))) {
                             ReturnCommentEntity commentEntity = new ReturnCommentEntity(topicid, myNikename, receiverNickname, newCommentcontent);
                             String json = gson.toJson(commentEntity);
-                            sendComment(json, entity,commentEntity);
+                            sendComment(json, entity, commentEntity);
                         }
                     }
                 });
@@ -269,20 +264,10 @@ public class TopicAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 if (!TextUtils.isEmpty(myNikename) && (!TextUtils.isEmpty(myUserid))) {
-                    boolean iHasThumb = entity.isiHasThumb();
                     String topicid = entity.getTopicid();
-
-                    if (iHasThumb) {
-                        //取消点赞
-                        notThumb(topicid, myUserid, entity);
-                    } else {
-                        //点赞
-                        ThumbEntity thumbEntity = new ThumbEntity(topicid, myUserid, myNikename);
-                        String jsonString = gson.toJson(thumbEntity);
-                        thumb(jsonString, entity,i);
-                    }
-
-
+                    ThumbEntity thumbEntity = new ThumbEntity(topicid, myUserid, myNikename);
+                    String jsonString = gson.toJson(thumbEntity);
+                    thumb(jsonString, entity, i);
                 } else {
                     Toast.makeText(activity, "你还没设置昵称，快去设置吧", Toast.LENGTH_SHORT).show();
                 }
@@ -298,7 +283,7 @@ public class TopicAdapter extends BaseAdapter {
 
     }
 
-    private void thumb(final String json, final TopicEntity topicEntity,int position) {
+    private void thumb(final String json, final TopicEntity topicEntity, int position) {
         Observable.create(new OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
@@ -317,10 +302,10 @@ public class TopicAdapter extends BaseAdapter {
                 ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
                 if (returnEntity != null) {
                     if (returnEntity.getCode() == 1) {
-                        if (topicEntity.isiHasThumb()){
+                        if (topicEntity.isiHasThumb()) {
                             topicEntity.setiHasThumb(false);
                             topicEntity.getThumbPersonsNickname().remove(myUserid);
-                        }else {
+                        } else {
                             topicEntity.setiHasThumb(true);
                             topicEntity.getThumbPersonsNickname().add(myUserid);
 
@@ -333,43 +318,6 @@ public class TopicAdapter extends BaseAdapter {
 
             }
         });
-    }
-    private void notThumb(final String topicid, final String userid, final TopicEntity topicEntity) {
-        Observable.create(new OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                OkHttpClient okHttpClient = HttpUtil.getClient();
-                Request request = new Request.Builder().url(HttpUrl.NOT_THUMB + "?topicid=" + topicid + "&&userid=" + userid).get().build();
-                try {
-                    Response response = okHttpClient.newCall(request).execute();
-                    subscriber.onNext(response.body().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.newThread()).subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
-                if (returnEntity != null) {
-                    if (returnEntity.getCode() == 1) {
-                        if (topicEntity.isiHasThumb()){
-                            topicEntity.setiHasThumb(false);
-                            topicEntity.getThumbPersonsNickname().remove(myUserid);
-                        }else {
-                            topicEntity.setiHasThumb(true);
-                            topicEntity.getThumbPersonsNickname().add(myUserid);
-                        }
-                        TopicAdapter.this.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-
-            }
-        });
-
     }
 
     private void sendComment(final String commentjson, final TopicEntity topicEntity, final ReturnCommentEntity commentEntity) {
@@ -391,7 +339,7 @@ public class TopicAdapter extends BaseAdapter {
                 ReturnEntity returnEntity = gson.fromJson(s, ReturnEntity.class);
                 if (returnEntity.getCode() == 1) {
                     topicEntity.getComments().add(commentEntity);
-                  TopicAdapter.this.notifyDataSetChanged();
+                    TopicAdapter.this.notifyDataSetChanged();
                 } else {
                     Toast.makeText(activity, returnEntity.getMsg(), Toast.LENGTH_SHORT).show();
                 }
@@ -484,10 +432,10 @@ public class TopicAdapter extends BaseAdapter {
 
             @Override
             public void onSuccess(Object... result) {
-                Observable.just("你已经申请添加"+target+"为好友").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
+                Observable.just("你已经申请添加" + target + "为好友").observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
                     @Override
                     public void call(String s) {
-                        Toast.makeText(activity,s,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, s, Toast.LENGTH_SHORT).show();
                     }
                 });
             }

@@ -7,21 +7,21 @@ import java.io.Serializable;
  */
 
 public class UserInforEntity implements Serializable {
-    private String userid;
-    private String mima;
-    private String nicheng;
-    private String xingming;
-    private String xibie;
-    private String banji;
-    private String xuehao;
-    private String xingbie;
-    private String shengri;
-    private String minzu;
-    private String jia;
-    private String xingqu;
-    private String shenfen;
-    private String touxiang;
-    private String zuoyouming;
+    private String userid="";
+    private String mima="";
+    private String nicheng="";
+    private String xingming="";
+    private String xibie="";
+    private String banji="";
+    private String xuehao="";
+    private String xingbie="";
+    private String shengri="";
+    private String minzu="";
+    private String jia="";
+    private String xingqu="";
+    private String shenfen="";
+    private String touxiang="";
+    private String zuoyouming="";
 
     public UserInforEntity() {
     }

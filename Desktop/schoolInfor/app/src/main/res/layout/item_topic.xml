@@ -27,7 +27,6 @@
                 android:id="@+id/txt_topic_nickname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="姓名"
                 android:textColor="@color/text_color"
                 android:textSize="@dimen/messege_title_text_size" />
 
@@ -35,7 +34,6 @@
                 android:id="@+id/txt_topic_create_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="yyyy_MM_dd"
                 android:textColor="@color/text_light_colored"
                 android:textSize="@dimen/small_text_size" />
         </LinearLayout>
@@ -49,7 +47,6 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="2dp"
-        android:text="话题内容"
         android:textColor="@color/text_color"
         android:textSize="@dimen/content_text_size" />
 

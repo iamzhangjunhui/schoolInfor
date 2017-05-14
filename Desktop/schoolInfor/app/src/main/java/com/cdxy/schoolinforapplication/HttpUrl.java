@@ -22,7 +22,6 @@ public class HttpUrl {
     public static final String ALL_TOPIC_PHOTOS=BASE_URL+"/topic/getPhotos";
     public static final String ALL_TOPIC_COMMENTS=BASE_URL+"/comment/getAllComment";
     public static final String THUMB=BASE_URL+"/like/addLike";
-    public static final String NOT_THUMB=BASE_URL+"/like/removeLike";
     public static final String SEND_COMMENT=BASE_URL+"/comment/addComment";
     public static final String UPDATE_PASSWORD=BASE_URL+"/rest/changePassword";
     public static final String DELETE_MY_TOPIC=BASE_URL+"/topic/delTopic";

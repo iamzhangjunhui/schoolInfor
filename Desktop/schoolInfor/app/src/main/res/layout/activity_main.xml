@@ -72,7 +72,6 @@
             android:onClick="onClick"
             android:paddingLeft="10dp"
             android:singleLine="true"
-            android:text="我的座右铭"
             android:textColor="@color/white"
             android:textSize="@dimen/content_text_size" />
 

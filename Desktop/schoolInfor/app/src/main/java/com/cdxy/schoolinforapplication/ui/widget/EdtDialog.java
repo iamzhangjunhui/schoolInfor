@@ -35,12 +35,20 @@ public class EdtDialog extends Dialog implements View.OnClickListener {
     public static String content = "";
     private Activity activity;
     private String type;
+    private String authorid;
 
     public EdtDialog(@NonNull Context context, @StyleRes int themeResId, AddFriendListener addFriendListener, Activity activity, String type) {
         super(context, themeResId);
         this.addFriendListener = addFriendListener;
         this.activity = activity;
         this.type = type;
+    }
+    public EdtDialog(@NonNull Context context, @StyleRes int themeResId, AddFriendListener addFriendListener, Activity activity, String type,String authorid) {
+        super(context, themeResId);
+        this.addFriendListener = addFriendListener;
+        this.activity = activity;
+        this.type = type;
+        this.authorid=authorid;
     }
 
     @Override
@@ -64,7 +72,9 @@ public class EdtDialog extends Dialog implements View.OnClickListener {
         getWindow().setAttributes(params);
         btnSure.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
-        if (type.equals(Constant.EDTDIALOG_TYPE_UPDATE_NAME)) {
+        if (type.equals(Constant.EDTDIALOG_TYPE_ADD_FRIEND)){
+            txtTitle.setText("回复"+authorid+"的好友请求:");
+        } else if (type.equals(Constant.EDTDIALOG_TYPE_UPDATE_NAME)) {
             txtTitle.setText("修改备注为：");
             btnSure.setText("确定");
             btnCancel.setText("取消");

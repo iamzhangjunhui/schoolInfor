@@ -58,6 +58,7 @@ public class TopicCommentContentAdapter extends BaseAdapter {
         ReturnCommentEntity commentContent= (ReturnCommentEntity) getItem(i);
         String content=commentContent.getContent();
         if (!TextUtils.isEmpty(content)){
+            viewHolder.commentContent.setVisibility(View.VISIBLE);
             //显示在屏幕上的发送者名称
             String senderNickName=commentContent.getSenderNickname();
             String receiverNickName=commentContent.getReceiverNickname();
@@ -69,6 +70,8 @@ public class TopicCommentContentAdapter extends BaseAdapter {
                 commentContentString="<font color='blue'>"+senderNickName+"</font>"+" 回复 "+"<font color='blue'>"+receiverNickName+":"+"</font>"+content;
             }
             viewHolder.commentContent.setText(Html.fromHtml(commentContentString));
+        }else {
+            viewHolder.commentContent.setVisibility(View.GONE);
         }
         return view;
     }

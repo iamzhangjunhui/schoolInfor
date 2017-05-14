@@ -59,7 +59,7 @@ public class ConversationListOperationCustomSample extends IMConversationListOpe
                             break;
                     }
                 }
-            },fragment.getActivity(), Constant.EDTDIALOG_TYPE_ADD_FRIEND);
+            },fragment.getActivity(), Constant.EDTDIALOG_TYPE_ADD_FRIEND,conversation.getLatestMessageAuthorId());
             isAddFriendDialog.show();
 
             return true;
