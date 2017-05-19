@@ -221,4 +221,22 @@
                 android:gravity="right" />
         </LinearLayout>
     </LinearLayout>
+
+    <!--<include layout="@layout/separate_line_1dp_margin10dp"/>-->
+    <!--<LinearLayout-->
+        <!--android:id="@+id/not_see_message"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:paddingTop="5dp"-->
+        <!--android:paddingBottom="5dp"-->
+        <!--android:paddingRight="10dp"-->
+        <!--android:paddingLeft="10dp">-->
+
+        <!--<Button-->
+            <!--android:id="@+id/not_see_list"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="未查看消息的学生列表"/>-->
+    <!--</LinearLayout>-->
 </LinearLayout>

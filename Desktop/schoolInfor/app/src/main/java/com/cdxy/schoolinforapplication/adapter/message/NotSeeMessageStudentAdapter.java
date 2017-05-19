@@ -2,7 +2,6 @@ package com.cdxy.schoolinforapplication.adapter.message;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import com.cdxy.schoolinforapplication.R;
 import com.cdxy.schoolinforapplication.model.message.MessageEntity;
 import com.cdxy.schoolinforapplication.model.message.NotSeeMessageStudentEntity;
-import com.cdxy.schoolinforapplication.ui.Message.NotSeeMessageStudentsActivity;
 import com.cdxy.schoolinforapplication.ui.widget.ChooseWayDialog;
 import com.cdxy.schoolinforapplication.util.Constant;
 
@@ -111,7 +109,7 @@ public class NotSeeMessageStudentAdapter extends BaseAdapter {
                                 break;
                             case R.id.txt_way2:
                                 intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + phoneNumber));
-                                String sender = messageEntity.getSender();
+                                String sender = messageEntity.getSendPersonName();
                                 String content = messageEntity.getContent();
                                 if ((!TextUtils.isEmpty(sender)) && (!TextUtils.isEmpty(content)))
                                     intent.putExtra("sms_body", content + "    --" + sender);

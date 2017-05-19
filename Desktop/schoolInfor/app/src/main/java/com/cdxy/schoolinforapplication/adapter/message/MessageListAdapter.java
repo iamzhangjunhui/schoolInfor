@@ -25,9 +25,9 @@ import butterknife.ButterKnife;
 public class MessageListAdapter extends BaseAdapter {
     private Context context;
     private List<MessageEntity> list;
-    private String messageFrom;
+    private int messageFrom;
 
-    public MessageListAdapter(Context context, List<MessageEntity> list, String messageFrom) {
+    public MessageListAdapter(Context context, List<MessageEntity> list, int messageFrom) {
         this.context = context;
         this.list = list;
         this.messageFrom = messageFrom;
@@ -62,17 +62,17 @@ public class MessageListAdapter extends BaseAdapter {
         String title = entity.getTitle();
         if (!TextUtils.isEmpty(title))
             viewHolder.txtMessageTitle.setText(title);
-        String sender = entity.getSender();
+        String sender = entity.getSendPersonName();
         if (!TextUtils.isEmpty(sender))
             viewHolder.txtMessageSender.setText(sender);
-        String acceptGroup = entity.getAcceptGroup();
+        String acceptGroup = entity.getSendTo();
         if (!TextUtils.isEmpty(acceptGroup))
             viewHolder.txtMessageAcceptGroup.setText(acceptGroup);
-        String sendTime = entity.getSendTime();
+        String sendTime = entity.getTime();
         if (!TextUtils.isEmpty(sendTime))
             viewHolder.txtMessageSendTime.setText(sendTime);
-        int messageType = entity.getType();
-        if (messageFrom.equals(Constant.MY_SEND_MESSAGE) && messageType == 1)
+        int messageType = entity.getMessageType();
+        if (messageFrom==Constant.MY_SEND_MESSAGE && messageType == 1)
             viewHolder.flagImportantMessage.setVisibility(View.VISIBLE);
         return view;
     }

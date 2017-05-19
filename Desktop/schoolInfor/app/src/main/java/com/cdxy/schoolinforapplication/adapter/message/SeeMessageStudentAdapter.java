@@ -58,16 +58,16 @@ public class SeeMessageStudentAdapter extends BaseAdapter {
         String name=entity.getName();
         if (!TextUtils.isEmpty(name))
             viewHolder.txtSeeMessageStudentName.setText(name);
-        String id=entity.getId();
+        String id=entity.getXuehao();
         if (!TextUtils.isEmpty(id))
             viewHolder.txtSeeMessageStudentId.setText(id);
-        String department=entity.getDepartment();
+        String department=entity.getXibie();
         if (!TextUtils.isEmpty(department))
             viewHolder.txtSeeMessageStudentDepartment.setText(department);
-        String clazz=entity.getClazz();
+        String clazz=entity.getBanji();
         if (!TextUtils.isEmpty(clazz))
         viewHolder.txtSeeMessageStudentClazz.setText(clazz);
-        String acceptTime=entity.getAccept_time();
+        String acceptTime=entity.getQueshi();
         if (!TextUtils.isEmpty(acceptTime))
             viewHolder.txtSeeMessageAcceptTime.setText(acceptTime);
         return view;
